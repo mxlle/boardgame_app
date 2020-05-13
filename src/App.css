@@ -1,0 +1,75 @@
+html, body, #root, .App {
+  height: 100%;
+  width: 100%;
+}
+
+.App {
+  text-align: center;
+  background-color: #fbf2e8;
+}
+
+.JustOne-banner {
+  width: 900px;
+}
+
+.Game-field {
+  display: flex;
+  width: 900px;
+  margin: 0 auto;
+}
+
+.Current-word, .Current-hints {
+  flex: 1;
+}
+
+.Word-card {
+  width: 400px;
+  height: 250px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  border-radius: 16px;
+  font-size: 32px;
+  margin: 16px auto;
+  outline: 2px solid black;
+  outline-offset: -16px;
+}
+
+.Word-hint-input button {
+  margin-left: 8px;
+}
+
+.Word-hint {
+  height: 100px;
+  width: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: white;
+  font-size: 48px;
+  margin: 16px auto;
+  outline: 1px solid black;
+  font-family: 'Gloria Hallelujah', cursive;
+}
+
+.Word-hint:nth-child(1) {
+  color: red;
+}
+.Word-hint:nth-child(2) {
+  color: blue;
+}
+.Word-hint:nth-child(3) {
+  color: purple;
+}
+.Word-hint:nth-child(4) {
+  color: orange;
+}
+.Word-hint:nth-child(5) {
+  color: green;
+}
+.Word-hint:nth-child(6) {
+  color: hotpink;
+}
+
+
