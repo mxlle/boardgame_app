@@ -1,3 +1,5 @@
+# ui -----------------------------
+
 # dependencies
 /ui/node_modules
 
@@ -6,3 +8,14 @@
 
 # production
 /ui/build
+
+# api ----------------------------
+
+# dependencies
+/api/node_modules
+
+# testing
+/api/coverage
+
+# production
+/api/build
