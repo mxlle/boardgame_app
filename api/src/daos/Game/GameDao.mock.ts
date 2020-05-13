@@ -1,5 +1,5 @@
 import { IGame } from '@entities/Game';
-import uuid4 from 'uuid4';
+const uuid4 = require('uuid4');
 import { MockDaoMock } from '../MockDb/MockDao.mock';
 import { IGameDao } from './GameDao';
 
@@ -36,6 +36,7 @@ class GameDao extends MockDaoMock implements IGameDao {
         try {
             const db = await super.openDb();
             if (!game.id) game.id = uuid4();
+            if (!db.games) db.games = [];
             db.games.push(game);
             await super.saveDb(db);
         } catch (err) {

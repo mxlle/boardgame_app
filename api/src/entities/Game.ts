@@ -1,4 +1,4 @@
-import uuid4 from 'uuid4';
+const uuid4 = require('uuid4');
 
 import { IUser } from './User';
 
