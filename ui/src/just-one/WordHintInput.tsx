@@ -42,9 +42,9 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
 	    		value={this.state.value} 
 	    		onChange={this.handleChange} 
 	    		onKeyPress={this.keyPressed} />
-			<Button variant="contained" color="primary" 
-				disabled={!this.state.value} 
-				onClick={this.submitHint}>Hinweis abschicken</Button>
+  			<Button variant="contained" color="primary" 
+  				disabled={!this.state.value} 
+  				onClick={this.submitHint}>Hinweis abschicken</Button>
 	    </div>
     );
   }

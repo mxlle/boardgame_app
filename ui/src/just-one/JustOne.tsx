@@ -1,18 +1,18 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 import logo from './Just_One_Banner.jpg';
-import {WordCard} from './WordCard';
-import {WordHint} from './WordHint';
-import {WordHintInput} from './WordHintInput';
+import {GameField} from './GameField';
+import {GameLobby} from './GameLobby';
 import { IGame } from 'boardgame_api/src/entities/Game';
+
+const GAME_ID = '005f2668-707f-4f50-9453-0c2a2dbfc32e';
 
 const API_URL = 'http://localhost:9000/api';
 const GAME_URL = API_URL + '/games';
 
 type JustOneProps = {};
 type JustOneState = {
-  currentWord: string, 
-  currentHints: string[]
+  currentGame?: IGame
 };
 
 export class JustOne extends React.Component<JustOneProps,JustOneState> {
@@ -24,34 +24,35 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     'Elefant',
     'Fussball',
   ];
+  private _interval: number = 0;
 
   constructor(props: JustOneProps) {
     super(props);
-    this.drawWord = this.drawWord.bind(this);
-    this.submitHint = this.submitHint.bind(this);
+
     this.createGame = this.createGame.bind(this);
-    this.state = { currentWord: '', currentHints: [] };
+
+    this.state = {};
   }
 
   componentDidMount() {
-    this.drawWord();
+    this.loadGame();
 
-    this.loadGames();
+    this._interval = setInterval(this.loadGame.bind(this), 1000);
   }
 
-  drawWord() {
-    const index = Math.floor(Math.random() * this.allWords.length);
-    const drawnWord = this.allWords[index];
-    this.setState({ 
-      currentWord: drawnWord,
-      currentHints: []
-    });
+  componentWillUnmount() {
+    clearInterval(this._interval);
   }
 
-  submitHint(hint: string) {
-    this.setState((state, props) => ({
-      currentHints: state.currentHints.concat([hint])
-    }));
+  loadGame(id: string = GAME_ID) {
+    fetch(`${GAME_URL}/${id}`)
+      .then(res => res.json())
+      .then((data) => {
+        this.setState({
+          currentGame: data.game
+        });
+      })
+      .catch(console.log)
   }
 
   loadGames() {
@@ -66,7 +67,8 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
   createGame() {
     const game: IGame = createGame();
     game.props.words = this.allWords;
-    game.props.players = [{ id: 1, name: 'Almut', email: 'email' }];
+    game.props.players = [{ id: '1', name: 'Almut', color: '#FF0044' }];
+    game.props.host = '1';
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -83,31 +85,27 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
   }
 
   render() {
-    const currentWord = this.state.currentWord;
-    const currentHints = this.state.currentHints.map(hint => 
-      <WordHint hint={hint} />
-    );
+    let optionalContent: React.ReactElement;
+    if (this.state.currentGame) {
+      if (this.state.currentGame.state.phase === 0) { // TODO GamePhase.Init
+        optionalContent = <GameLobby game={this.state.currentGame}></GameLobby>
+      } else {
+        optionalContent = <GameField game={this.state.currentGame}></GameField>;
+      }
+    } else {
+      optionalContent = <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>;
+    }
 
     return (
       <div>
         <img src={logo} className="JustOne-banner" alt="logo" />
-        <h1>Spiele jetzt Just One</h1>
-        <div className="Game-field">
-          <div className="Current-word">
-            <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
-            <Button variant="contained" color="primary" onClick={this.drawWord}>Neues Wort</Button>
-            <WordCard word={currentWord}/>
-          </div>
-          <div className="Current-hints">
-            <WordHintInput submitHint={this.submitHint}/>
-            <div className="WordHint-list">{currentHints}</div>
-          </div>
-        </div>
+        <h1>Spiele jetzt Just One</h1>     
+        {optionalContent}
       </div>
     );
   }
 }
 
 function createGame(): IGame {
-    return {"id":"","props":{"words":[],"players":[]},"state":{"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]}};
+    return {"id":"","props":{"words":[],"players":[],"host":"1"},"state":{"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]}};
 }

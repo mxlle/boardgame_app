@@ -18,6 +18,7 @@ export enum GamePhase {
 interface IGameProps {
     words: string[];
     players: IUser[];
+    host: string; // hostId
 }
 
 interface IGameState {
@@ -41,11 +42,12 @@ class Game implements IGame {
     public props: IGameProps;
     public state: IGameState;
 
-    constructor(words: string[] = [], players: IUser[] = []) {
+    constructor(words: string[] = [], players: IUser[] = [], host: string = '1') { // TODO
         this.id = uuid4();
         this.props = {
             words: words,
-            players: players
+            players: players,
+            host: host
         };
         this.state = {
             round: 0,

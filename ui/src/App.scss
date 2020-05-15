@@ -1,3 +1,8 @@
+$appBackground: #fbf2e8;
+$gridSize: 8px;
+$standardMargin: 2*$gridSize;
+$pageContentWidth: 900px;
+
 html, body, #root, .App {
   height: 100%;
   width: 100%;
@@ -5,17 +10,31 @@ html, body, #root, .App {
 
 .App {
   text-align: center;
-  background-color: #fbf2e8;
+  background-color: $appBackground;
 }
 
 .JustOne-banner {
-  width: 900px;
+  width: $pageContentWidth;
+}
+
+.Game-lobby {
+  display: flex;
+  width: $pageContentWidth;
+  margin: $standardMargin auto;
+}
+
+.New-player, .Player-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center; 
 }
 
 .Game-field {
   display: flex;
-  width: 900px;
-  margin: 0 auto;
+  width: $pageContentWidth;
+  margin: $standardMargin auto;
 }
 
 .Current-word, .Current-hints {
@@ -29,11 +48,11 @@ html, body, #root, .App {
   align-items: center;
   justify-content: center;
   background-color: white;
-  border-radius: 16px;
+  border-radius: $standardMargin;
   font-size: 32px;
-  margin: 16px auto;
+  margin: $standardMargin auto;
   outline: 2px solid black;
-  outline-offset: -16px;
+  outline-offset: -$standardMargin;
 }
 
 .Word-hint-input button {
@@ -48,28 +67,8 @@ html, body, #root, .App {
   justify-content: center;
   background-color: white;
   font-size: 48px;
-  margin: 16px auto;
+  margin: $standardMargin auto;
   outline: 1px solid black;
   font-family: 'Gloria Hallelujah', cursive;
 }
-
-.Word-hint:nth-child(1) {
-  color: red;
-}
-.Word-hint:nth-child(2) {
-  color: blue;
-}
-.Word-hint:nth-child(3) {
-  color: purple;
-}
-.Word-hint:nth-child(4) {
-  color: orange;
-}
-.Word-hint:nth-child(5) {
-  color: green;
-}
-.Word-hint:nth-child(6) {
-  color: hotpink;
-}
-
 

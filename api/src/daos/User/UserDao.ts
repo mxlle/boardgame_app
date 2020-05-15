@@ -6,7 +6,7 @@ export interface IUserDao {
     getAll: () => Promise<IUser[]>;
     add: (user: IUser) => Promise<void>;
     update: (user: IUser) => Promise<void>;
-    delete: (id: number) => Promise<void>;
+    delete: (id: string) => Promise<void>;
 }
 
 class UserDao implements IUserDao {
@@ -54,7 +54,7 @@ class UserDao implements IUserDao {
      *
      * @param id
      */
-    public async delete(id: number): Promise<void> {
+    public async delete(id: string): Promise<void> {
         // TODO
         return {} as any;
     }

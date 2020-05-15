@@ -1,25 +1,29 @@
+const uuid4 = require('uuid4');
+
 export interface IUser {
-    id: number;
+    id: string;
     name: string;
-    email: string;
+    color?: string;
 }
 
 class User implements IUser {
 
-    public id: number;
+    public id: string;
     public name: string;
-    public email: string;
+    public color: string;
 
-    constructor(nameOrUser: string | IUser, email?: string, id?: number) {
+    constructor(nameOrUser: string | IUser, color?: string, id?: string) {
         if (typeof nameOrUser === 'string') {
             this.name = nameOrUser;
-            this.email = email || '';
-            this.id = id || -1;
+            this.color = color || '';
+            this.id = id || '';
         } else {
             this.name = nameOrUser.name;
-            this.email = nameOrUser.email;
+            this.color = nameOrUser.color || '';
             this.id = nameOrUser.id;
         }
+
+        if (!this.id) this.id = uuid4();
     }
 }
 
