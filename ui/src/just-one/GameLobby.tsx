@@ -1,12 +1,15 @@
 import React from 'react';
-import { IGame } from 'boardgame_api/src/entities/Game';
-import { IUser } from 'boardgame_api/src/entities/User';
+import { IGame, IUser } from '../custom.d';
 import { Button } from '@material-ui/core';
-import TextField from '@material-ui/core/TextField';
 import { WordHint } from './WordHint';
+import { NewPlayer } from './NewPlayer';
 
 const API_URL = 'http://localhost:9000/api';
 const GAME_URL = API_URL + '/games';
+
+const SETTING_ID = 'playerId';
+const SETTING_NAME = 'playerName';
+const SETTING_COLOR = 'playerColor';
 
 type GameLobbyProps = {
   game: IGame
@@ -19,8 +22,8 @@ type GameLobbyState = {
 export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
   public state: GameLobbyState = { 
-    name: '',
-    color: '#000000'
+    name: localStorage.getItem(SETTING_NAME) || '',
+    color: localStorage.getItem(SETTING_COLOR) || 'black'
   };
 
   constructor(props: GameLobbyProps) {
@@ -43,9 +46,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
   }
 
-  addPlayer() {
-    const player = { id: '', name: this.state.name, color: this.state.color };
-
+  addPlayer(player: IUser) {
     fetch(`${GAME_URL}/${this.props.game.id}/addPlayer`, {
       method: 'PUT',
       headers: {
@@ -53,13 +54,21 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({player})
-    }).then((data) => {
+    }).then(res => res.json())
+      .then((data) => {
+        this.setLocalPlayer(data.player);
         this.setState({
-          color: '#000000',
+          color: 'black',
           name: ''
         });
       })
       .catch(console.log)
+  }
+
+  setLocalPlayer(player: IUser) {
+    localStorage.setItem('playerId', player.id);
+    localStorage.setItem('playerName', player.name);
+    if (player.color) localStorage.setItem('playerColor', player.color);
   }
 
   startGame() {
@@ -76,23 +85,18 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
       <WordHint key={player.id} hint={player.name} color={player.color}></WordHint>
     ));
 
-    const currentUser: IUser = this.props.game.players[0]; // TODO
-    const isHost: boolean = this.props.game.host === currentUser.id;
+    const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
+    const isHost: boolean = !!currentUserId && this.props.game.host === currentUserId;
+    const isInGame: boolean = !!currentUserId && this.props.game.players.findIndex(player => player.id === currentUserId) > -1;
 
     return (
       <div className="Game-lobby">
         <div className="New-player">
-          <TextField required label="Spielername" 
-            name='name'
-            value={this.state.name} 
-            onChange={this.handleChange}  />
-          <TextField required label="Spielerfarbe" 
-            name='color'
-            value={this.state.color} 
-            onChange={this.handleChange}  />
-          <Button variant="contained" color="primary" 
-            disabled={!this.state.name} 
-            onClick={this.addPlayer}>Mitspielen</Button>
+          { 
+            !isInGame && 
+            <NewPlayer name={this.state.name} color={this.state.color}
+              addPlayer={this.addPlayer}></NewPlayer>
+          }
           {
             isHost && 
             <Button variant="contained" color="primary" 

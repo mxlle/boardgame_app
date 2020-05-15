@@ -1,4 +1,5 @@
 import { IUser } from './User';
+export { IUser }; // reexport
 
 export interface IHint {
     hint: string;
@@ -16,6 +17,7 @@ export enum GamePhase {
 
 export interface IGame {
     id: string;
+    name: string;
     words: string[];
     players: IUser[];
     host: string; // hostId

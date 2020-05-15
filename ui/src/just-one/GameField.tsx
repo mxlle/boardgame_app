@@ -1,14 +1,15 @@
 import React from 'react';
 import { Button } from '@material-ui/core';
 import {WordCard} from './WordCard';
-import { IGame, IHint } from 'boardgame_api/src/entities/Game';
-import { IUser } from 'boardgame_api/src/entities/User';
+import { IGame, IHint, IUser } from '../custom.d';
 import {WordHint} from './WordHint';
 import {WordHintInput} from './WordHintInput';
 import {GameStats} from './GameStats';
 
 const API_URL = 'http://localhost:9000/api';
 const GAME_URL = API_URL + '/games';
+
+const SETTING_ID = 'playerId';
 
 type GameFieldProps = {
   game: IGame
@@ -18,6 +19,8 @@ type GameFieldState = {
 };
 
 export class GameField extends React.Component<GameFieldProps,GameFieldState> {
+  public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
+
   constructor(props: GameFieldProps) {
     super(props);
 
@@ -33,7 +36,9 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
   }
 
   submitHint(hintWord: string) {
-    const hint: IHint = { hint: hintWord, author: getCurrentUser(this.props.game)};
+    const currentUser = getCurrentUser(this.props.game, this.currentUserId);
+    if (!currentUser) return; // TODO
+    const hint: IHint = { hint: hintWord, author: currentUser};
 
     fetch(`${GAME_URL}/${this.props.game.id}/hint`, {
       method: 'PUT',
@@ -64,9 +69,9 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
 
   render() {
     const game: IGame = this.props.game;
-    const currentUser = getCurrentUser(game); // TODO
+    const currentUser = getCurrentUser(game, this.currentUserId); // TODO
     const guesser = game.currentGuesser ? game.currentGuesser : { name: '?', id: '?' }; // TODO
-    const isGuesser = (currentUser.id === guesser.id);
+    const isGuesser = currentUser && currentUser.id === guesser.id;
 
     const isComparingPhase = game.phase === 2 // TODO GamePhase.HintComparing;
     const isGuessingPhase = game.phase === 3; // GamePhase.Guessing;
@@ -77,8 +82,8 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
       if (isGuessingPhase) {
         hint = isGuesser && hintObj.isDuplicate ? 'LEIDER DOPPELT' : hintObj.hint;
       } else if (isComparingPhase) {
-        if (true || !isGuesser) hint = hintObj.hint; // TODO
-      } else if (currentUser.id === hintObj.author.id ) {
+        if (!isGuesser) hint = hintObj.hint;
+      } else if (currentUser && currentUser.id === hintObj.author.id ) {
         hint = hintObj.hint || '...';
       }
       return <WordHint key={hintObj.author.id} hint={hint} color={hintObj.author.color} duplicate={hintObj.isDuplicate} />
@@ -89,20 +94,18 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
         <div className="Current-word">
           <GameStats game={game}></GameStats>
           <WordCard word={currentWord}/>
-          {isGuessingPhase && <WordHintInput submitHint={this.guess} label="Rateversuch" buttonText="Jetzt raten"/>}
+          {isGuessingPhase && isGuesser && <WordHintInput submitHint={this.guess} label="Rateversuch" buttonText="Jetzt raten"/>}
         </div>
         <div className="Current-hints">
-          <WordHintInput submitHint={this.submitHint}/>
+          {!isGuesser && <WordHintInput submitHint={this.submitHint}/>}
           <div className="WordHint-list">{currentHints}</div>
-          {isComparingPhase && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
+          {isComparingPhase && !isGuesser && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
         </div>
       </div>
     );
   }
 }
 
-function getCurrentUser(game: IGame): IUser {
-  const emptyHint: IHint|undefined = game.hints.find(h => !h.hint);
-  let user: IUser = (emptyHint && emptyHint.author) || game.currentGuesser || game.players[0];
-  return user;
+function getCurrentUser(game: IGame, currentUserId: string): IUser|undefined {
+  return game.players.find(player => player.id === currentUserId);
 }

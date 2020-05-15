@@ -35,9 +35,18 @@ if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
 }
 
-app.use(cors({
-  origin: 'http://localhost:3000'
-}));
+var whitelist = ['http://localhost:3000', 'http://0.0.0.0:3000']
+var corsOptions = {
+  origin: function (origin: string, callback: any) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true)
+    } else {
+      callback(new Error('Not allowed by CORS'))
+    }
+  }
+}
+
+app.use(cors(corsOptions));
 
 // Add APIs
 app.use('/api', BaseRouter);

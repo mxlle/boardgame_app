@@ -11,6 +11,14 @@ html, body, #root, .App {
 .App {
   text-align: center;
   background-color: $appBackground;
+  >div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+      Button {
+        margin: $gridSize;
+      }
+  }
 }
 
 .JustOne-banner {
@@ -23,6 +31,12 @@ html, body, #root, .App {
   flex-direction: column;
   align-items: center;
   justify-content: center; 
+  Button {
+    margin: $gridSize;
+  }
+  .Word-hint:last-child {
+    outline-style: dotted
+  }
 }
 
 .Game-lobby, .Game-field, .Game-end-view {
@@ -73,7 +87,7 @@ html, body, #root, .App {
   background-color: white;
   font-size: 48px;
   margin: $standardMargin auto;
-  outline: 1px solid black;
+  outline: 2px solid black;
   font-family: 'Gloria Hallelujah', cursive;
 }
 

@@ -1,22 +1,27 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@material-ui/core';
 import logo from './Just_One_Banner.jpg';
 import {GameField} from './GameField';
 import {GameLobby} from './GameLobby';
 import {GameEndView} from './GameEndView';
-import { IGame } from 'boardgame_api/src/entities/Game';
-
-const GAME_ID = '005f2668-707f-4f50-9453-0c2a2dbfc32e';
+import { IGame } from '../custom.d';
 
 const API_URL = 'http://localhost:9000/api';
 const GAME_URL = API_URL + '/games';
 
-type JustOneProps = {};
+const SETTING_ID = 'playerId';
+
+type JustOneProps = {
+  gameId?: string;
+};
 type JustOneState = {
-  currentGame?: IGame
+  currentGame?: IGame,
+  allGames?: IGame[]
 };
 
 export class JustOne extends React.Component<JustOneProps,JustOneState> {
+  public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
   allWords = [
     'Ananas',
     'Bauernhof',
@@ -25,28 +30,36 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     'Elefant',
     'Fussball',
   ];
-  private _interval: number = 0;
+  private _interval: any; // TODO
 
   constructor(props: JustOneProps) {
     super(props);
 
     this.createGame = this.createGame.bind(this);
-    this.resetGame = this.resetGame.bind(this);
 
     this.state = {};
   }
 
   componentDidMount() {
-    this.loadGame();
+    if (this.props.gameId) {
+      this.loadGame();
 
-    this._interval = setInterval(this.loadGame.bind(this), 1000);
+      this._interval = setInterval(this.loadGame.bind(this), 1000);
+    } else {
+      this.loadGames();
+
+      this._interval = setInterval(this.loadGames.bind(this), 1000);
+    }
   }
 
   componentWillUnmount() {
     clearInterval(this._interval);
   }
 
-  loadGame(id: string = GAME_ID) {
+  loadGame() {
+    let id = this.props.gameId;
+    if (!id) return;
+
     fetch(`${GAME_URL}/${id}`)
       .then(res => res.json())
       .then((data) => {
@@ -61,29 +74,13 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     fetch(`${GAME_URL}/all`)
       .then(res => res.json())
       .then((data) => {
-        console.log(data);
-      })
-      .catch(console.log)
-  }
-
-  resetGame() {
-    const game: IGame = createGame();
-    game.words = this.allWords;
-    game.players = [{ id: '1', name: 'Almut', color: '#FF0044' }];
-    game.host = '1';
-
-    if (this.state.currentGame) game.id = this.state.currentGame.id;
-
-    fetch(`${GAME_URL}/update`, {
-      method: 'PUT',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({game})
-    }).then((data) => {
-        console.log(data);
-        this.loadGames();
+        let games = data.games;
+        games = games.filter((game: IGame) => {
+          return game.phase === 0 || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
+        });
+        this.setState({
+          allGames: games
+        });
       })
       .catch(console.log)
   }
@@ -91,8 +88,6 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
   createGame() {
     const game: IGame = createGame();
     game.words = this.allWords;
-    game.players = [{ id: '1', name: 'Almut', color: '#FF0044' }];
-    game.host = '1';
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -103,7 +98,6 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
       body: JSON.stringify({game})
     }).then((data) => {
         console.log(data);
-        this.loadGames();
       })
       .catch(console.log)
   }
@@ -112,31 +106,37 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     const currentGame: IGame|undefined = this.state.currentGame;
 
     let optionalContent: React.ReactElement;
+    let gameList;
     if (currentGame) {
       if (currentGame.phase === 0) { // TODO GamePhase.Init
         optionalContent = <GameLobby game={currentGame}></GameLobby>
       } else if (currentGame.phase === 4) { // TODO GamePhase.End
         optionalContent = (<div>
-          <Button variant="contained" color="primary" onClick={this.resetGame}>Neues Spiel</Button>
+          <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
           <GameEndView game={currentGame}></GameEndView>
         </div>);
       } else {
         optionalContent = <GameField game={currentGame}></GameField>;
       }
     } else {
+      if (this.state.allGames) gameList = this.state.allGames.map(game => (
+        <Link key={game.id} to={`/${game.id}`}>{`Play ${game.id}`}</Link>
+      ));
       optionalContent = <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>;
     }
 
     return (
       <div>
         <img src={logo} className="JustOne-banner" alt="logo" />
-        <h1>Spiele jetzt Just One</h1>     
+        <h1>Spiele jetzt Just One</h1>   
+        {!!currentGame && <Link to="/">Zur Startseite</Link>}
         {optionalContent}
+        {gameList}
       </div>
     );
   }
 }
 
 function createGame(): IGame {
-    return {"id":"","words":[],"players":[],"host":"1","round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
+    return {"id":"", "name": "", "words":[],"players":[],"host":"1","round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }

@@ -1,28 +1,12 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
 import {WordCard} from './WordCard';
-import { IGame } from 'boardgame_api/src/entities/Game';
-const API_URL = 'http://localhost:9000/api';
-const GAME_URL = API_URL + '/games';
+import { IGame } from '../custom.d';
 
 type GameEndViewProps = {
   game: IGame
 };
-type GameEndViewState = {
 
-};
-
-export class GameEndView extends React.Component<GameEndViewProps,GameEndViewState> {
-  constructor(props: GameEndViewProps) {
-    super(props);
-
-    this.state = {  };
-  }
-
-  componentDidMount() {
-
-  }
-
+export class GameEndView extends React.Component<GameEndViewProps> {
   render() {
     const game: IGame = this.props.game;
     const correctWords = game.correctWords.map(word => {
