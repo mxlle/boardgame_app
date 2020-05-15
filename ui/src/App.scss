@@ -17,12 +17,6 @@ html, body, #root, .App {
   width: $pageContentWidth;
 }
 
-.Game-lobby {
-  display: flex;
-  width: $pageContentWidth;
-  margin: $standardMargin auto;
-}
-
 .New-player, .Player-list {
   flex: 1;
   display: flex;
@@ -31,14 +25,16 @@ html, body, #root, .App {
   justify-content: center; 
 }
 
-.Game-field {
+.Game-lobby, .Game-field, .Game-end-view {
   display: flex;
   width: $pageContentWidth;
   margin: $standardMargin auto;
 }
 
-.Current-word, .Current-hints {
+.Current-word, .Current-hints, .Correct-words, .Wrong-words {
   flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .Word-card {
@@ -55,13 +51,22 @@ html, body, #root, .App {
   outline-offset: -$standardMargin;
 }
 
+.Game-end-view {
+  .Word-card {
+    width: 200px;
+    height: 125px;
+    font-size: 16px;
+    margin: $gridSize auto;
+  }
+}
+
 .Word-hint-input button {
   margin-left: 8px;
 }
 
 .Word-hint {
   height: 100px;
-  width: 400px;
+  min-width: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -70,5 +75,10 @@ html, body, #root, .App {
   margin: $standardMargin auto;
   outline: 1px solid black;
   font-family: 'Gloria Hallelujah', cursive;
+}
+
+.Game-progress {
+  display: flex;
+  margin: $standardMargin auto;
 }
 

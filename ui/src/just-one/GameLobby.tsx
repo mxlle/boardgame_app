@@ -3,8 +3,7 @@ import { IGame } from 'boardgame_api/src/entities/Game';
 import { IUser } from 'boardgame_api/src/entities/User';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
-import {WordHint} from './WordHint';
-const ColorPicker = require('material-ui-color-picker');
+import { WordHint } from './WordHint';
 
 const API_URL = 'http://localhost:9000/api';
 const GAME_URL = API_URL + '/games';
@@ -28,7 +27,6 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     super(props);
 
     this.handleChange = this.handleChange.bind(this);
-    this.handleColorChange = this.handleColorChange.bind(this);
     this.addPlayer = this.addPlayer.bind(this);
     this.startGame = this.startGame.bind(this);
   }
@@ -38,17 +36,15 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
       this.setState({
         name: event.target.value
       });  
+    } else if (event.target.name === 'color') {
+      this.setState({
+        color: event.target.value
+      });  
     }
   }
 
-  handleColorChange(color: string) {
-    this.setState({
-      color: color
-    });  
-  }
-
   addPlayer() {
-    const player = { name: this.state.name, color: this.state.color };
+    const player = { id: '', name: this.state.name, color: this.state.color };
 
     fetch(`${GAME_URL}/${this.props.game.id}/addPlayer`, {
       method: 'PUT',
@@ -81,6 +77,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     ));
 
     const currentUser: IUser = this.props.game.players[0]; // TODO
+    const isHost: boolean = this.props.game.host === currentUser.id;
 
     return (
       <div className="Game-lobby">
@@ -89,18 +86,15 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             name='name'
             value={this.state.name} 
             onChange={this.handleChange}  />
-          <ColorPicker
+          <TextField required label="Spielerfarbe" 
             name='color'
-            label='Spielerfarbe'
-            defaultValue={this.state.color}
-            value={this.state.color}
-            onChange={this.handleColorChange}
-          />
+            value={this.state.color} 
+            onChange={this.handleChange}  />
           <Button variant="contained" color="primary" 
             disabled={!this.state.name} 
             onClick={this.addPlayer}>Mitspielen</Button>
           {
-            this.props.game.host === currentUser.id && 
+            isHost && 
             <Button variant="contained" color="primary" 
               disabled={this.props.game.players.length < 3} 
               onClick={this.startGame}>Spiel beginnen</Button>

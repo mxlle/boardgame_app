@@ -12,7 +12,6 @@
     "@types/react": "^16.9.35",
     "@types/react-dom": "^16.9.8",
     "boardgame_api": "file:../api",
-    "material-ui-color-picker": "^3.5.0",
     "node-sass": "^4.14.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",

@@ -4,7 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 const uuid4 = require('uuid4');
 
 import GameDao from '@daos/Game/GameDao.mock';
-import { GamePhase } from '@entities/Game';
+import * as GameController from '@entities/Game';
 import { paramMissingError, gameNotFoundError } from '@shared/constants';
 
 // Init shared
@@ -65,7 +65,7 @@ router.put('/update', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Add player to game - "GET /api/games/:id/addPlay"
+ *                      Add player to game - "PUT /api/games/:id/addPlay"
  ******************************************************************************/
 
 router.put('/:id/addPlayer', async (req: Request, res: Response) => {
@@ -91,7 +91,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Start game - "GET /api/games/:id/start"
+ *                      Start game - "PUT /api/games/:id/start"
  ******************************************************************************/
 
 router.put('/:id/start', async (req: Request, res: Response) => {
@@ -102,12 +102,77 @@ router.put('/:id/start', async (req: Request, res: Response) => {
         });
     }
 
-    game.phase = GamePhase.HintWriting;
+    GameController.startGame(game);
 
     await gameDao.update(game);
     return res.status(OK).end();
 });
 
+/******************************************************************************
+ *                      Send hint - "PUT /api/games/:id/hint"
+ ******************************************************************************/
+
+router.put('/:id/hint', async (req: Request, res: Response) => {
+    const { hint } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!hint) {
+        return res.status(BAD_REQUEST).json({
+            error: paramMissingError,
+        });
+    }
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.addHint(game, hint.hint, hint.author.id);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
+
+/******************************************************************************
+ *                      Send hint - "PUT /api/games/:id/showHints"
+ ******************************************************************************/
+
+router.put('/:id/showHints', async (req: Request, res: Response) => {
+    const game = await gameDao.getOne(req.params.id);
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.showHints(game);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
+
+/******************************************************************************
+ *                      Send hint - "PUT /api/games/:id/guess"
+ ******************************************************************************/
+
+router.put('/:id/guess', async (req: Request, res: Response) => {
+    const { guess } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!guess) {
+        return res.status(BAD_REQUEST).json({
+            error: paramMissingError,
+        });
+    }
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.guess(game, guess);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
 
 /******************************************************************************
  *                    Delete - "DELETE /api/games/delete/:id"

@@ -4,6 +4,8 @@ import TextField from '@material-ui/core/TextField';
 
 type WordHintInputProps = {
   submitHint: (hint: string)=>void
+  label?: string,
+  buttonText?: string
 };
 type WordHintInputState = {
   value: string, 
@@ -38,13 +40,13 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
   render() {
     return (
 	    <div className="Word-hint-input">
-	    	<TextField required label="Wort-Hinweis" 
+	    	<TextField required label={this.props.label || 'Wort-Hinweis'}
 	    		value={this.state.value} 
 	    		onChange={this.handleChange} 
 	    		onKeyPress={this.keyPressed} />
   			<Button variant="contained" color="primary" 
   				disabled={!this.state.value} 
-  				onClick={this.submitHint}>Hinweis abschicken</Button>
+  				onClick={this.submitHint}>{this.props.buttonText || 'Hinweis abschicken'}</Button>
 	    </div>
     );
   }
