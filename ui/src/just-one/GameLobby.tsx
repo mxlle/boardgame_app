@@ -4,8 +4,7 @@ import { Button } from '@material-ui/core';
 import { WordHint } from './WordHint';
 import { NewPlayer } from './NewPlayer';
 
-const API_URL = 'http://localhost:9000/api';
-const GAME_URL = API_URL + '/games';
+import { GAME_URL } from '../App';
 
 const SETTING_ID = 'playerId';
 const SETTING_NAME = 'playerName';

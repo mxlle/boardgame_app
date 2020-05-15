@@ -6,8 +6,7 @@ import {WordHint} from './WordHint';
 import {WordHintInput} from './WordHintInput';
 import {GameStats} from './GameStats';
 
-const API_URL = 'http://localhost:9000/api';
-const GAME_URL = API_URL + '/games';
+import { GAME_URL } from '../App';
 
 const SETTING_ID = 'playerId';
 

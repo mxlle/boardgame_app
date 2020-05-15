@@ -7,8 +7,7 @@ import {GameLobby} from './GameLobby';
 import {GameEndView} from './GameEndView';
 import { IGame } from '../custom.d';
 
-const API_URL = 'http://localhost:9000/api';
-const GAME_URL = API_URL + '/games';
+import { GAME_URL } from '../App';
 
 const SETTING_ID = 'playerId';
 
@@ -59,6 +58,8 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
   loadGame() {
     let id = this.props.gameId;
     if (!id) return;
+
+    console.log(GAME_URL);
 
     fetch(`${GAME_URL}/${id}`)
       .then(res => res.json())
