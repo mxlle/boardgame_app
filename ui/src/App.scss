@@ -3,14 +3,20 @@ $gridSize: 8px;
 $standardMargin: 2*$gridSize;
 $pageContentWidth: 900px;
 
-html, body, #root, .App {
+html {
   height: 100%;
   width: 100%;
 }
 
+body, #root, .App {
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  background-color: $appBackground;
+}
+
 .App {
   text-align: center;
-  background-color: $appBackground;
   >div {
     display: flex;
     flex-direction: column;
@@ -23,6 +29,7 @@ html, body, #root, .App {
 
 .JustOne-banner {
   width: $pageContentWidth;
+  max-width: 100%;
 }
 
 .New-player, .Player-list {
@@ -42,7 +49,9 @@ html, body, #root, .App {
 .Game-lobby, .Game-field, .Game-end-view {
   display: flex;
   width: $pageContentWidth;
+  max-width: 100%;
   margin: $standardMargin auto;
+  flex-wrap: wrap
 }
 
 .Current-word, .Current-hints, .Correct-words, .Wrong-words {
@@ -53,6 +62,7 @@ html, body, #root, .App {
 
 .Word-card {
   width: 400px;
+  max-width: 100%;
   height: 250px;
   display: flex;
   align-items: center;
@@ -63,6 +73,19 @@ html, body, #root, .App {
   margin: $standardMargin auto;
   outline: 2px solid black;
   outline-offset: -$standardMargin;
+  white-space: nowrap;
+  position: relative;
+
+  .Author-tag {
+    font-family: 'Gloria Hallelujah', cursive;
+    text-decoration: none !important;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 16px;
+    line-height: 16px;
+    margin: $standardMargin+$gridSize;
+  }
 }
 
 .Game-end-view {
@@ -80,7 +103,8 @@ html, body, #root, .App {
 
 .Word-hint {
   height: 100px;
-  min-width: 400px;
+  width: 400px;
+  max-width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -89,6 +113,18 @@ html, body, #root, .App {
   margin: $standardMargin auto;
   outline: 2px solid black;
   font-family: 'Gloria Hallelujah', cursive;
+  white-space: nowrap;
+  position: relative;
+
+  .Author-tag {
+    text-decoration: none !important;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    font-size: 16px;
+    line-height: 16px;
+    margin: $gridSize;
+  }
 }
 
 .Game-progress {
@@ -96,3 +132,35 @@ html, body, #root, .App {
   margin: $standardMargin auto;
 }
 
+$pencilWidth: 12px;
+$pencilLength: 4*$pencilWidth;
+$pencilNib: 1px;
+
+.pencil {
+  width: $pencilWidth;
+  margin-left:$pencilLength/4;
+  margin-top:0px;
+  transform:rotate(35deg);
+  animation: pencil .5s forwards;
+  animation-iteration-count: infinite;
+  .nib{
+    width: 2*$pencilNib;
+    height: 0;
+    border-top: $pencilWidth solid #000000;
+    border-left: $pencilWidth/2-$pencilNib solid transparent;
+    border-right: $pencilWidth/2-$pencilNib solid transparent;
+   }
+  .body{
+    width: $pencilWidth;
+    height: $pencilLength;
+    background-color: #000000;
+    border-top-left-radius: $pencilWidth/4;
+    border-top-right-radius: $pencilWidth/4;
+  }
+}
+
+@keyframes pencil{
+  0% {transform:rotate(35deg);}
+  50% {transform:rotateZ(25deg);}
+  100% {transform:rotateZ(35deg);}
+}

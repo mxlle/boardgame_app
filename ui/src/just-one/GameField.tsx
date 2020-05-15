@@ -83,16 +83,18 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
       } else if (isComparingPhase) {
         if (!isGuesser) hint = hintObj.hint;
       } else if (currentUser && currentUser.id === hintObj.author.id ) {
-        hint = hintObj.hint || '...';
+        hint = hintObj.hint;
+      } else if (!hintObj.hint) {
+        hint = ''; // TODO
       }
-      return <WordHint key={hintObj.author.id} hint={hint} color={hintObj.author.color} duplicate={hintObj.isDuplicate} />
+      return <WordHint key={hintObj.author.id} hint={hint} color={hintObj.author.color} duplicate={hintObj.isDuplicate} author={hintObj.author.name}/>
     });
 
     return (
       <div className="Game-field">
         <div className="Current-word">
           <GameStats game={game}></GameStats>
-          <WordCard word={currentWord}/>
+          <WordCard word={currentWord} guesser={guesser.name} color={guesser.color}/>
           {isGuessingPhase && isGuesser && <WordHintInput submitHint={this.guess} label="Rateversuch" buttonText="Jetzt raten"/>}
         </div>
         <div className="Current-hints">

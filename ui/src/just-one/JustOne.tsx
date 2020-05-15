@@ -129,7 +129,7 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     return (
       <div>
         <img src={logo} className="JustOne-banner" alt="logo" />
-        <h1>Spiele jetzt Just One</h1>   
+        <h1>Spiele jetzt Just One</h1>
         {!!currentGame && <Link to="/">Zur Startseite</Link>}
         {optionalContent}
         {gameList}
