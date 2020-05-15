@@ -4,6 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 const uuid4 = require('uuid4');
 
 import GameDao from '@daos/Game/GameDao.mock';
+import { GamePhase } from '@entities/Game';
 import { paramMissingError, gameNotFoundError } from '@shared/constants';
 
 // Init shared
@@ -83,7 +84,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
 
     if (!player.id) player.id = uuid4();
 
-    game.props.players.push(player);
+    game.players.push(player);
 
     await gameDao.update(game);
     return res.status(OK).json({id: player.id});
@@ -101,7 +102,7 @@ router.put('/:id/start', async (req: Request, res: Response) => {
         });
     }
 
-    game.state.phase = 1; // TODO
+    game.phase = GamePhase.HintWriting;
 
     await gameDao.update(game);
     return res.status(OK).end();

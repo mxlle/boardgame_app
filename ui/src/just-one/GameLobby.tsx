@@ -76,11 +76,11 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
   }
 
   render() {
-    const listOfPlayers = this.props.game.props.players.map(player => (
+    const listOfPlayers = this.props.game.players.map(player => (
       <WordHint key={player.id} hint={player.name} color={player.color}></WordHint>
     ));
 
-    const currentUser: IUser = this.props.game.props.players[0]; // TODO
+    const currentUser: IUser = this.props.game.players[0]; // TODO
 
     return (
       <div className="Game-lobby">
@@ -100,9 +100,9 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             disabled={!this.state.name} 
             onClick={this.addPlayer}>Mitspielen</Button>
           {
-            this.props.game.props.host === currentUser.id && 
+            this.props.game.host === currentUser.id && 
             <Button variant="contained" color="primary" 
-              disabled={this.props.game.props.players.length < 3} 
+              disabled={this.props.game.players.length < 3} 
               onClick={this.startGame}>Spiel beginnen</Button>
           }
         </div>

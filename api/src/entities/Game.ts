@@ -1,5 +1,3 @@
-const uuid4 = require('uuid4');
-
 import { IUser } from './User';
 
 interface IHint {
@@ -15,13 +13,11 @@ export enum GamePhase {
     End
 }
 
-interface IGameProps {
+export interface IGame {
+    id: string;
     words: string[];
     players: IUser[];
     host: string; // hostId
-}
-
-interface IGameState {
     round: number;
     phase: GamePhase;
     hints: IHint[];
@@ -29,34 +25,3 @@ interface IGameState {
     wrongWords: string[];
     currentGuesser?: IUser;
 }
-
-export interface IGame {
-    id: string;
-    props: IGameProps;
-    state: IGameState;
-}
-
-class Game implements IGame {
-
-    public id: string;
-    public props: IGameProps;
-    public state: IGameState;
-
-    constructor(words: string[] = [], players: IUser[] = [], host: string = '1') { // TODO
-        this.id = uuid4();
-        this.props = {
-            words: words,
-            players: players,
-            host: host
-        };
-        this.state = {
-            round: 0,
-            phase: GamePhase.Init,
-            hints: [],
-            correctWords: [],
-            wrongWords: []
-        }
-    }
-}
-
-export default Game;

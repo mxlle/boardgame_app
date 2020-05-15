@@ -66,9 +66,9 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
 
   createGame() {
     const game: IGame = createGame();
-    game.props.words = this.allWords;
-    game.props.players = [{ id: '1', name: 'Almut', color: '#FF0044' }];
-    game.props.host = '1';
+    game.words = this.allWords;
+    game.players = [{ id: '1', name: 'Almut', color: '#FF0044' }];
+    game.host = '1';
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -87,7 +87,7 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
   render() {
     let optionalContent: React.ReactElement;
     if (this.state.currentGame) {
-      if (this.state.currentGame.state.phase === 0) { // TODO GamePhase.Init
+      if (this.state.currentGame.phase === 0) { // TODO GamePhase.Init
         optionalContent = <GameLobby game={this.state.currentGame}></GameLobby>
       } else {
         optionalContent = <GameField game={this.state.currentGame}></GameField>;
@@ -107,5 +107,5 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
 }
 
 function createGame(): IGame {
-    return {"id":"","props":{"words":[],"players":[],"host":"1"},"state":{"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]}};
+    return {"id":"","words":[],"players":[],"host":"1","round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
