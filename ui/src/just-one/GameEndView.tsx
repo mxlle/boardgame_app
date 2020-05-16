@@ -9,11 +9,11 @@ type GameEndViewProps = {
 export class GameEndView extends React.Component<GameEndViewProps> {
   render() {
     const game: IGame = this.props.game;
-    const correctWords = game.correctWords.map(word => {
-      return <WordCard key={word} word={word}/>
+    const correctWords = game.correctWords.map(wordResult => {
+      return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={true}/>
     });
-    const wrongWords = game.wrongWords.map(word => {
-      return <WordCard key={word} word={word}/>
+    const wrongWords = game.wrongWords.map(wordResult => {
+      return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={false}/>
     });
 
     return (

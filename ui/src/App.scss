@@ -42,6 +42,10 @@ header {
   }
 }
 
+.Game-content {
+  max-width: 100%;
+}
+
 .New-player, .Player-list {
   flex: 1;
   display: flex;
@@ -88,6 +92,13 @@ header {
   white-space: nowrap;
   position: relative;
 
+  &.Word-card-correct {
+    outline-color: green
+  }
+  &.Word-card-wrong {
+    outline-color: red
+  }
+
   .Author-tag {
     font-family: $handwriting;
     text-decoration: none !important;
@@ -97,6 +108,7 @@ header {
     font-size: 16px;
     line-height: 16px;
     margin: $standardMargin+$gridSize;
+    white-space: normal;
   }
 }
 
@@ -106,6 +118,10 @@ header {
     height: 125px;
     font-size: 16px;
     margin: $gridSize auto;
+    align-items: flex-start;
+    span:first-child {
+      margin-top: 5*$gridSize;
+    }
   }
 }
 
@@ -130,6 +146,7 @@ header {
 
   &.Word-hint-duplicate {
     text-decoration: line-through;
+    font-size: 32px;
   }
 
   &.Word-hint-long {

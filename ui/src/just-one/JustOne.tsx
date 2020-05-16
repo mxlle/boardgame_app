@@ -1,16 +1,13 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button, AppBar, Toolbar, IconButton, Typography, Chip } from '@material-ui/core';
-import { Home as HomeIcon, AccountCircle as AccountCircleIcon } from '@material-ui/icons';
+import { Button } from '@material-ui/core';
 import {GameField} from './GameField';
 import {GameLobby} from './GameLobby';
 import {GameEndView} from './GameEndView';
-import { IGame } from '../custom.d';
+import { IGame, GamePhase } from '../custom.d';
 
-import { GAME_URL } from '../App';
+import { GAME_URL, SETTING_ID } from '../App';
 
-const SETTING_ID = 'playerId';
-const SETTING_NAME = 'playerName';
 const POLLING_INTERVAL = 2000;
 
 type JustOneProps = {
@@ -107,18 +104,14 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
 
   render() {
     const currentGame: IGame|undefined = this.state.currentGame;
-    const currentUserName: string|null = localStorage.getItem(SETTING_NAME);
 
     let optionalContent: React.ReactElement;
     let gameList;
     if (currentGame) {
-      if (currentGame.phase === 0) { // TODO GamePhase.Init
+      if (currentGame.phase === GamePhase.Init) {
         optionalContent = <GameLobby game={currentGame}></GameLobby>
-      } else if (currentGame.phase === 4) { // TODO GamePhase.End
-        optionalContent = (<div>
-          <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
-          <GameEndView game={currentGame}></GameEndView>
-        </div>);
+      } else if (currentGame.phase === GamePhase.End) {
+        optionalContent = <GameEndView game={currentGame}></GameEndView>;
       } else {
         optionalContent = <GameField game={currentGame}></GameField>;
       }
@@ -130,20 +123,7 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     }
 
     return (
-      <div>
-        <AppBar position="sticky">
-          <Toolbar>
-            <Link to="/" className="ButtonLink">
-              <IconButton edge="start" color="inherit" aria-label="home">
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <Typography variant="h2" className="appTitle">
-              Nur ein Wort!
-            </Typography>
-            {currentUserName && <Chip label={currentUserName} icon={<AccountCircleIcon />}/>}
-          </Toolbar>
-        </AppBar>
+      <div className="Game-content">
         {optionalContent}
         {gameList}
       </div>

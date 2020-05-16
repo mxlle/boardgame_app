@@ -18,7 +18,13 @@ export enum GamePhase {
     HintWriting,
     HintComparing,
     Guessing,
+    Solution,
     End
+}
+
+export interface WordResult {
+    word: string;
+    guess: string;
 }
 
 export interface IGame {
@@ -32,7 +38,9 @@ export interface IGame {
     phase: GamePhase;
     currentWord?: string;
     currentGuesser?: IUser;
+    currentGuess?: string;
+    guessedRight?: boolean;
     hints: IHint[];
-    correctWords: string[];
-    wrongWords: string[];
+    correctWords: WordResult[];
+    wrongWords: WordResult[];
 }

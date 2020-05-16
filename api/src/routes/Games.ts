@@ -175,6 +175,25 @@ router.put('/:id/guess', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
+ *                      Send hint - "PUT /api/games/:id/resolve"
+ ******************************************************************************/
+
+router.put('/:id/resolve', async (req: Request, res: Response) => {
+    const { countCorrect } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.resolveRound(game, !!countCorrect);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
+
+/******************************************************************************
  *                    Delete - "DELETE /api/games/delete/:id"
  ******************************************************************************/
 

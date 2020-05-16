@@ -80,6 +80,8 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     const isHost: boolean = !!currentUserId && this.props.game.host === currentUserId;
     const isInGame: boolean = !!currentUserId && this.props.game.players.findIndex(player => player.id === currentUserId) > -1;
+    const newPlayerName: string = (isInGame || !this.state.name) ? '?' : this.state.name;
+    const newPlayerColor: string = (isInGame || !this.state.color) ? generateRandomColor() : this.state.color;
 
     return (
       <div className="Game-lobby">
@@ -99,7 +101,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         </div>
         <div className="Player-list">
           {listOfPlayers}
-          <WordHint hint={this.state.name || '?'} color={this.state.color} showPencil={true}></WordHint>
+          <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>
         </div>
       </div>
     );
