@@ -7,7 +7,7 @@
 /ui/coverage
 
 # production
-/ui/build
+#/ui/build
 
 # api ----------------------------
 
@@ -20,4 +20,4 @@
 /api/coverage
 
 # production
-#/api/build
+/api/build
