@@ -39,8 +39,33 @@ export interface IGame {
     wrongWords: WordResult[];
 }
 
+export function addPlayer(game: IGame, player: IUser) {
+    if (game.players.length === 0 || !game.host) game.host = player.id;
+    if (!player.enteredWords) player.enteredWords = [];
+    game.players.push(player);
+
+    game.words.push(...player.enteredWords);
+}
+
 export function startGame(game: IGame) {
+    createWordOrder(game);
     newRound(game, true);
+}
+
+export function createWordOrder(game: IGame) {
+    const newWordOrder: string[] = [];
+    const numPlayers = game.players.length;
+    game.words.forEach((word: string, i: number) => {
+        const guesserIndex = i % game.players.length;
+        const guesser: IUser = game.players[guesserIndex];
+        const guessTime: number = Math.floor(i/game.players.length);
+        const guessFromIndex: number = ((guessTime%2 === 0) ? guesserIndex+1 : guesserIndex-1+numPlayers)%numPlayers;
+        const getWordsFrom: IUser = game.players[guessFromIndex];
+        const wordToGuess = getWordsFrom.enteredWords ? getWordsFrom.enteredWords[guessTime] : 'Fehler'; // TODO
+        newWordOrder.push(wordToGuess);
+    });
+    game.words = newWordOrder;
+    game.words = game.words.filter(word => word && word.length > 0);
 }
 
 export function newRound(game: IGame, gameStart: boolean = false) {

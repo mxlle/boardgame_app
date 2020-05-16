@@ -4,6 +4,7 @@ export interface IUser {
     id: string;
     name: string;
     color?: string;
+    enteredWords?: string[];
 }
 
 class User implements IUser {

@@ -96,7 +96,7 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
         hint = isGuesser && hintObj.isDuplicate ? 'LEIDER DOPPELT' : hintObj.hint;
       } else if (isComparingPhase) {
         if (!isGuesser) hint = hintObj.hint;
-      } else if (isSolutionPhase || currentUser && currentUser.id === hintObj.author.id ) {
+      } else if (isSolutionPhase || (currentUser && currentUser.id === hintObj.author.id)) {
         hint = hintObj.hint;
       } else if (!hintObj.hint) {
         hint = ''; // TODO

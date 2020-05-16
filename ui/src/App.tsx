@@ -7,10 +7,9 @@ import {
   RouteComponentProps,
 } from 'react-router-dom';
 import './App.scss';
-import { Button, AppBar, Toolbar, IconButton, Typography, Chip } from '@material-ui/core';
+import { AppBar, Toolbar, IconButton, Typography, Chip } from '@material-ui/core';
 import { Home as HomeIcon, AccountCircle as AccountCircleIcon } from '@material-ui/icons';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
-import { teal, pink } from '@material-ui/core/colors';
 
 import {JustOne} from './just-one/JustOne';
 
@@ -25,47 +24,67 @@ export const SETTING_COLOR = 'playerColor';
 const DEFAULT_PRIMARY_COLOR = '#43a047';
 const DEFAULT_SECONDARY_COLOR = '#3949ab';
 
-function App() {
-  const currentUserName: string|null = localStorage.getItem(SETTING_NAME);
+type AppProps = {};
+type AppState = {
+  primaryColor: string
+};
 
-  const primaryColor = localStorage.getItem(SETTING_COLOR) || DEFAULT_PRIMARY_COLOR;
+export class App extends React.Component<AppProps,AppState> {
 
-  const theme = createMuiTheme({
-    palette: {
-      primary: {
-        main: primaryColor
-      },
-      secondary: {
-        main: DEFAULT_SECONDARY_COLOR,
-      },  
-    }
-  });
+  public state: AppState = {
+    primaryColor: localStorage.getItem(SETTING_COLOR) || DEFAULT_PRIMARY_COLOR
+  };
 
-  return (
-    <Router>
-      <ThemeProvider theme={theme}>
-      <div className="App">
-        <AppBar position="sticky">
-          <Toolbar>
-            <Link to="/" className="ButtonLink">
-              <IconButton edge="start" color="inherit" aria-label="home">
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <Typography variant="h2" className="appTitle">
-              Nur ein Wort!
-            </Typography>
-            {currentUserName && <Chip label={currentUserName} icon={<AccountCircleIcon />}/>}
-          </Toolbar>
-        </AppBar>
-        <Switch>
-            <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOne gameId={props.match.params.gameId}/>} />
-            <Route children={<JustOne/>} />
-          </Switch> 
-      </div>  
-    </ThemeProvider>
-    </Router>
-  );
+  constructor(props: AppProps) {
+    super(props);
+
+    this.setTheme = this.setTheme.bind(this);
+  }
+
+  setTheme(primaryColor: string) {
+    this.setState({primaryColor: primaryColor});
+  }
+
+  render() {
+    const currentUserName: string|null = localStorage.getItem(SETTING_NAME);
+
+    const theme = createMuiTheme({
+      palette: {
+        primary: {
+          main: this.state.primaryColor
+        },
+        secondary: {
+          main: DEFAULT_SECONDARY_COLOR,
+        },  
+      }
+    });
+
+    return (
+      <Router>
+        <ThemeProvider theme={theme}>
+        <div className="App">
+          <AppBar position="sticky">
+            <Toolbar>
+              <Link to="/" className="ButtonLink">
+                <IconButton edge="start" color="inherit" aria-label="home">
+                  <HomeIcon />
+                </IconButton>
+              </Link>
+              <Typography variant="h2" className="appTitle">
+                Nur ein Wort!
+              </Typography>
+              {currentUserName && <Chip label={currentUserName} icon={<AccountCircleIcon />}/>}
+            </Toolbar>
+          </AppBar>
+          <Switch>
+              <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOne gameId={props.match.params.gameId} setTheme={this.setTheme}/>} />
+              <Route children={<JustOne/>} />
+            </Switch> 
+        </div>  
+      </ThemeProvider>
+      </Router>
+    );  
+  }
 }
 
 export default App;

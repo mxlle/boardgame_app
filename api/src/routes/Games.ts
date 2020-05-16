@@ -83,8 +83,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
     }
 
     if (!player.id) player.id = generateId();
-    if (game.players.length === 0 || !game.host) game.host = player.id;
-    game.players.push(player);
+    GameController.addPlayer(game, player);
 
     await gameDao.update(game);
     return res.status(OK).json({player: player});

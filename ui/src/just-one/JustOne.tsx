@@ -11,7 +11,8 @@ import { GAME_URL, SETTING_ID } from '../App';
 const POLLING_INTERVAL = 2000;
 
 type JustOneProps = {
-  gameId?: string;
+  gameId?: string,
+  setTheme?: (color: string)=>void
 };
 type JustOneState = {
   currentGame?: IGame,
@@ -58,8 +59,6 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     let id = this.props.gameId;
     if (!id) return;
 
-    console.log(GAME_URL);
-
     fetch(`${GAME_URL}/${id}`)
       .then(res => res.json())
       .then((data) => {
@@ -87,7 +86,6 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
 
   createGame() {
     const game: IGame = createGame();
-    game.words = this.allWords;
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -109,7 +107,7 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     let gameList;
     if (currentGame) {
       if (currentGame.phase === GamePhase.Init) {
-        optionalContent = <GameLobby game={currentGame}></GameLobby>
+        optionalContent = <GameLobby game={currentGame} setTheme={this.props.setTheme}></GameLobby>
       } else if (currentGame.phase === GamePhase.End) {
         optionalContent = <GameEndView game={currentGame}></GameEndView>;
       } else {

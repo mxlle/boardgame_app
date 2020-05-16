@@ -7,7 +7,8 @@ import { NewPlayer, generateRandomColor } from './NewPlayer';
 import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../App';
 
 type GameLobbyProps = {
-  game: IGame
+  game: IGame,
+  setTheme?: (color: string)=>void
 }
 type GameLobbyState = {
   name: string,
@@ -61,6 +62,9 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     localStorage.setItem(SETTING_ID, player.id);
     localStorage.setItem(SETTING_NAME, player.name);
     if (player.color) localStorage.setItem('playerColor', player.color);
+    if (this.props.setTheme && player.color) {
+      this.props.setTheme(player.color);
+    }
   }
 
   startGame() {
