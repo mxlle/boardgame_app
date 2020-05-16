@@ -14,8 +14,10 @@
 # dependencies
 /api/node_modules
 
+/api/logs
+
 # testing
 /api/coverage
 
 # production
-/api/build
+#/api/build
