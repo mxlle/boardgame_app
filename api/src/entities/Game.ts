@@ -106,6 +106,15 @@ export function compareHints(game: IGame) {
     game.phase = GamePhase.HintComparing;
 }
 
+export function toggleDuplicateHint(game: IGame, hintIndex: number) {
+    if (game.phase !== GamePhase.HintComparing) return;
+    
+    const hintObj = game.hints[hintIndex];
+    if (hintObj) {
+        hintObj.isDuplicate = !hintObj.isDuplicate;
+    }
+}
+
 export function showHints(game: IGame) {
     if (game.phase !== GamePhase.HintComparing) return;
 

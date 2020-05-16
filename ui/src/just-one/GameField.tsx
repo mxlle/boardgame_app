@@ -22,6 +22,7 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     super(props);
 
     this.submitHint = this.submitHint.bind(this);
+    this.toggleDuplicate = this.toggleDuplicate.bind(this);
     this.showHints = this.showHints.bind(this);
     this.guess = this.guess.bind(this);
     this.resolveRound = this.resolveRound.bind(this);
@@ -45,6 +46,17 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({hint})
+    }).catch(console.log)
+  }
+
+  toggleDuplicate(hintIndex: number) {
+    fetch(`${GAME_URL}/${this.props.game.id}/toggleDuplicateHint`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({hintIndex})
     }).catch(console.log)
   }
 
@@ -87,6 +99,9 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     const isGuessingPhase = game.phase === GamePhase.Guessing;
     const isSolutionPhase = game.phase === GamePhase.Solution;
 
+    const isRoundHost = this.currentUserId === game.hints[0].author.id;
+    const showDuplicateToggle = isRoundHost && isComparingPhase;
+
     const currentWord = isGuesser && !isSolutionPhase ? '?' : (game.currentWord || '');
     const currentGuess = game.currentGuess || '';
     const currentHints = game.hints.map((hintObj: IHint, index: number) => {
@@ -108,6 +123,8 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
               submitHint={this.submitHint}
               showCheck={!showHint}
               duplicate={hintObj.isDuplicate}
+              showDuplicateToggle={showDuplicateToggle}
+              toggleDuplicate={()=>this.toggleDuplicate(index)}
               author={authorName}/>
     });
     let solutionButton1 = <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>Super, weiter geht's</Button>;
@@ -142,7 +159,7 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
             Spieler-Hinweise
           </Typography>
           <div className="WordHint-list">{currentHints}</div>
-          {isComparingPhase && !isGuesser && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
+          {isComparingPhase && isRoundHost && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
         </div>
       </div>
     );

@@ -132,6 +132,25 @@ router.put('/:id/hint', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
+ *                      Send hint - "PUT /api/games/:id/toggleDuplicateHint"
+ ******************************************************************************/
+
+router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
+    const { hintIndex } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.toggleDuplicateHint(game, hintIndex);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
+
+/******************************************************************************
  *                      Send hint - "PUT /api/games/:id/showHints"
  ******************************************************************************/
 

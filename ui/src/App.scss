@@ -65,7 +65,7 @@ header {
   display: flex;
   width: $pageContentWidth;
   max-width: 100%;
-  margin: $standardMargin auto;
+  margin: $standardMargin;
   flex-wrap: wrap
 }
 
@@ -75,6 +75,7 @@ header {
   flex-direction: column;
   max-width: 100%;
   margin-bottom: 2*$standardMargin;
+  align-items: center;
 }
 
 .Word-card {
@@ -117,7 +118,7 @@ header {
     width: 200px;
     height: 125px;
     font-size: 16px;
-    margin: $gridSize auto;
+    margin: $gridSize;
     align-items: flex-start;
     span:first-child {
       margin-top: 5*$gridSize;
@@ -148,6 +149,10 @@ header {
   font-family: $handwriting;
   white-space: nowrap;
   position: relative;
+  
+  &.Word-hint-writing {
+    border-style: dotted
+  }
 
   &.Word-hint-duplicate {
     text-decoration: line-through;
@@ -172,6 +177,11 @@ header {
     margin: $gridSize;
   }
 
+  .Duplicate-toggle {
+    position: absolute;
+    right: $gridSize;
+  }
+
   .Done-icon {
     font-size: 80px;
   }
@@ -179,7 +189,11 @@ header {
 
 .Game-progress {
   display: flex;
-  margin: $standardMargin auto;
+  flex-direction: column;
+  margin: $standardMargin;
+  div + div {
+    margin-top: $gridSize
+  }
 }
 
 .ButtonLink {

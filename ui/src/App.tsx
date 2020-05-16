@@ -22,7 +22,7 @@ export const SETTING_ID = 'playerId';
 export const SETTING_NAME = 'playerName';
 export const SETTING_COLOR = 'playerColor';
 const DEFAULT_PRIMARY_COLOR = '#43a047';
-const DEFAULT_SECONDARY_COLOR = '#3949ab';
+const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
 
 type AppProps = {};
 type AppState = {
