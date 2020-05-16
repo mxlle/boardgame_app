@@ -1,4 +1,4 @@
-const uuid4 = require('uuid4');
+import { generateId } from '@shared/functions';
 
 export interface IUser {
     id: string;
@@ -23,7 +23,7 @@ class User implements IUser {
             this.id = nameOrUser.id;
         }
 
-        if (!this.id) this.id = uuid4();
+        if (!this.id) this.id = generateId();
     }
 }
 

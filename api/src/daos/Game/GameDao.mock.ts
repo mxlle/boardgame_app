@@ -1,7 +1,7 @@
 import { IGame } from '@entities/Game';
-const uuid4 = require('uuid4');
 import { MockDaoMock } from '../MockDb/MockDao.mock';
 import { IGameDao } from './GameDao';
+import { generateId } from '@shared/functions';
 
 
 class GameDao extends MockDaoMock implements IGameDao {
@@ -35,7 +35,7 @@ class GameDao extends MockDaoMock implements IGameDao {
     public async add(game: IGame): Promise<void> {
         try {
             const db = await super.openDb();
-            if (!game.id) game.id = uuid4();
+            if (!game.id) game.id = generateId();
             if (!db.games) db.games = [];
             db.games.push(game);
             await super.saveDb(db);

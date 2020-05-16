@@ -1,8 +1,7 @@
-const uuid4 = require('uuid4');
-
 import { IUser } from '@entities/User';
 import { MockDaoMock } from '../MockDb/MockDao.mock';
 import { IUserDao } from './UserDao';
+import { generateId } from '@shared/functions';
 
 
 class UserDao extends MockDaoMock implements IUserDao {
@@ -36,7 +35,7 @@ class UserDao extends MockDaoMock implements IUserDao {
     public async add(user: IUser): Promise<void> {
         try {
             const db = await super.openDb();
-            user.id = uuid4();
+            user.id = generateId();
             db.users.push(user);
             await super.saveDb(db);
         } catch (err) {

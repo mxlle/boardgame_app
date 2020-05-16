@@ -1,7 +1,7 @@
 import { Request, Response, Router } from 'express';
 import { BAD_REQUEST, CREATED, OK, NOT_FOUND } from 'http-status-codes';
 import { ParamsDictionary } from 'express-serve-static-core';
-const uuid4 = require('uuid4');
+import { generateId } from '@shared/functions';
 
 import GameDao from '@daos/Game/GameDao.mock';
 import * as GameController from '@entities/Game';
@@ -42,7 +42,7 @@ router.post('/add', async (req: Request, res: Response) => {
         });
     }
 
-    if (!game.id) game.id = uuid4();
+    if (!game.id) game.id = generateId();
 
     await gameDao.add(game);
     return res.status(CREATED).json({id: game.id});
@@ -82,7 +82,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
         });
     }
 
-    if (!player.id) player.id = uuid4();
+    if (!player.id) player.id = generateId();
     if (game.players.length === 0 || !game.host) game.host = player.id;
     game.players.push(player);
 

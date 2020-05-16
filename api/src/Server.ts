@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
 }
 
-var whitelist = ['http://localhost:3000', 'http://0.0.0.0:3000']
+var whitelist = ['http://localhost:3000', 'http://0.0.0.0:3000', 'https://justone.okj.name']
 var corsOptions = {
   origin: function (origin: string, callback: any) {
     if (whitelist.indexOf(origin) !== -1) {

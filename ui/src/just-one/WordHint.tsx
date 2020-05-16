@@ -5,7 +5,8 @@ type WordHintProps = {
 	hint?: string,
 	color?: string,
 	duplicate?: boolean,
-  author?: string
+  author?: string,
+  showPencil?: boolean
 }
 
 export class WordHint extends React.Component<WordHintProps> {
@@ -14,14 +15,21 @@ export class WordHint extends React.Component<WordHintProps> {
   	const currentHint = this.props.hint;
     const color = this.props.color;
     const styleObj = {
-    	'color': color,
-    	'textDecoration': this.props.duplicate ? 'line-through' : 'none'
+    	'color': color
     };
     const author = this.props.author;
+    const showPencil = this.props.showPencil || !this.props.hint;
+
+    const classes = ['Word-hint'];
+    if (this.props.duplicate) classes.push('Word-hint-duplicate');
+    if (currentHint && currentHint.length > 20) classes.push('Word-hint-huge');
+    else if (currentHint && currentHint.length > 14) classes.push('Word-hint-long');
+    const extraClasses = classes.join(' ');
 
     return (
-	    <div className="Word-hint" style={styleObj}>
-        {currentHint || <PencilAnimation color={color}></PencilAnimation>}
+	    <div className={extraClasses} style={styleObj}>
+        {currentHint}
+        {showPencil && <PencilAnimation color={color}></PencilAnimation>}
         {author && <span className="Author-tag">{author}</span>}
       </div>
     );

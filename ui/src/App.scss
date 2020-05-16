@@ -1,7 +1,8 @@
-$appBackground: #fbf2e8;
+$appBackground: #fff8f5;
 $gridSize: 8px;
 $standardMargin: 2*$gridSize;
 $pageContentWidth: 900px;
+$handwriting: 'Gloria Hallelujah', cursive;
 
 html {
   height: 100%;
@@ -27,9 +28,18 @@ body, #root, .App {
   }
 }
 
-.JustOne-banner {
-  width: $pageContentWidth;
-  max-width: 100%;
+header {
+  margin-bottom: 2*$standardMargin;
+  padding: $gridSize;
+  .appTitle {
+    flex: 1;
+    font-family: $handwriting;
+    letter-spacing: 4px;
+    font-size: 4vw // relativ to width
+  } 
+  .MuiChip-root {
+    font-family: $handwriting;
+  }
 }
 
 .New-player, .Player-list {
@@ -38,7 +48,8 @@ body, #root, .App {
   flex-direction: column;
   align-items: center;
   justify-content: center; 
-  Button {
+  max-width: 100%;
+  Button, .MuiFormControl-root {
     margin: $gridSize;
   }
   .Word-hint:last-child {
@@ -58,11 +69,12 @@ body, #root, .App {
   flex: 1;
   display: flex;
   flex-direction: column;
+  max-width: 100%;
 }
 
 .Word-card {
   width: 400px;
-  max-width: 100%;
+  max-width: calc(100% - #{2*$standardMargin});
   height: 250px;
   display: flex;
   align-items: center;
@@ -70,14 +82,14 @@ body, #root, .App {
   background-color: white;
   border-radius: $standardMargin;
   font-size: 32px;
-  margin: $standardMargin auto;
+  margin: $standardMargin;
   outline: 2px solid black;
   outline-offset: -$standardMargin;
   white-space: nowrap;
   position: relative;
 
   .Author-tag {
-    font-family: 'Gloria Hallelujah', cursive;
+    font-family: $handwriting;
     text-decoration: none !important;
     position: absolute;
     bottom: 0;
@@ -104,20 +116,32 @@ body, #root, .App {
 .Word-hint {
   height: 100px;
   width: 400px;
-  max-width: 100%;
+  max-width: calc(100% - #{2*$standardMargin});
   display: flex;
   align-items: center;
   justify-content: center;
   background-color: white;
   font-size: 48px;
-  margin: $standardMargin auto;
+  margin: $standardMargin;
   outline: 2px solid black;
-  font-family: 'Gloria Hallelujah', cursive;
+  font-family: $handwriting;
   white-space: nowrap;
   position: relative;
 
+  &.Word-hint-duplicate {
+    text-decoration: line-through;
+  }
+
+  &.Word-hint-long {
+    font-size: 32px;
+  }
+
+  &.Word-hint-huge {
+    font-size: 24px;
+  }
+
   .Author-tag {
-    text-decoration: none !important;
+    text-decoration: none;
     position: absolute;
     bottom: 0;
     left: 0;
@@ -132,13 +156,17 @@ body, #root, .App {
   margin: $standardMargin auto;
 }
 
+.ButtonLink {
+  color: inherit;
+}
+
 $pencilWidth: 12px;
 $pencilLength: 4*$pencilWidth;
 $pencilNib: 1px;
 
 .pencil {
   width: $pencilWidth;
-  margin-left:$pencilLength/4;
+  margin-left:$pencilLength/2;
   margin-top:0px;
   transform:rotate(35deg);
   animation: pencil .5s forwards;

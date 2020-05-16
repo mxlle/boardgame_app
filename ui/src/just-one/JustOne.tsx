@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Button } from '@material-ui/core';
-import logo from './Just_One_Banner.jpg';
+import { Button, AppBar, Toolbar, IconButton, Typography, Chip } from '@material-ui/core';
+import { Home as HomeIcon, AccountCircle as AccountCircleIcon } from '@material-ui/icons';
 import {GameField} from './GameField';
 import {GameLobby} from './GameLobby';
 import {GameEndView} from './GameEndView';
@@ -10,6 +10,8 @@ import { IGame } from '../custom.d';
 import { GAME_URL } from '../App';
 
 const SETTING_ID = 'playerId';
+const SETTING_NAME = 'playerName';
+const POLLING_INTERVAL = 2000;
 
 type JustOneProps = {
   gameId?: string;
@@ -43,11 +45,11 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
     if (this.props.gameId) {
       this.loadGame();
 
-      this._interval = setInterval(this.loadGame.bind(this), 1000);
+      this._interval = setInterval(this.loadGame.bind(this), POLLING_INTERVAL);
     } else {
       this.loadGames();
 
-      this._interval = setInterval(this.loadGames.bind(this), 1000);
+      this._interval = setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
     }
   }
 
@@ -105,6 +107,7 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
 
   render() {
     const currentGame: IGame|undefined = this.state.currentGame;
+    const currentUserName: string|null = localStorage.getItem(SETTING_NAME);
 
     let optionalContent: React.ReactElement;
     let gameList;
@@ -121,16 +124,26 @@ export class JustOne extends React.Component<JustOneProps,JustOneState> {
       }
     } else {
       if (this.state.allGames) gameList = this.state.allGames.map(game => (
-        <Link key={game.id} to={`/${game.id}`}>{`Play ${game.id}`}</Link>
+        <Link key={game.id} to={`/${game.id}`}>{`Spiele ${game.id}`}</Link>
       ));
       optionalContent = <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>;
     }
 
     return (
       <div>
-        <img src={logo} className="JustOne-banner" alt="logo" />
-        <h1>Spiele jetzt Just One</h1>
-        {!!currentGame && <Link to="/">Zur Startseite</Link>}
+        <AppBar position="sticky">
+          <Toolbar>
+            <Link to="/" className="ButtonLink">
+              <IconButton edge="start" color="inherit" aria-label="home">
+                <HomeIcon />
+              </IconButton>
+            </Link>
+            <Typography variant="h2" className="appTitle">
+              Nur ein Wort!
+            </Typography>
+            {currentUserName && <Chip label={currentUserName} icon={<AccountCircleIcon />}/>}
+          </Toolbar>
+        </AppBar>
         {optionalContent}
         {gameList}
       </div>
