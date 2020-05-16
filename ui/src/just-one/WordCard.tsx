@@ -1,4 +1,5 @@
 import React from 'react';
+import { WordHintInput } from './WordHintInput';
 
 type WordCardProps = {
 	word: string;
@@ -6,6 +7,8 @@ type WordCardProps = {
 	color?: string;
   guess?: string;
   guessedRight?: boolean;
+  showInput?: boolean;
+  submitHint?: (hint:string)=>void
 }
 
 export class WordCard extends React.Component<WordCardProps> {
@@ -15,7 +18,11 @@ export class WordCard extends React.Component<WordCardProps> {
     const guesser = this.props.guesser;
     let guesserText = '';
     if (guesser) {
-      guesserText = this.props.guess ? (guesser + '\'s Rateversuch: ' + this.props.guess) : (guesser + ' muss raten');
+      if (this.props.guess) {
+        guesserText = (guesser.toLowerCase() === 'ich' ? 'Mein ' : (guesser + '\'s ')) + 'Rateversuch: ' + this.props.guess;
+      } else {
+        guesserText = guesser + ' muss raten';
+      }
     } else if (this.props.guess) {
       guesserText = 'Rateversuch: ' + this.props.guess;
     }
@@ -29,8 +36,12 @@ export class WordCard extends React.Component<WordCardProps> {
     }
 
     return (
-	    <div className={classes.join(' ')}>
-	    	<span>{currentWord}</span>
+	    <div className={classes.join(' ')} style={{borderColor: this.props.color}}>
+	    	{
+          (this.props.showInput && this.props.submitHint) ? 
+          <WordHintInput submitHint={this.props.submitHint} label="Rateversuch"/> : 
+          <span>{currentWord}</span>
+        }
         {guesserText && <span className="Author-tag" style={{color: this.props.color}}>{guesserText}</span>}
 	    </div>
     );

@@ -1,11 +1,11 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { IconButton } from '@material-ui/core';
+import { Send as SendIcon } from '@material-ui/icons';
 import TextField from '@material-ui/core/TextField';
 
 type WordHintInputProps = {
   submitHint: (hint: string)=>void
-  label?: string,
-  buttonText?: string
+  label?: string
 };
 type WordHintInputState = {
   value: string, 
@@ -40,13 +40,15 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
   render() {
     return (
 	    <div className="Word-hint-input">
-	    	<TextField required label={this.props.label || 'Wort-Hinweis'}
+	    	<TextField label={this.props.label || 'Hinweis eingeben'}
 	    		value={this.state.value} 
 	    		onChange={this.handleChange} 
 	    		onKeyPress={this.keyPressed} />
-  			<Button variant="contained" color="primary" 
+  			<IconButton color="primary" 
   				disabled={!this.state.value} 
-  				onClick={this.submitHint}>{this.props.buttonText || 'Hinweis abschicken'}</Button>
+  				onClick={this.submitHint}>
+          <SendIcon></SendIcon>
+        </IconButton>
 	    </div>
     );
   }

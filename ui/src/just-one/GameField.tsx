@@ -1,10 +1,8 @@
 import React from 'react';
-import { Button } from '@material-ui/core';
+import { Button, Typography } from '@material-ui/core';
 import {WordCard} from './WordCard';
 import { IGame, IHint, IUser, GamePhase } from '../custom.d';
 import {WordHint} from './WordHint';
-import {WordHintInput} from './WordHintInput';
-import {GameStats} from './GameStats';
 
 import { GAME_URL } from '../App';
 
@@ -84,24 +82,33 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     const guesser = game.currentGuesser ? game.currentGuesser : { name: '?', id: '?' }; // TODO
     const isGuesser = currentUser && currentUser.id === guesser.id;
 
+    const isWritingPhase = game.phase === GamePhase.HintWriting;
     const isComparingPhase = game.phase === GamePhase.HintComparing;
     const isGuessingPhase = game.phase === GamePhase.Guessing;
     const isSolutionPhase = game.phase === GamePhase.Solution;
 
     const currentWord = isGuesser && !isSolutionPhase ? '?' : (game.currentWord || '');
     const currentGuess = game.currentGuess || '';
-    const currentHints = game.hints.map(hintObj => {
-      let hint: string = '?';
-      if (isGuessingPhase) {
-        hint = isGuesser && hintObj.isDuplicate ? 'LEIDER DOPPELT' : hintObj.hint;
-      } else if (isComparingPhase) {
-        if (!isGuesser) hint = hintObj.hint;
-      } else if (isSolutionPhase || (currentUser && currentUser.id === hintObj.author.id)) {
-        hint = hintObj.hint;
-      } else if (!hintObj.hint) {
-        hint = ''; // TODO
-      }
-      return <WordHint key={hintObj.author.id} hint={hint} color={hintObj.author.color} duplicate={hintObj.isDuplicate} author={hintObj.author.name}/>
+    const currentHints = game.hints.map((hintObj: IHint, index: number) => {
+      let hint: string = hintObj.hint;
+      const hintIsMine = currentUser && currentUser.id === hintObj.author.id;
+      const showHint = !hint || isGuessingPhase || isSolutionPhase || hintIsMine || (isComparingPhase && !isGuesser);
+      const showInput = !hint && isWritingPhase && hintIsMine;
+
+      if (isGuessingPhase && isGuesser && hintObj.isDuplicate) {
+        hint = 'LEIDER DOPPELT';
+      } 
+
+      const authorName = hintIsMine ? 'Ich' : hintObj.author.name;
+
+      return <WordHint key={hintObj.author.id+index} 
+              hint={hint} 
+              color={hintObj.author.color}
+              showInput={showInput}
+              submitHint={this.submitHint}
+              showCheck={!showHint}
+              duplicate={hintObj.isDuplicate}
+              author={authorName}/>
     });
     let solutionButton1 = <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>Super, weiter geht's</Button>;
     let solutionButton2;
@@ -110,17 +117,30 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
       solutionButton2 = <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>Leider falsch</Button>;
     }
 
+    const showGuessInput = isGuessingPhase && isGuesser;
+    const guesserName = isGuesser ? 'Ich' : guesser.name;
+
     return (
       <div className="Game-field">
         <div className="Current-word">
-          <GameStats game={game}></GameStats>
-          <WordCard word={currentWord} guesser={guesser.name} color={guesser.color} guess={isSolutionPhase ? currentGuess : ''} guessedRight={game.guessedRight}/>
-          {isGuessingPhase && isGuesser && <WordHintInput submitHint={this.guess} label="Rateversuch" buttonText="Jetzt raten"/>}
-          {!isGuesser && isSolutionPhase && solutionButton1}
-          {!isGuesser && isSolutionPhase && solutionButton2}
+          <Typography variant="h5" className="appTitle">
+            Begriff
+          </Typography>
+          <WordCard 
+            word={currentWord} 
+            guesser={guesserName} 
+            color={guesser.color} 
+            showInput={showGuessInput}
+            submitHint={this.guess}
+            guess={isSolutionPhase ? currentGuess : ''} 
+            guessedRight={game.guessedRight}/>
+          {isSolutionPhase && (!isGuesser || game.guessedRight) && solutionButton1}
+          {isSolutionPhase && !isGuesser && solutionButton2}
         </div>
         <div className="Current-hints">
-          {!isGuesser && !isGuessingPhase && !isComparingPhase && <WordHintInput submitHint={this.submitHint}/>}
+          <Typography variant="h5" className="appTitle">
+            Spieler-Hinweise
+          </Typography>
           <div className="WordHint-list">{currentHints}</div>
           {isComparingPhase && !isGuesser && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
         </div>

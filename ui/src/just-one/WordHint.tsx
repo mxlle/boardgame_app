@@ -1,12 +1,17 @@
 import React from 'react';
+import { WordHintInput } from './WordHintInput';
 import { PencilAnimation } from './PencilAnimation';
+import { Done as DoneIcon } from '@material-ui/icons';
 
 type WordHintProps = {
 	hint?: string,
 	color?: string,
 	duplicate?: boolean,
   author?: string,
-  showPencil?: boolean
+  showPencil?: boolean,
+  showCheck?: boolean,
+  showInput?: boolean,
+  submitHint?: (hint:string)=>void
 }
 
 export class WordHint extends React.Component<WordHintProps> {
@@ -19,6 +24,7 @@ export class WordHint extends React.Component<WordHintProps> {
     };
     const author = this.props.author;
     const showPencil = this.props.showPencil || !this.props.hint;
+    const showCheck = this.props.showCheck;
 
     const classes = ['Word-hint'];
     if (this.props.duplicate) classes.push('Word-hint-duplicate');
@@ -26,13 +32,25 @@ export class WordHint extends React.Component<WordHintProps> {
     else if (currentHint && currentHint.length > 14) classes.push('Word-hint-long');
     const extraClasses = classes.join(' ');
 
-    return (
-	    <div className={extraClasses} style={styleObj}>
-        {currentHint}
-        {showPencil && <PencilAnimation color={color}></PencilAnimation>}
-        {author && <span className="Author-tag">{author}</span>}
-      </div>
-    );
+    if (this.props.showInput && this.props.submitHint) {
+      return (
+        <div className={extraClasses} style={styleObj}>
+          <WordHintInput submitHint={this.props.submitHint}/>
+          {author && <span className="Author-tag">{author}</span>}
+        </div>
+      );
+    } else {
+      return (
+        <div className={extraClasses} style={styleObj}>
+          {!showCheck && currentHint}
+          {showCheck && <DoneIcon className="Done-icon"></DoneIcon>}
+          {showPencil && <PencilAnimation color={color}></PencilAnimation>}
+          {author && <span className="Author-tag">{author}</span>}
+        </div>
+      );
+    }
+
+    
   }
 
 }

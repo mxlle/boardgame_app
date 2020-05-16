@@ -62,7 +62,7 @@ export function createWordOrder(game: IGame) {
         const guessFromIndex: number = ((guessTime%2 === 0) ? guesserIndex+1 : guesserIndex-1+numPlayers)%numPlayers;
         const getWordsFrom: IUser = game.players[guessFromIndex];
         const wordToGuess = getWordsFrom.enteredWords ? getWordsFrom.enteredWords[guessTime] : 'Fehler'; // TODO
-        newWordOrder.push(wordToGuess);
+        newWordOrder.push(wordToGuess.trim());
     });
     game.words = newWordOrder;
     game.words = game.words.filter(word => word && word.length > 0);
@@ -81,10 +81,12 @@ export function newRound(game: IGame, gameStart: boolean = false) {
     game.currentGuess = '';
     game.guessedRight = false;
     game.hints = game.players.filter(player => !game.currentGuesser || player.id !== game.currentGuesser.id).map(player => { return { hint: '', author: player } });
+    if (game.players.length < 4) game.hints = game.hints.concat(game.hints);
 }
 
 export function addHint(game: IGame, hint: string = '', playerId: string = '') {
-    const hintObj = game.hints.find(h => h.author.id === playerId);
+    let hintObj = game.hints.find(h => h.author.id === playerId && !h.hint);
+    if (!hintObj) hintObj = game.hints.find(h => h.author.id === playerId);
     if (!hintObj) return; // TODO
     hintObj.hint = hint.split(' ')[0]; // just one word
 
@@ -105,12 +107,16 @@ export function compareHints(game: IGame) {
 }
 
 export function showHints(game: IGame) {
+    if (game.phase !== GamePhase.HintComparing) return;
+
     game.phase = GamePhase.Guessing;
 }
 
 export function guess(game: IGame, guess: string) {
+    if (game.phase !== GamePhase.Guessing) return;
+
     if (!game.currentWord || !guess) return;
-    const isCorrect = guess.toLowerCase() === game.currentWord.toLowerCase();
+    const isCorrect = guess.trim().toLowerCase() === game.currentWord.toLowerCase();
 
     game.currentGuess = guess;
     game.guessedRight = isCorrect;
@@ -118,6 +124,8 @@ export function guess(game: IGame, guess: string) {
 }
 
 export function resolveRound(game: IGame, countAsCorrect: boolean) {
+    if (game.phase !== GamePhase.Solution) return;
+
     const wordResult: WordResult = {
         word: game.currentWord || '',
         guess: game.currentGuess || ''
