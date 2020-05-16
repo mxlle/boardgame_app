@@ -38,7 +38,7 @@ if (process.env.NODE_ENV === 'production') {
 var whitelist = ['http://localhost:3000', 'http://0.0.0.0:3000', 'https://justone.okj.name']
 var corsOptions = {
   origin: function (origin: string, callback: any) {
-    if (whitelist.indexOf(origin) !== -1) {
+    if (undefined === origin || whitelist.indexOf(origin) !== -1) {
       callback(null, true)
     } else {
       callback(new Error('Not allowed by CORS'))
