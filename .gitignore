@@ -7,12 +7,14 @@
 /ui/coverage
 
 # production
-/ui/build
+#/ui/build
 
 # api ----------------------------
 
 # dependencies
 /api/node_modules
+
+/api/logs
 
 # testing
 /api/coverage

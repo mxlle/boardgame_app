@@ -15,7 +15,7 @@ import {JustOne} from './just-one/JustOne';
 
 
 const isProd = window.location.hostname === 'justone.okj.name';
-const apiPort = isProd ? ':9001' : ':9000';
+const apiPort = isProd ? '' : ':9000';
 export const API_URL = window.location.protocol + '//' + window.location.hostname + apiPort + '/api';
 export const GAME_URL = API_URL + '/games';
 export const SETTING_ID = 'playerId';
