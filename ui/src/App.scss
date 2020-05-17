@@ -53,6 +53,24 @@ header {
   }
 }
 
+.GameList {
+  width: calc(100vw - #{2*$standardMargin});
+  max-width: 600px;
+  .GameListItem {
+    
+  }
+}
+
+.MuiTypography-root.MuiTypography-h5 {
+  font-family: $handwriting;
+  margin-top: $standardMargin;
+  padding-top: $gridSize;
+}
+
+.MuiAlert-filledInfo {
+  align-items: center;
+}
+
 .Game-content {
   max-width: 100%;
 }

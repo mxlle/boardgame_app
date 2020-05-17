@@ -5,7 +5,7 @@ import {GameEndView} from './GameEndView';
 import {GameStats} from './GameStats';
 import { IGame, GamePhase } from '../custom.d';
 
-import { GAME_URL, SETTING_ID } from '../App';
+import { GAME_URL, SETTING_ID, APP_TITLE } from '../App';
 
 const POLLING_INTERVAL = 2000;
 
@@ -45,6 +45,7 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
     fetch(`${GAME_URL}/${id}`)
       .then(res => res.json())
       .then((data) => {
+        setDocumentTitle(data.game.name);
         this.setState({
           currentGame: data.game
         });
@@ -74,5 +75,13 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
         {gameContent}
       </div>
     );
+  }
+}
+
+function setDocumentTitle(gameName?: string) {
+  if (gameName) {
+    document.title = `${APP_TITLE} - ${gameName}`;
+  } else {
+    document.title = APP_TITLE;
   }
 }

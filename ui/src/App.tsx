@@ -23,6 +23,7 @@ export const SETTING_ID = 'playerId';
 export const SETTING_NAME = 'playerName';
 export const SETTING_COLOR = 'playerColor';
 export const SETTING_THEME = 'darkTheme';
+export const APP_TITLE = 'Nur ein Wort!';
 const DEFAULT_PRIMARY_COLOR = '#43a047';
 const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
 

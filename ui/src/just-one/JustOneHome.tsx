@@ -1,19 +1,21 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Button } from '@material-ui/core';
+import { Button, TextField } from '@material-ui/core';
 import { IGame } from '../custom.d';
+import { GameList } from './GameList';
 
-import { GAME_URL, SETTING_ID } from '../App';
+import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE } from '../App';
 
 const POLLING_INTERVAL = 2000;
 
 type JustOneHomeProps = {};
 type JustOneHomeState = {
+  newGameName: string,
   allGames: IGame[]
 };
 
 export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
   public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
+  public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
   private _interval: any; // TODO
 
@@ -21,14 +23,20 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     super(props);
 
     this.createGame = this.createGame.bind(this);
+    this.handleChange = this.handleChange.bind(this);
+    this.deleteGame = this.deleteGame.bind(this);
 
-    this.state = { allGames: [] };
+    let newGameName = this.currentUserName ? `${this.currentUserName}s Spiel` : 'Neues Spiel';
+
+    this.state = { allGames: [], newGameName: newGameName };
   }
 
   componentDidMount() {
-      this.loadGames();
+    document.title = APP_TITLE;
 
-      this._interval = setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
+    this.loadGames();
+
+    this._interval = setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
   }
 
   componentWillUnmount() {
@@ -50,8 +58,23 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
       .catch(console.log)
   }
 
+  deleteGame(gameId: string) {
+    fetch(`${GAME_URL}/delete/${gameId}`, {
+      method: 'DELETE'
+    }).then(res => res.json())
+      .then((data) => {
+        console.log('deleted', data);
+      })
+      .catch(console.log)
+  }
+
+  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+    this.setState({newGameName: event.target.value});
+  }
+
   createGame() {
     const game: IGame = createGame();
+    game.name = this.state.newGameName;
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -60,21 +83,23 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({game})
-    }).then((data) => {
-        console.log(data);
+    }).then(res => res.json())
+      .then((data) => {
+        window.location.href = '/' + data.id;
       })
       .catch(console.log)
   }
 
   render() {
-    const gameList = this.state.allGames.map(game => (
-      <Link key={game.id} to={`/${game.id}`}>{`Spiele ${game.id}`}</Link>
-    ));
+    const {newGameName, allGames} = this.state;
 
     return (
-      <div className="Game-list">
+      <div className="JustOneHome">
+        <TextField label={'Spielname'}
+            value={newGameName} 
+            onChange={this.handleChange} />
         <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
-        {gameList}
+        <GameList allGames={allGames} deleteGame={this.deleteGame}/>
       </div>
     );
   }
