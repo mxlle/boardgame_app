@@ -2,7 +2,8 @@ import React from 'react';
 import { IGame, IUser } from '../custom.d';
 import { Button } from '@material-ui/core';
 import { WordHint } from './WordHint';
-import { NewPlayer, generateRandomColor } from './NewPlayer';
+import { NewPlayer } from './NewPlayer';
+import { getRandomColor } from '../common/ColorPicker';
 
 import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../App';
 
@@ -19,7 +20,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
   public state: GameLobbyState = { 
     name: localStorage.getItem(SETTING_NAME) || '',
-    color: localStorage.getItem(SETTING_COLOR) || generateRandomColor() || 'black'
+    color: getRandomColor(localStorage.getItem(SETTING_COLOR))
   };
 
   constructor(props: GameLobbyProps) {
@@ -50,10 +51,6 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }).then(res => res.json())
       .then((data) => {
         this.setLocalPlayer(data.player);
-        this.setState({
-          color: generateRandomColor() || 'black',
-          name: ''
-        });
       })
       .catch(console.log)
   }
@@ -85,7 +82,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     const isHost: boolean = !!currentUserId && this.props.game.host === currentUserId;
     const isInGame: boolean = !!currentUserId && this.props.game.players.findIndex(player => player.id === currentUserId) > -1;
     const newPlayerName: string = (isInGame || !this.state.name) ? '?' : this.state.name;
-    const newPlayerColor: string = (isInGame || !this.state.color) ? generateRandomColor() : this.state.color;
+    const newPlayerColor: string = (isInGame || !this.state.color) ? getRandomColor() : this.state.color;
 
     return (
       <div className="Game-lobby">
