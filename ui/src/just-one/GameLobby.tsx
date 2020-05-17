@@ -117,15 +117,15 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     });
     const isHost: boolean = !!currentUserId && game.host === currentUserId;
     const allWordsEntered: boolean = game.words.length >= numWordsPerPlayer*listOfPlayers.length;
-    const newPlayerName: string = (isInGame || !currentPlayer.name) ? '?' : currentPlayer.name;
-    const newPlayerColor: string = (isInGame || !currentPlayer.color) ? getRandomColor() : currentPlayer.color;
+    const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
+    const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
 
     return (
       <div className="Game-lobby">
         <div className="New-player">
           { 
             !isInGame && 
-            <NewPlayer name={currentPlayer.name} color={currentPlayer.color || getRandomColor()} 
+            <NewPlayer currentPlayer={currentPlayer}
               updatePlayer={this.setPlayerProps}
               addPlayer={this.addPlayer}/>
           }
@@ -142,7 +142,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         </div>
         <div className="Player-list">
           {listOfPlayers}
-          <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>
+          {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}
         </div>
       </div>
     );

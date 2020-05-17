@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
 }
 
-var whitelist = [process.env.UI_URL]
+var whitelist = process.env.UI_URL ? process.env.UI_URL.split(',') : [];
 var corsOptions = {
   origin: function (origin: string, callback: any) {
     if (undefined === origin || whitelist.indexOf(origin) !== -1) {

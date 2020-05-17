@@ -7,8 +7,7 @@ import { ColorPicker } from '../common/ColorPicker';
 type NewPlayerProps = {
   addPlayer: (player: IUser) => void,
   updatePlayer: (player: IUser) => void,
-  name: string,
-  color: string
+  currentPlayer: IUser
 }
 
 export class NewPlayer extends React.Component<NewPlayerProps> {
@@ -23,48 +22,34 @@ export class NewPlayer extends React.Component<NewPlayerProps> {
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
     if (event.target.name === 'name') {
-      let player: IUser = { 
-        id: '', 
-        name: event.target.value, 
-        color: this.props.color 
-      };
+      this.props.currentPlayer.name = event.target.value;
 
-      this.props.updatePlayer(player);   
+      this.props.updatePlayer(this.props.currentPlayer);   
 
     }
   }
 
   setColor(color: string) {
-    let player: IUser = { 
-      id: '', 
-      name: this.props.name, 
-      color: color || this.props.color 
-    };
-    this.props.updatePlayer(player);  
+    this.props.currentPlayer.color = color;
+    this.props.updatePlayer(this.props.currentPlayer);  
   }
 
   addPlayer() {
-    const player: IUser = { 
-      id: '', 
-      name: this.props.name, 
-      color: this.props.color,
-      enteredWords: []
-    };
-    this.props.addPlayer(player);
+    this.props.addPlayer(this.props.currentPlayer);
   }
 
   render() {
-    const { name, color } = this.props;
+    const { currentPlayer } = this.props;
 
     return (
       <div className="New-player">
         <TextField required label="Spielername" 
           name='name'
-          value={name} 
+          value={currentPlayer.name} 
           onChange={this.handleChange}/>
-        <ColorPicker select={this.setColor} selected={color}/>
+        <ColorPicker select={this.setColor} selected={currentPlayer.color}/>
         <Button variant="contained" color="primary" 
-          disabled={!name} 
+          disabled={!currentPlayer.name} 
           onClick={this.addPlayer}>Mitspielen</Button>
       </div>
     );
