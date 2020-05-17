@@ -48,6 +48,16 @@ export function addPlayer(game: IGame, player: IUser) {
     game.words.push(...player.enteredWords);
 }
 
+export function updatePlayer(game: IGame, player: IUser) {
+    let currentUser = game.players.find(p => p.id === player.id);
+    if (!currentUser) return;
+    currentUser.name = player.name;
+    currentUser.color = player.color;
+    currentUser.enteredWords = player.enteredWords || [];
+
+    game.words.push(...currentUser.enteredWords);
+}
+
 export function startGame(game: IGame) {
     createWordOrder(game);
     newRound(game, true);

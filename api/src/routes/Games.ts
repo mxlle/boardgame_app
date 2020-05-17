@@ -90,6 +90,30 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
+ *                      Add player to game - "PUT /api/games/:id/updatePlayer"
+ ******************************************************************************/
+
+router.put('/:id/updatePlayer', async (req: Request, res: Response) => {
+    const { player } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!player) {
+        return res.status(BAD_REQUEST).json({
+            error: paramMissingError,
+        });
+    }
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.updatePlayer(game, player);
+
+    await gameDao.update(game);
+    return res.status(OK).json({player: player});
+});
+
+/******************************************************************************
  *                      Start game - "PUT /api/games/:id/start"
  ******************************************************************************/
 
