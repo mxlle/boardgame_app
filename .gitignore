@@ -6,18 +6,20 @@
 # testing
 /ui/coverage
 
-# production
-#/ui/build
+# logs
+/ui/*.log
+/ui/report.*.json
 
 # api ----------------------------
 
 # dependencies
 /api/node_modules
 
+# logs
 /api/logs
 
 # testing
 /api/coverage
 
 # production
-/api/build
+/api/dist

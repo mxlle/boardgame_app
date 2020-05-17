@@ -35,7 +35,7 @@ if (process.env.NODE_ENV === 'production') {
     app.use(helmet());
 }
 
-var whitelist = ['http://localhost:3000', 'http://0.0.0.0:3000', 'https://justone.okj.name']
+var whitelist = [process.env.UI_URL]
 var corsOptions = {
   origin: function (origin: string, callback: any) {
     if (undefined === origin || whitelist.indexOf(origin) !== -1) {
@@ -47,6 +47,8 @@ var corsOptions = {
 }
 
 app.use(cors(corsOptions));
+
+app.set('trust proxy', process.env.TRUST_PROXY || false);
 
 // Add APIs
 app.use('/api', BaseRouter);
