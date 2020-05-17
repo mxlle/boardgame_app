@@ -13,7 +13,7 @@ type JustOneState = {
 export class JustOne extends React.Component<JustOneProps,JustOneState> {
   render() {
     if (this.props.gameId) {
-      return <JustOneGame gameId={this.props.gameId}></JustOneGame>;
+      return <JustOneGame gameId={this.props.gameId} setTheme={this.props.setTheme}></JustOneGame>;
     } else {
       return <JustOneHome></JustOneHome>
     }

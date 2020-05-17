@@ -34,6 +34,7 @@ export interface IGame {
     currentGuesser?: IUser;
     currentGuess?: string;
     guessedRight?: boolean;
+    roundHost?: IUser;
     hints: IHint[];
     correctWords: WordResult[];
     wrongWords: WordResult[];
@@ -62,7 +63,7 @@ export function createWordOrder(game: IGame) {
         const guessFromIndex: number = ((guessTime%2 === 0) ? guesserIndex+1 : guesserIndex-1+numPlayers)%numPlayers;
         const getWordsFrom: IUser = game.players[guessFromIndex];
         const wordToGuess = getWordsFrom.enteredWords ? getWordsFrom.enteredWords[guessTime] : 'Fehler'; // TODO
-        newWordOrder.push(wordToGuess.trim());
+        newWordOrder.push(justOne(wordToGuess));
     });
     game.words = newWordOrder;
     game.words = game.words.filter(word => word && word.length > 0);
@@ -78,6 +79,7 @@ export function newRound(game: IGame, gameStart: boolean = false) {
     game.phase = GamePhase.HintWriting;
     game.currentWord = game.words[game.round];
     game.currentGuesser = game.players[game.round % game.players.length];
+    game.roundHost = game.players[(game.round+1) % game.players.length];
     game.currentGuess = '';
     game.guessedRight = false;
     game.hints = game.players.filter(player => !game.currentGuesser || player.id !== game.currentGuesser.id).map(player => { return { hint: '', author: player } });
@@ -88,7 +90,7 @@ export function addHint(game: IGame, hint: string = '', playerId: string = '') {
     let hintObj = game.hints.find(h => h.author.id === playerId && !h.hint);
     if (!hintObj) hintObj = game.hints.find(h => h.author.id === playerId);
     if (!hintObj) return; // TODO
-    hintObj.hint = hint.split(' ')[0]; // just one word
+    hintObj.hint = justOne(hint);
 
     if (game.hints.every(h => h.hint && h.hint.length > 0)) {
         compareHints(game);
@@ -125,7 +127,7 @@ export function guess(game: IGame, guess: string) {
     if (game.phase !== GamePhase.Guessing) return;
 
     if (!game.currentWord || !guess) return;
-    const isCorrect = guess.trim().toLowerCase() === game.currentWord.toLowerCase();
+    const isCorrect = justOne(guess).toLowerCase() === game.currentWord.toLowerCase();
 
     game.currentGuess = guess;
     game.guessedRight = isCorrect;
@@ -155,4 +157,8 @@ export function resolveRound(game: IGame, countAsCorrect: boolean) {
 
 export function endOfGame(game: IGame) {
     game.phase = GamePhase.End;
+}
+
+function justOne(word: string = ''): string {
+    return word.split(' ')[0];
 }

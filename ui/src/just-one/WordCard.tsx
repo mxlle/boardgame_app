@@ -1,4 +1,5 @@
 import React from 'react';
+import { Paper } from '@material-ui/core';
 import { WordHintInput } from './WordHintInput';
 
 type WordCardProps = {
@@ -36,14 +37,14 @@ export class WordCard extends React.Component<WordCardProps> {
     }
 
     return (
-	    <div className={classes.join(' ')} style={{borderColor: this.props.color}}>
+	    <Paper className={classes.join(' ')} style={{borderColor: this.props.color}}>
 	    	{
           (this.props.showInput && this.props.submitHint) ? 
           <WordHintInput submitHint={this.props.submitHint} label="Rateversuch"/> : 
           <span>{currentWord}</span>
         }
         {guesserText && <span className="Author-tag" style={{color: this.props.color}}>{guesserText}</span>}
-	    </div>
+	    </Paper>
     );
   }
 

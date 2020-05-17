@@ -1,7 +1,7 @@
 import React from 'react';
 import { WordHintInput } from './WordHintInput';
 import { PencilAnimation } from './PencilAnimation';
-import { Checkbox } from '@material-ui/core';
+import { Checkbox, Paper } from '@material-ui/core';
 import { Mood as MoodIcon, MoodBad as MoodBadIcon } from '@material-ui/icons';
 
 type WordHintProps = {
@@ -41,14 +41,14 @@ export class WordHint extends React.Component<WordHintProps> {
 
     if (this.props.showInput && this.props.submitHint) {
       return (
-        <div className={extraClasses} style={styleObj}>
+        <Paper className={extraClasses} style={styleObj}>
           <WordHintInput submitHint={this.props.submitHint}/>
           {author && <span className="Author-tag">{author}</span>}
-        </div>
+        </Paper>
       );
     } else {
       return (
-        <div className={extraClasses} style={styleObj}>
+        <Paper className={extraClasses} style={styleObj}>
           {!showCheck && currentHint}
           {showCheck && <span className="Done-icon">✓</span>}
           {showPencil && <PencilAnimation color={color}></PencilAnimation>}
@@ -59,7 +59,7 @@ export class WordHint extends React.Component<WordHintProps> {
               onChange={()=>toggleDuplicate()}/>
           )}
           {author && <span className="Author-tag">{author}</span>}
-        </div>
+        </Paper>
       );
     }
 

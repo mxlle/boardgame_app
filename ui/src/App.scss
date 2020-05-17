@@ -1,19 +1,30 @@
 $appBackground: #fff8f5;
+$appBackgroundDark: #222222;
 $gridSize: 8px;
 $standardMargin: 2*$gridSize;
 $pageContentWidth: 900px;
 $handwriting: 'Gloria Hallelujah', cursive;
 
-html {
+html, #root, .App {
   height: 100%;
   width: 100%;
+  min-height: 100vh;
 }
 
-body, #root, .App {
+body{
   width: 100%;
   height: auto;
   min-height: 100%;
-  background-color: $appBackground;
+}
+
+.MuiPaper-root {
+  &.App {
+    background-color: $appBackground;
+  }
+
+  &.App-dark {
+    background-color: $appBackgroundDark;
+  }
 }
 
 .App {
@@ -63,8 +74,9 @@ header {
 
 .Game-lobby, .Game-field, .Game-end-view {
   display: flex;
-  width: $pageContentWidth;
-  max-width: 100%;
+  min-width: 0;
+  width: calc(100vw - #{2*$standardMargin});
+  max-width: $pageContentWidth;
   margin: $standardMargin;
   flex-wrap: wrap
 }
@@ -79,9 +91,11 @@ header {
 }
 
 .Word-card {
-  width: 400px;
-  max-width: calc(100% - #{2*$standardMargin});
+  width: calc(100vw - #{2*$standardMargin});
+  min-width: 0;
+  max-width: 400px;
   height: 250px;
+  max-height: 30vh;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -115,7 +129,7 @@ header {
 
 .Game-end-view {
   .Word-card {
-    width: 200px;
+    max-width: 200px;
     height: 125px;
     font-size: 16px;
     margin: $gridSize;
@@ -135,10 +149,15 @@ header {
   } 
 }
 
+.WordHint-list {
+  max-width: 100vw;
+}
+
 .Word-hint {
   height: 100px;
-  width: 400px;
-  max-width: calc(100% - #{2*$standardMargin});
+  width: calc(100vw - #{2*$standardMargin});
+  min-width: 0;
+  max-width: 400px;
   display: flex;
   align-items: center;
   justify-content: center;

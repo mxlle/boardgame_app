@@ -41,6 +41,7 @@ export interface IGame {
     currentGuesser?: IUser;
     currentGuess?: string;
     guessedRight?: boolean;
+    roundHost?: IUser;
     hints: IHint[];
     correctWords: WordResult[];
     wrongWords: WordResult[];

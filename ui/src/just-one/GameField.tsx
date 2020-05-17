@@ -99,7 +99,7 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     const isGuessingPhase = game.phase === GamePhase.Guessing;
     const isSolutionPhase = game.phase === GamePhase.Solution;
 
-    const isRoundHost = this.currentUserId === game.hints[0].author.id;
+    const isRoundHost = game.roundHost && this.currentUserId === game.roundHost.id;
     const showDuplicateToggle = isRoundHost && isComparingPhase;
 
     const currentWord = isGuesser && !isSolutionPhase ? '?' : (game.currentWord || '');
@@ -140,7 +140,7 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     return (
       <div className="Game-field">
         <div className="Current-word">
-          <Typography variant="h5" className="appTitle">
+          <Typography variant="h5">
             Begriff
           </Typography>
           <WordCard 
@@ -151,14 +151,19 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
             submitHint={this.guess}
             guess={isSolutionPhase ? currentGuess : ''} 
             guessedRight={game.guessedRight}/>
-          {isSolutionPhase && (!isGuesser || game.guessedRight) && solutionButton1}
-          {isSolutionPhase && !isGuesser && solutionButton2}
+          {isSolutionPhase && (isRoundHost || game.guessedRight) && solutionButton1}
+          {isSolutionPhase && isRoundHost && solutionButton2}
         </div>
         <div className="Current-hints">
-          <Typography variant="h5" className="appTitle">
+          <Typography variant="h5">
             Spieler-Hinweise
           </Typography>
           <div className="WordHint-list">{currentHints}</div>
+          {isComparingPhase && isRoundHost && (
+            <Typography variant="subtitle1">
+              Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ungültige Werte zu markieren.
+            </Typography>
+          )}
           {isComparingPhase && isRoundHost && <Button variant="contained" color="primary" onClick={this.showHints}>{guesser.name + ' kann losraten!'}</Button>}
         </div>
       </div>

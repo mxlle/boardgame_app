@@ -8,7 +8,7 @@ type GameStatsProps = {
 export class GameStats extends React.Component<GameStatsProps> {
   render() {
     const game: IGame = this.props.game;
-    const roundHost = !!game.hints.length && game.hints[0].author.name;
+    const roundHost = game.roundHost ? game.roundHost.name : '?';
     const guesser = game.currentGuesser ? game.currentGuesser.name : '?';
 
     let gamePhase;
