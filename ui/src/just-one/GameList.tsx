@@ -12,7 +12,7 @@ import {
 import DeleteIcon from '@material-ui/icons/Delete';
 import { IGame, GamePhase } from '../custom.d';
 
-import { SETTING_ID, SETTING_NAME } from '../App';
+import { SETTING_ID, SETTING_NAME } from '../shared/constants';
 
 type GameListProps = {
   allGames: IGame[],

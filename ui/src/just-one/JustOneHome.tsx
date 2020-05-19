@@ -3,7 +3,7 @@ import { Button, TextField } from '@material-ui/core';
 import { IGame, GamePhase } from '../custom.d';
 import { GameList } from './GameList';
 
-import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE, DEFAULT_NUM_WORDS } from '../App';
+import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE, DEFAULT_NUM_WORDS } from '../shared/constants';
 
 const POLLING_INTERVAL = 3000;
 

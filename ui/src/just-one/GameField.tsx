@@ -1,12 +1,10 @@
 import React from 'react';
 import { Button, Typography } from '@material-ui/core';
-import {WordCard} from './WordCard';
 import { IGame, IHint, IUser, GamePhase } from '../custom.d';
-import {WordHint} from './WordHint';
+import { WordCard } from './WordCard';
+import { WordHint } from './WordHint';
 
-import { GAME_URL } from '../App';
-
-const SETTING_ID = 'playerId';
+import { GAME_URL, SETTING_ID } from '../shared/constants';
 
 type GameFieldProps = {
   game: IGame
@@ -28,10 +26,6 @@ export class GameField extends React.Component<GameFieldProps,GameFieldState> {
     this.resolveRound = this.resolveRound.bind(this);
 
     this.state = {  };
-  }
-
-  componentDidMount() {
-
   }
 
   submitHint(hintWord: string) {

@@ -2,8 +2,6 @@ import React from 'react';
 import { Button, Typography } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 
-import { DEFAULT_NUM_WORDS } from '../App';
-
 type WordAdderProps = {
   add: (words: string[])=>void,
   numOfWords: number
@@ -50,13 +48,6 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     const { add, numOfWords } = this.props;
     const { words } = this.state;
     const wordFields = [];
-    if (numOfWords>0) {
-      wordFields.push(
-        <Typography variant="subtitle1" key="heading">
-          Gib {numOfWords>1?`${numOfWords} Wörter` : `ein Wort`} für das Spiel ein
-        </Typography>
-      );
-    }
     for (let i=0; i<numOfWords; i++) {
       wordFields.push(
         <TextField required label={`Wort ${numOfWords > 1 ? (i+1) : ''}`}
@@ -68,10 +59,14 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
           onKeyPress={this.keyPressed}/>
       );
     }
-    let enterDisabled = words.length < numOfWords || words.some(word => !word || word.length === 0);
+    
+    const enterDisabled = words.length < numOfWords || words.some(word => !word || word.length === 0);
 
     return (
       <div className="Word-adder">
+        <Typography variant="subtitle1">
+          Gib {numOfWords>1?`${numOfWords} Wörter` : `ein Wort`} für das Spiel ein
+        </Typography>
         {wordFields}
         <Button variant="contained" color="primary" 
           disabled={enterDisabled} 

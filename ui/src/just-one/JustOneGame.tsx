@@ -5,7 +5,7 @@ import {GameEndView} from './GameEndView';
 import {GameStats} from './GameStats';
 import { IGame, GamePhase } from '../custom.d';
 
-import { GAME_URL, SETTING_ID, APP_TITLE } from '../App';
+import { GAME_URL, SETTING_ID, APP_TITLE } from '../shared/constants';
 
 const POLLING_INTERVAL = 1000;
 

@@ -7,7 +7,7 @@ import { WordAdder } from './WordAdder';
 import { RoundSelector } from './RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
-import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../App';
+import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../shared/constants';
 
 type GameLobbyProps = {
   game: IGame,
