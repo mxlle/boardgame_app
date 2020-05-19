@@ -7,7 +7,7 @@ import { IGame, GamePhase } from '../custom.d';
 
 import { GAME_URL, SETTING_ID, APP_TITLE } from '../App';
 
-const POLLING_INTERVAL = 2000;
+const POLLING_INTERVAL = 1000;
 
 type JustOneGameProps = {
   gameId: string,

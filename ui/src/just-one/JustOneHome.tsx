@@ -5,7 +5,7 @@ import { GameList } from './GameList';
 
 import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE, DEFAULT_NUM_WORDS } from '../App';
 
-const POLLING_INTERVAL = 2000;
+const POLLING_INTERVAL = 3000;
 
 type JustOneHomeProps = {};
 type JustOneHomeState = {
@@ -75,7 +75,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
   createGame() {
     const game: IGame = createGame();
     game.name = this.state.newGameName;
-    game.host = this.currentUserId;
+    game.host = this.currentUserId || '';
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -86,7 +86,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
       body: JSON.stringify({game})
     }).then(res => res.json())
       .then((data) => {
-        if(!this.currentUserId) {
+        if(this.currentUserId !== data.playerId) {
           localStorage.setItem(SETTING_ID, data.playerId);
         }
         window.location.href = '/' + data.id;
