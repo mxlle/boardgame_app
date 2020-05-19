@@ -22,6 +22,7 @@ import { UserConfig } from './common/UserConfig';
 export const App = () =>  {
   const [userColor, setUserColor] = useState(localStorage.getItem(SETTING_COLOR));
   const [userTheme, setUserTheme] = useState(localStorage.getItem(SETTING_THEME) || ThemeMode.AUTO);
+  const [userConfigOpen, setUserConfigOpen] = React.useState(false);
 
   const currentUserName: string|null = localStorage.getItem(SETTING_NAME);
   let prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -61,45 +62,43 @@ export const App = () =>  {
   const classNames = ['App'];
   if (prefersDarkMode) classNames.push('App-dark');
 
-  const [userConfigOpen, setUserConfigOpen] = React.useState(false);
-
   return (
     <Router>
       <ThemeProvider theme={theme}>
-      <Paper square elevation={0} className={classNames.join(' ')}>
-        <AppBar position="sticky">
-          <Toolbar>
-            <Link to="/" className="ButtonLink">
-              <IconButton edge="start" color="inherit" aria-label="home">
-                <HomeIcon />
-              </IconButton>
-            </Link>
-            <Typography variant="h2" className="appTitle">
-              Nur ein Wort!
-            </Typography>
-            { 
-              currentUserName ? 
-              <Button onClick={()=>setUserConfigOpen(true)} className="Account-button" color="inherit" startIcon={<AccountCircleIcon />}>
-                {currentUserName}
-              </Button> : 
-              <IconButton onClick={()=>setUserConfigOpen(true)} edge="end" color="inherit">
-                <AccountCircleIcon />
-              </IconButton>
-            }
-            <UserConfig 
-              open={userConfigOpen} 
-              onClose={applyUserTheme} 
-              selectedValue={userTheme} 
-              possibleValues={[ThemeMode.AUTO, ThemeMode.BRIGHT, ThemeMode.DARK]}
-            ></UserConfig>
-          </Toolbar>
-        </AppBar>
-        <Switch>
-          <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOneGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
-          <Route children={<JustOneHome/>} />
-        </Switch> 
-      </Paper>  
-    </ThemeProvider>
+        <Paper square elevation={0} className={classNames.join(' ')}>
+          <AppBar position="sticky">
+            <Toolbar>
+              <Link to="/" className="ButtonLink">
+                <IconButton edge="start" color="inherit" aria-label="home">
+                  <HomeIcon />
+                </IconButton>
+              </Link>
+              <Typography variant="h2" className="appTitle">
+                Nur ein Wort!
+              </Typography>
+              { 
+                currentUserName ? 
+                <Button onClick={()=>setUserConfigOpen(true)} className="Account-button" color="inherit" startIcon={<AccountCircleIcon />}>
+                  {currentUserName}
+                </Button> : 
+                <IconButton onClick={()=>setUserConfigOpen(true)} edge="end" color="inherit">
+                  <AccountCircleIcon />
+                </IconButton>
+              }
+              <UserConfig 
+                open={userConfigOpen} 
+                onClose={applyUserTheme} 
+                selectedValue={userTheme} 
+                possibleValues={[ThemeMode.AUTO, ThemeMode.BRIGHT, ThemeMode.DARK]}
+              ></UserConfig>
+            </Toolbar>
+          </AppBar>
+          <Switch>
+            <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOneGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
+            <Route children={<JustOneHome/>} />
+          </Switch> 
+        </Paper>  
+      </ThemeProvider>
     </Router>
   );  
 }

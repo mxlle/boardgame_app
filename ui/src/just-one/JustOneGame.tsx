@@ -2,86 +2,82 @@ import React from 'react';
 import {GameField} from './GameField';
 import {GameLobby} from './GameLobby';
 import {GameEndView} from './GameEndView';
-import {GameStats} from './GameStats';
+import {GameStats} from './components/GameStats';
 import { IGame, GamePhase } from '../custom.d';
 
-import { GAME_URL, SETTING_ID, APP_TITLE } from '../shared/constants';
+import { loadGame } from '../shared/apiFunctions';
+import { setDocumentTitle } from '../shared/functions';
 
 const POLLING_INTERVAL = 1000;
 
 type JustOneGameProps = {
-  gameId: string,
-  setTheme?: (color: string)=>void
+    gameId: string,
+    setTheme?: (color: string)=>void
 };
 type JustOneGameState = {
-  currentGame?: IGame
+    currentGame?: IGame
 };
 
 export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameState> {
-  public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
+    public state: JustOneGameState = {};
+    private _interval: number|undefined;
+    private _isMounted: boolean = false;
 
-  private _interval: any; // TODO
+    componentDidMount() {
+        this._isMounted = true;
 
-  constructor(props: JustOneGameProps) {
-    super(props);
+        this.loadGame();
 
-    this.state = {};
-  }
-
-  componentDidMount() {
-    this.loadGame();
-
-    this._interval = setInterval(this.loadGame.bind(this), POLLING_INTERVAL);
-  }
-
-  componentWillUnmount() {
-    clearInterval(this._interval);
-  }
-
-  loadGame() {
-    let id = this.props.gameId;
-    if (!id) return;
-
-    fetch(`${GAME_URL}/${id}`)
-      .then(res => res.json())
-      .then((data) => {
-        setDocumentTitle(data.game.name);
-        this.setState({
-          currentGame: data.game
-        });
-      })
-      .catch(console.log)
-  }
-
-  render() {
-    const currentGame: IGame|undefined = this.state.currentGame;
-
-    let gameContent;
-    let gameStats;
-    if (currentGame) {
-      if ([GamePhase.Init,GamePhase.Preparation].includes(currentGame.phase)) {
-        gameContent = <GameLobby game={currentGame} setTheme={this.props.setTheme}></GameLobby>
-      } else if (currentGame.phase === GamePhase.End) {
-        gameContent = <GameEndView game={currentGame}></GameEndView>;
-      } else {
-        gameStats = <GameStats game={currentGame}></GameStats>;
-        gameContent = <GameField game={currentGame}></GameField>;
-      }     
+        this._interval = window.setInterval(this.loadGame.bind(this), POLLING_INTERVAL);
     }
 
-    return (
-      <div className="Game-content">
-        {gameStats}
-        {gameContent}
-      </div>
-    );
-  }
-}
+    componentWillUnmount() {
+        this._isMounted = false;
+        clearInterval(this._interval);
+    }
 
-function setDocumentTitle(gameName?: string) {
-  if (gameName) {
-    document.title = `${APP_TITLE} - ${gameName}`;
-  } else {
-    document.title = APP_TITLE;
-  }
+    async loadGame() {
+        const id = this.props.gameId;
+        const game = await loadGame(id);
+        if (!this._isMounted) return;
+        if (!game) return;
+        setDocumentTitle(game.name);
+        this.setState({
+            currentGame: game
+        });
+    }
+
+    render() {
+        const {setTheme} = this.props;
+        const {currentGame} = this.state;
+
+        if (!currentGame) return null;
+
+        let gameContent;
+        let gameStats;
+
+        switch(currentGame.phase) {
+            case GamePhase.Init:
+            case GamePhase.Preparation:
+                gameContent = <GameLobby game={currentGame} setTheme={setTheme}></GameLobby>;
+                break;
+            case GamePhase.HintWriting:
+            case GamePhase.HintComparing:
+            case GamePhase.Guessing:
+            case GamePhase.Solution:
+                gameStats = <GameStats game={currentGame}></GameStats>;
+                gameContent = <GameField game={currentGame}></GameField>;
+                break;
+            case GamePhase.End:
+                gameContent = <GameEndView game={currentGame}></GameEndView>;
+                break;
+        }
+
+        return (
+            <div className="Game-content">
+                {gameStats}
+                {gameContent}
+            </div>
+        );
+    }
 }

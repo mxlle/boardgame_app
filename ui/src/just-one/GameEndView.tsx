@@ -1,5 +1,5 @@
 import React from 'react';
-import {WordCard} from './WordCard';
+import {WordCard} from './components/WordCard';
 import { IGame } from '../custom.d';
 
 type GameEndViewProps = {

@@ -3,112 +3,101 @@ import { Button, TextField } from '@material-ui/core';
 import { IGame, GamePhase } from '../custom.d';
 import { GameList } from './GameList';
 
-import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE, DEFAULT_NUM_WORDS } from '../shared/constants';
+import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
+import { setDocumentTitle } from '../shared/functions';
+import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
 
 const POLLING_INTERVAL = 3000;
 
 type JustOneHomeProps = {};
 type JustOneHomeState = {
-  newGameName: string,
-  allGames: IGame[]
+    newGameName: string,
+    allGames: IGame[]
 };
 
 export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
-  public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
-  public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
+    public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
+    public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
-  private _interval: any; // TODO
+    private _interval: number|undefined;
+    private _isMounted: boolean = false;
 
-  constructor(props: JustOneHomeProps) {
-    super(props);
+    constructor(props: JustOneHomeProps) {
+        super(props);
 
-    this.createGame = this.createGame.bind(this);
-    this.handleChange = this.handleChange.bind(this);
-    this.deleteGame = this.deleteGame.bind(this);
+        this.createGame = this.createGame.bind(this);
+        this.handleChange = this.handleChange.bind(this);
+        this.deleteGame = this.deleteGame.bind(this);
 
-    let newGameName = this.currentUserName ? `${this.currentUserName}s Spiel` : 'Neues Spiel';
+        let newGameName = this.currentUserName ? `${this.currentUserName}s Spiel` : 'Neues Spiel';
 
-    this.state = { allGames: [], newGameName: newGameName };
-  }
+        this.state = { allGames: [], newGameName: newGameName };
+    }
 
-  componentDidMount() {
-    document.title = APP_TITLE;
+    componentDidMount() {
+        this._isMounted = true;
 
-    this.loadGames();
+        setDocumentTitle();
 
-    this._interval = setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
-  }
+        this.loadGames();
+        this._interval = window.setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
+    }
 
-  componentWillUnmount() {
-    clearInterval(this._interval);
-  }
+    componentWillUnmount() {
+        this._isMounted = false;
+        clearInterval(this._interval);
+    }
 
-  loadGames() {
-    fetch(`${GAME_URL}/all`)
-      .then(res => res.json())
-      .then((data) => {
-        let games = data.games || [];
+    async loadGames() {
+        let games = await loadGames();
+        if (!this._isMounted) return;
         games = games.filter((game: IGame) => {
-          return game.phase === GamePhase.Init || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
+            return game.phase === GamePhase.Init || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
         });
         this.setState({
-          allGames: games
+            allGames: games
         });
-      })
-      .catch(console.log)
-  }
+    }
 
-  deleteGame(gameId: string) {
-    fetch(`${GAME_URL}/delete/${gameId}`, {
-      method: 'DELETE'
-    }).then(res => res.json())
-      .then((data) => {
-        console.log('deleted', data);
-      })
-      .catch(console.log)
-  }
+    deleteGame(gameId: string) {
+        deleteGame(gameId);
+        this.setState((state) => {
+            return {
+                allGames: state.allGames.filter(g => g.id !== gameId)
+            }
+        });
+    }
 
-  handleChange(event: React.ChangeEvent<HTMLInputElement>) {
-    this.setState({newGameName: event.target.value});
-  }
+    handleChange(event: React.ChangeEvent<HTMLInputElement>) {
+        this.setState({newGameName: event.target.value});
+    }
 
-  createGame() {
-    const game: IGame = createGame();
-    game.name = this.state.newGameName;
-    game.host = this.currentUserId || '';
+    async createGame() {
+        const game: IGame = emptyGame();
+        game.name = this.state.newGameName;
+        game.host = this.currentUserId || '';
 
-    fetch(`${GAME_URL}/add`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({game})
-    }).then(res => res.json())
-      .then((data) => {
-        if(this.currentUserId !== data.playerId) {
-          localStorage.setItem(SETTING_ID, data.playerId);
+        const {id, playerId} = await createGame(game);
+
+        if(this.currentUserId !== playerId) {
+            localStorage.setItem(SETTING_ID, playerId);
         }
-        window.location.href = '/' + data.id;
-      })
-      .catch(console.log)
-  }
+        window.location.href = '/' + id;
+    }
 
-  render() {
-    const {newGameName, allGames} = this.state;
+    render() {
+        const {newGameName, allGames} = this.state;
 
-    return (
-      <div className="JustOneHome">
-        <TextField label={'Spielname'}
-            value={newGameName} 
-            onChange={this.handleChange} />
-        <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
-        <GameList allGames={allGames} deleteGame={this.deleteGame}/>
-      </div>
-    );
-  }
+        return (
+            <div className="JustOneHome">
+                <TextField label={'Spielname'} value={newGameName} onChange={this.handleChange} />
+                <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
+                <GameList allGames={allGames} deleteGame={this.deleteGame} />
+            </div>
+        );
+    }
 }
 
-function createGame(): IGame {
+function emptyGame(): IGame {
     return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }

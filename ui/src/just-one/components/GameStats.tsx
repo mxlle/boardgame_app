@@ -1,5 +1,5 @@
 import React from 'react';
-import { IGame, GamePhase } from '../custom.d';
+import { IGame, GamePhase } from '../../custom.d';
 
 type GameStatsProps = {
   game: IGame

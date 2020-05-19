@@ -134,24 +134,6 @@ router.put('/:id/updatePlayer', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Start game - "PUT /api/games/:id/start"
- ******************************************************************************/
-
-router.put('/:id/start', async (req: Request, res: Response) => {
-    const game = await gameDao.getOne(req.params.id);
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-
-    GameController.startGame(game);
-
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
-
-/******************************************************************************
  *                      Send hint - "PUT /api/games/:id/hint"
  ******************************************************************************/
 
@@ -241,7 +223,7 @@ router.put('/:id/guess', async (req: Request, res: Response) => {
  ******************************************************************************/
 
 router.put('/:id/resolve', async (req: Request, res: Response) => {
-    const { countCorrect } = req.body;
+    const { correct } = req.body;
     const game = await gameDao.getOne(req.params.id);
     if (!game) {
         return res.status(NOT_FOUND).json({
@@ -249,7 +231,7 @@ router.put('/:id/resolve', async (req: Request, res: Response) => {
         });
     }
 
-    GameController.resolveRound(game, !!countCorrect);
+    GameController.resolveRound(game, !!correct);
 
     await gameDao.update(game);
     return res.status(OK).end();
