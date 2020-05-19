@@ -158,7 +158,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
               )
             }
             {
-              isHost && (
+              isHost && isInGame && (
                 <Button variant="contained" color="primary" 
                   disabled={game.players.length < 3}
                   onClick={this.selectNumRounds}>Alle Spieler sind da</Button>

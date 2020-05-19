@@ -75,6 +75,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
   createGame() {
     const game: IGame = createGame();
     game.name = this.state.newGameName;
+    game.host = this.currentUserId;
 
     fetch(`${GAME_URL}/add`, {
       method: 'POST',
@@ -85,6 +86,9 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
       body: JSON.stringify({game})
     }).then(res => res.json())
       .then((data) => {
+        if(!this.currentUserId) {
+          localStorage.setItem(SETTING_ID, data.playerId);
+        }
         window.location.href = '/' + data.id;
       })
       .catch(console.log)
@@ -106,5 +110,5 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
 }
 
 function createGame(): IGame {
-    return {"id":"", "name": "", "words":[],"players":[],"host":"1","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
+    return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
