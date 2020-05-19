@@ -85,7 +85,7 @@ header {
   Button, .MuiFormControl-root {
     margin: $gridSize;
   }
-  .Word-hint:last-child {
+  .Word-hint.Word-hint-writing {
     border-style: dotted
   }
 }
