@@ -2,10 +2,11 @@ import React from 'react';
 import { Button, Typography } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 
-export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
+import { DEFAULT_NUM_WORDS } from '../App';
 
 type WordAdderProps = {
-  add: (words: string[])=>void
+  add: (words: string[])=>void,
+  numOfWords: number
 }
 
 type WordAdderState = {
@@ -22,6 +23,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     super(props);
 
     this.handleChange = this.handleChange.bind(this);
+    this.keyPressed = this.keyPressed.bind(this);
   }
 
   handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -36,26 +38,34 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     });
   }
 
+  keyPressed(event: React.KeyboardEvent<HTMLInputElement>) {
+    if (event.key === "Enter") {
+      const words = this.state.words;
+      const enterDisabled = words.length < this.props.numOfWords || words.some(word => !word || word.length === 0);
+      if (!enterDisabled) this.props.add(words);
+    }
+  }
+
   render() {
-    const { add } = this.props;
+    const { add, numOfWords } = this.props;
     const { words } = this.state;
-    const numOfWords = DEFAULT_NUM_WORDS;
     const wordFields = [];
     if (numOfWords>0) {
       wordFields.push(
         <Typography variant="subtitle1" key="heading">
-          Gebe {numOfWords} Wörter für das Spiel ein
+          Gib {numOfWords>1?`${numOfWords} Wörter` : `ein Wort`} für das Spiel ein
         </Typography>
       );
     }
     for (let i=0; i<numOfWords; i++) {
       wordFields.push(
-        <TextField required label={`Wort ${i+1}`}
-          placeholder="Für den Stapel"
+        <TextField required label={`Wort ${numOfWords > 1 ? (i+1) : ''}`}
+          placeholder="Ratebegriff eingeben"
           name={`word${i}`}
           key={`word${i}`}
           value={words[i]||''} 
-          onChange={this.handleChange} />
+          onChange={this.handleChange} 
+          onKeyPress={this.keyPressed}/>
       );
     }
     let enterDisabled = words.length < numOfWords || words.some(word => !word || word.length === 0);
@@ -65,7 +75,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
         {wordFields}
         <Button variant="contained" color="primary" 
           disabled={enterDisabled} 
-          onClick={() => add(words)}>Wörter abschicken</Button>
+          onClick={() => add(words)}>Jetzt abschicken</Button>
       </div>
     );
   }

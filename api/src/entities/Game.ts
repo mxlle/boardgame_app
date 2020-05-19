@@ -1,6 +1,8 @@
 import { IUser } from './User';
 export { IUser }; // reexport
 
+export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
+
 export interface IHint {
     hint: string;
     author: IUser;
@@ -9,6 +11,7 @@ export interface IHint {
 
 export enum GamePhase {
     Init,
+    Preparation,
     HintWriting,
     HintComparing,
     Guessing,
@@ -27,6 +30,7 @@ export interface IGame {
     words: string[];
     players: IUser[];
     host: string; // hostId
+    wordsPerPlayer: number;
 
     round: number;
     phase: GamePhase;
@@ -41,11 +45,18 @@ export interface IGame {
 }
 
 export function addPlayer(game: IGame, player: IUser) {
-    if (game.players.length === 0 || !game.host) game.host = player.id;
+    if (!game.host) game.host = player.id; // TODO still needed? 
     if (!player.enteredWords) player.enteredWords = [];
     game.players.push(player);
 
     game.words.push(...player.enteredWords);
+}
+
+export function goToPreparation(game: IGame, wordsPerPlayer: number) {
+    if (game.phase !== GamePhase.Init) return;
+
+    game.wordsPerPlayer = wordsPerPlayer || game.wordsPerPlayer || DEFAULT_NUM_WORDS;
+    game.phase = GamePhase.Preparation;
 }
 
 export function updatePlayer(game: IGame, player: IUser) {
@@ -56,6 +67,10 @@ export function updatePlayer(game: IGame, player: IUser) {
     currentUser.enteredWords = player.enteredWords || [];
 
     game.words.push(...currentUser.enteredWords);
+
+    // check if ready to start 
+    const allWordsEntered: boolean = game.words.length >= game.wordsPerPlayer*game.players.length;
+    if (allWordsEntered) startGame(game);
 }
 
 export function startGame(game: IGame) {

@@ -43,9 +43,10 @@ router.post('/add', async (req: Request, res: Response) => {
     }
 
     if (!game.id) game.id = generateId();
+    if (!game.host) game.host = generateId();
 
     await gameDao.add(game);
-    return res.status(CREATED).json({id: game.id});
+    return res.status(CREATED).json({id: game.id, playerId: game.host});
 });
 
 
@@ -65,7 +66,26 @@ router.put('/update', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Add player to game - "PUT /api/games/:id/addPlay"
+ *              Start preparation - "PUT /api/games/:id/startPreparation"
+ ******************************************************************************/
+
+router.put('/:id/startPreparation', async (req: Request, res: Response) => {
+    const { wordsPerPlayer } = req.body;
+    const game = await gameDao.getOne(req.params.id);
+    if (!game) {
+        return res.status(NOT_FOUND).json({
+            error: gameNotFoundError,
+        });
+    }
+
+    GameController.goToPreparation(game, wordsPerPlayer);
+
+    await gameDao.update(game);
+    return res.status(OK).end();
+});
+
+/******************************************************************************
+ *          Add player to game - "PUT /api/games/:id/addPlayer"
  ******************************************************************************/
 
 router.put('/:id/addPlayer', async (req: Request, res: Response) => {
@@ -90,7 +110,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
 });
 
 /******************************************************************************
- *                      Add player to game - "PUT /api/games/:id/updatePlayer"
+ *          Update player in game - "PUT /api/games/:id/updatePlayer"
  ******************************************************************************/
 
 router.put('/:id/updatePlayer', async (req: Request, res: Response) => {

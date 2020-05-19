@@ -16,6 +16,7 @@ export interface IHint {
 
 export enum GamePhase {
     Init,
+    Preparation,
     HintWriting,
     HintComparing,
     Guessing,
@@ -34,6 +35,7 @@ export interface IGame {
     words: string[];
     players: IUser[];
     host: string; // hostId
+    wordsPerPlayer: number;
 
     round: number;
     phase: GamePhase;

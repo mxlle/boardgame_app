@@ -1,9 +1,9 @@
 import React from 'react';
 import { Button, TextField } from '@material-ui/core';
-import { IGame } from '../custom.d';
+import { IGame, GamePhase } from '../custom.d';
 import { GameList } from './GameList';
 
-import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE } from '../App';
+import { GAME_URL, SETTING_ID, SETTING_NAME, APP_TITLE, DEFAULT_NUM_WORDS } from '../App';
 
 const POLLING_INTERVAL = 2000;
 
@@ -49,7 +49,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
       .then((data) => {
         let games = data.games || [];
         games = games.filter((game: IGame) => {
-          return game.phase === 0 || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
+          return game.phase === GamePhase.Init || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
         });
         this.setState({
           allGames: games
@@ -106,5 +106,5 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
 }
 
 function createGame(): IGame {
-    return {"id":"", "name": "", "words":[],"players":[],"host":"1","round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
+    return {"id":"", "name": "", "words":[],"players":[],"host":"1","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }

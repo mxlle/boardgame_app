@@ -99,6 +99,11 @@ header {
   flex-wrap: wrap
 }
 
+.MuiPaper-root.StatusInfo {
+  padding: $standardMargin;
+  margin: $standardMargin;
+}
+
 .Current-word, .Current-hints, .Correct-words, .Wrong-words {
   flex: 1;
   display: flex;

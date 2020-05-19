@@ -1,19 +1,21 @@
 import React from 'react';
-import { IGame, IUser } from '../custom.d';
-import { Button } from '@material-ui/core';
+import { IGame, IUser, GamePhase } from '../custom.d';
+import { Button, Paper } from '@material-ui/core';
 import { WordHint } from './WordHint';
 import { NewPlayer } from './NewPlayer';
-import { WordAdder, DEFAULT_NUM_WORDS  } from './WordAdder';
+import { WordAdder } from './WordAdder';
+import { RoundSelector } from './RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
-import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../App';
+import { GAME_URL, SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../App';
 
 type GameLobbyProps = {
   game: IGame,
   setTheme?: (color: string)=>void
 }
 type GameLobbyState = {
-  currentPlayer: IUser
+  currentPlayer: IUser,
+  roundDialogOpen: boolean
 }
 
 export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -23,7 +25,8 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
       id: localStorage.getItem(SETTING_ID) || '',
       name: localStorage.getItem(SETTING_NAME) || '',
       color: getRandomColor(localStorage.getItem(SETTING_COLOR))
-    }
+    }, 
+    roundDialogOpen: false
   };
 
   constructor(props: GameLobbyProps) {
@@ -32,6 +35,8 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     this.addPlayer = this.addPlayer.bind(this);
     this.addWords = this.addWords.bind(this);
     this.setPlayerProps = this.setPlayerProps.bind(this);
+    this.selectNumRounds = this.selectNumRounds.bind(this);
+    this.startPreparation = this.startPreparation.bind(this);
     this.startGame = this.startGame.bind(this);
   }
 
@@ -86,6 +91,28 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     });
   }
 
+  selectNumRounds() {
+    this.setState({
+      roundDialogOpen: true
+    });
+  }
+
+
+  startPreparation(wordsPerPlayer: number = DEFAULT_NUM_WORDS) {
+    this.setState({
+      roundDialogOpen: false
+    });
+
+    fetch(`${GAME_URL}/${this.props.game.id}/startPreparation`, {
+      method: 'PUT',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({wordsPerPlayer})
+    }).catch(console.log)
+  }
+
   startGame() {
     fetch(`${GAME_URL}/${this.props.game.id}/start`, {
       method: 'PUT'
@@ -97,55 +124,91 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
   render() {
     const { game } = this.props;
-    const { currentPlayer } = this.state;
-    const numWordsPerPlayer = DEFAULT_NUM_WORDS;
+    const { currentPlayer, roundDialogOpen } = this.state;
+    const numWordsPerPlayer = game.wordsPerPlayer || DEFAULT_NUM_WORDS;
     const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
-
-    let isInGame: boolean = false;
-    //let myWords: string[] = [];
-    let allMyWordsEntered: boolean = false;
-    const listOfPlayers = game.players.map(player => {
-      const wordsEntered: boolean = !!player.enteredWords && player.enteredWords.length === numWordsPerPlayer;
-      if (player.id === currentUserId) {
-        isInGame = true;
-        //myWords = player.enteredWords || [];
-        allMyWordsEntered = wordsEntered;
-      } 
-      return (
-        <WordHint key={player.id} hint={player.name} color={player.color} showPencil={!wordsEntered}></WordHint>
-      )
-    });
     const isHost: boolean = !!currentUserId && game.host === currentUserId;
-    const allWordsEntered: boolean = game.words.length >= numWordsPerPlayer*listOfPlayers.length;
-    const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
-    const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
+    let isInGame: boolean = false;
+    let listOfPlayers;
 
-    return (
-      <div className="Game-lobby">
-        <div className="New-player">
-          { 
-            !isInGame && 
-            <NewPlayer currentPlayer={currentPlayer}
-              updatePlayer={this.setPlayerProps}
-              addPlayer={this.addPlayer}/>
-          }
-          { 
-            isInGame && !allMyWordsEntered &&
-            <WordAdder add={this.addWords}/>
-          }
-          {
-            isHost && 
-            <Button variant="contained" color="primary" 
-              disabled={game.players.length < 3 || !allWordsEntered} 
-              onClick={this.startGame}>Spiel beginnen</Button>
-          }
+    if (game.phase === GamePhase.Init) {
+      listOfPlayers = game.players.map(player => {
+        if (player.id === currentUserId) {
+          isInGame = true;
+        } 
+        return (
+          <WordHint key={player.id} hint={player.name} color={player.color}></WordHint>
+        )
+      });
+      const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
+      const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
+
+      return (
+        <div className="Game-lobby">
+          <div className="New-player">
+            { 
+              isInGame ? (
+                <Paper className="StatusInfo">
+                  Warten auf Mitspieler ... Sobald alle Mitspieler da sind, { isHost ? 'kannst du' : 'kann der Spielleiter'} das Spiel starten. 
+                </Paper>
+              ) : (
+                <NewPlayer currentPlayer={currentPlayer}
+                  updatePlayer={this.setPlayerProps}
+                  addPlayer={this.addPlayer}/>
+              )
+            }
+            {
+              isHost && (
+                <Button variant="contained" color="primary" 
+                  disabled={game.players.length < 3}
+                  onClick={this.selectNumRounds}>Alle Spieler sind da</Button>
+              )
+            }
+          </div>
+          <div className="Player-list">
+            {listOfPlayers}
+            {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}
+          </div>
+          <RoundSelector numOfPlayers={game.players.length} open={roundDialogOpen} onClose={this.startPreparation}/>
         </div>
-        <div className="Player-list">
-          {listOfPlayers}
-          {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}
+      );
+    } else if (game.phase === GamePhase.Preparation) {
+      //let myWords: string[] = [];
+      let allMyWordsEntered: boolean = false;
+      listOfPlayers = game.players.map(player => {
+        const wordsEntered: boolean = !!player.enteredWords && player.enteredWords.length === numWordsPerPlayer;
+        if (player.id === currentUserId) {
+          isInGame = true;
+          //myWords = player.enteredWords || [];
+          allMyWordsEntered = wordsEntered;
+        } 
+        return (
+          <WordHint key={player.id} hint={player.name} color={player.color} showPencil={!wordsEntered}></WordHint>
+        )
+      });
+
+      // TODO not in game users
+      return (
+        <div className="Game-lobby">
+          <div className="New-player">
+            { 
+              allMyWordsEntered || !isInGame ? ( 
+                <Paper className="StatusInfo">
+                  Warten auf Mitspieler ... Sobald alle fertig sind, geht's los. 
+                </Paper>
+              ) : (
+                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
+              )
+            }
+          </div>
+          <div className="Player-list">
+            {listOfPlayers}
+          </div>
         </div>
-      </div>
-    );
+      );
+    } else {
+      return null;
+    }
   }
 
 }

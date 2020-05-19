@@ -59,7 +59,7 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
     let gameContent;
     let gameStats;
     if (currentGame) {
-      if (currentGame.phase === GamePhase.Init) {
+      if ([GamePhase.Init,GamePhase.Preparation].includes(currentGame.phase)) {
         gameContent = <GameLobby game={currentGame} setTheme={this.props.setTheme}></GameLobby>
       } else if (currentGame.phase === GamePhase.End) {
         gameContent = <GameEndView game={currentGame}></GameEndView>;

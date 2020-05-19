@@ -24,6 +24,7 @@ export const SETTING_NAME = 'playerName';
 export const SETTING_COLOR = 'playerColor';
 export const SETTING_THEME = 'darkTheme';
 export const APP_TITLE = 'Nur ein Wort!';
+export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 const DEFAULT_PRIMARY_COLOR = '#43a047';
 const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
 
@@ -80,7 +81,7 @@ export const App = () =>  {
   return (
     <Router>
       <ThemeProvider theme={theme}>
-      <Paper elevation={0} className={classNames.join(' ')}>
+      <Paper square elevation={0} className={classNames.join(' ')}>
         <AppBar position="sticky">
           <Toolbar>
             <Link to="/" className="ButtonLink">
