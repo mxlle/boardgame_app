@@ -5,7 +5,7 @@ export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 
 export interface IHint {
     hint: string;
-    author: IUser;
+    author: string;
     isDuplicate?: boolean
 }
 
@@ -35,10 +35,10 @@ export interface IGame {
     round: number;
     phase: GamePhase;
     currentWord?: string;
-    currentGuesser?: IUser;
+    currentGuesser?: string;
     currentGuess?: string;
     guessedRight?: boolean;
-    roundHost?: IUser;
+    roundHost?: string;
     hints: IHint[];
     correctWords: WordResult[];
     wrongWords: WordResult[];
@@ -103,17 +103,17 @@ export function newRound(game: IGame, gameStart: boolean = false) {
 
     game.phase = GamePhase.HintWriting;
     game.currentWord = game.words[game.round];
-    game.currentGuesser = game.players[game.round % game.players.length];
-    game.roundHost = game.players[(game.round+1) % game.players.length];
+    game.currentGuesser = game.players[game.round % game.players.length].id;
+    game.roundHost = game.players[(game.round+1) % game.players.length].id;
     game.currentGuess = '';
     game.guessedRight = false;
-    game.hints = game.players.filter(player => !game.currentGuesser || player.id !== game.currentGuesser.id).map(player => { return { hint: '', author: player } });
+    game.hints = game.players.filter(player => player.id !== game.currentGuesser).map(player => { return { hint: '', author: player.id } });
     if (game.players.length < 4) game.hints = game.hints.concat(game.hints);
 }
 
 export function addHint(game: IGame, hint: string = '', playerId: string = '') {
-    let hintObj = game.hints.find(h => h.author.id === playerId && !h.hint);
-    if (!hintObj) hintObj = game.hints.find(h => h.author.id === playerId);
+    let hintObj = game.hints.find(h => h.author === playerId && !h.hint);
+    if (!hintObj) hintObj = game.hints.find(h => h.author === playerId);
     if (!hintObj) return; // TODO
     hintObj.hint = justOne(hint);
 

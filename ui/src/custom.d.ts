@@ -10,7 +10,7 @@ export interface IUser {
 
 export interface IHint {
     hint: string;
-    author: IUser;
+    author: string;
     isDuplicate?: boolean
 }
 
@@ -40,10 +40,10 @@ export interface IGame {
     round: number;
     phase: GamePhase;
     currentWord?: string;
-    currentGuesser?: IUser;
+    currentGuesser?: string;
     currentGuess?: string;
     guessedRight?: boolean;
-    roundHost?: IUser;
+    roundHost?: string;
     hints: IHint[];
     correctWords: WordResult[];
     wrongWords: WordResult[];

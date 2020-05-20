@@ -4,8 +4,7 @@ import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
 
-import { SETTING_ID } from '../../shared/constants';
-import { getCurrentUserInGame } from '../../shared/functions';
+import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
 
 type SolutionViewProps = {
@@ -13,8 +12,6 @@ type SolutionViewProps = {
 };
 
 export class SolutionView extends React.Component<SolutionViewProps> {
-    public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
-
     constructor(props: SolutionViewProps) {
         super(props);
 
@@ -27,23 +24,24 @@ export class SolutionView extends React.Component<SolutionViewProps> {
 
     render() {
         const game: IGame = this.props.game;
-        const currentUser = getCurrentUserInGame(game, this.currentUserId); // TODO
-        const guesser = game.currentGuesser ? game.currentGuesser : { name: '?', id: '?' }; // TODO
+        const currentUser = getCurrentUserInGame(game);
+        const guesser = getUserInGame(game, game.currentGuesser) ||  { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = isGuesser ? 'Ich' : guesser.name;
-        const isRoundHost = game.roundHost && this.currentUserId === game.roundHost.id;
+        const isRoundHost = currentUser && currentUser.id === game.roundHost;
 
         const currentWord = game.currentWord || '';
         const currentGuess = game.currentGuess || '';
         const currentHints = game.hints.map((hintObj: IHint, index: number) => {
-            const hintIsMine = currentUser && currentUser.id === hintObj.author.id;
-            const authorName = hintIsMine ? 'Ich' : hintObj.author.name;
+            const hintIsMine = currentUser && currentUser.id === hintObj.author;
+            const author = getUserInGame(game, hintObj.author) || { name: '?', id: '?' };
+            const authorName = hintIsMine ? 'Ich' : author.name;
 
             return (
                 <WordHint 
-                    key={hintObj.author.id+index} 
+                    key={hintObj.author+index} 
                     hint={hintObj.hint} 
-                    color={hintObj.author.color}
+                    color={author.color}
                     author={authorName}
                 />
             );

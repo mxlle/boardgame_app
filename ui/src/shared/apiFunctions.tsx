@@ -1,5 +1,6 @@
 import { GAME_URL } from './constants';
-import { IGame, IHint, IUser } from '../custom.d';
+import { getCurrentUserId } from './functions';
+import { IGame, IUser } from '../custom.d';
 
 export async function loadGames(): Promise<IGame[]> {
     return (await _get('all')).games || [];
@@ -29,7 +30,7 @@ export function startPreparation(id: string, wordsPerPlayer: number) {
     return _put(`${id}/startPreparation`, {wordsPerPlayer});
 }
 
-export function submitHint(id: string, hint: IHint) {
+export function submitHint(id: string, hint: string) {
     return _put(`${id}/hint`, {hint});
 }
 
@@ -52,7 +53,12 @@ export function resolveRound(id: string, correct: boolean) {
 
 function _get(endpoint: string): Promise<any> {
     return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`)
+        fetch(`${GAME_URL}/${endpoint}`, {
+            method: 'GET',
+            headers: {
+                ..._getAuthHeader()
+            }
+        })
             .then(res => res.json())
             .then((data) => {
                 resolve(data);
@@ -68,6 +74,7 @@ function _post(endpoint: string, data: any): Promise<any> {
         fetch(`${GAME_URL}/${endpoint}`, {
             method: 'POST',
             headers: {
+                ..._getAuthHeader(),
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
@@ -88,6 +95,7 @@ function _put(endpoint: string, data?: any): Promise<any> {
         fetch(`${GAME_URL}/${endpoint}`, {
             method: 'PUT',
             headers: {
+                ..._getAuthHeader(),
                 'Accept': 'application/json',
                 'Content-Type': 'application/json',
             },
@@ -108,7 +116,12 @@ function _put(endpoint: string, data?: any): Promise<any> {
 
 function _delete(endpoint: string) {
     return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, { method: 'DELETE'})
+        fetch(`${GAME_URL}/${endpoint}`, { 
+            method: 'DELETE',
+            headers: {
+                ..._getAuthHeader()
+            }
+        })
             .then((data) => {
                 resolve();
             }, (error) => {
@@ -116,4 +129,10 @@ function _delete(endpoint: string) {
                 reject(error);
             })
     });   
+}
+
+function _getAuthHeader() {
+    return {
+        'Authorization': getCurrentUserId()
+    }
 }

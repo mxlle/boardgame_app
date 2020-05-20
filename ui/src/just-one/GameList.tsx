@@ -13,6 +13,7 @@ import DeleteIcon from '@material-ui/icons/Delete';
 import { IGame, GamePhase } from '../custom.d';
 
 import { SETTING_ID, SETTING_NAME } from '../shared/constants';
+import { getCurrentUserInGame } from '../shared/functions';
 
 type GameListProps = {
   allGames: IGame[],
@@ -28,8 +29,10 @@ export class GameList extends React.Component<GameListProps,GameListState> {
 
   render() {
     const {allGames,deleteGame} = this.props;
-    const newGames = allGames.filter(game => game.phase === GamePhase.Init);
-    const onGoingGames = allGames.filter(game => ![GamePhase.Init,GamePhase.End].includes(game.phase));
+    const newGames = allGames.filter(game => game.phase === GamePhase.Init && !getCurrentUserInGame(game));
+    const onGoingGames = allGames.filter(game => 
+      ![GamePhase.Init,GamePhase.End].includes(game.phase) || (game.phase === GamePhase.Init && !!getCurrentUserInGame(game))
+    );
     const doneGames = allGames.filter(game => game.phase === GamePhase.End);
 
     const createListItem = (game: IGame) => {

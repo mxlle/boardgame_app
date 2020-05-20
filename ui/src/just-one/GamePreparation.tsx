@@ -53,7 +53,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
             )
         });
 
-        const myWordCards = myWords.map(word => <WordCard word={word}/>)
+        const myWordCards = myWords.map(word => <WordCard key={word} word={word}/>)
 
         // TODO not in game users
         // TODO css classes
@@ -70,7 +70,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                         )
                     }
                     {myWordCards.length > 0 && <Typography variant="subtitle1">{myWordCards.length > 1 ? 'Meine Begriffe' : 'Mein Begriff'}</Typography>}
-                    {myWordCards.length > 0 && myWordCards}
+                    {myWordCards}
                 </div>
                 <div className="Player-list">
                     <Typography variant="h5">

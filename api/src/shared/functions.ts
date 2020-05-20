@@ -1,10 +1,8 @@
 import logger from './Logger';
-
-const ShortUniqueId = require('short-unique-id').default;
+import shortid from 'shortid'; 
 
 export const generateId = () => {
-	const generator = new ShortUniqueId({ length: 8 });
-	return generator();
+	return shortid();
 }
 
 export const pErr = (err: Error) => {

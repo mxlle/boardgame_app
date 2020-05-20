@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button, TextField } from '@material-ui/core';
-import { IGame, GamePhase } from '../custom.d';
+import { IGame } from '../custom.d';
 import { GameList } from './GameList';
 
 import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
@@ -51,9 +51,6 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     async loadGames() {
         let games = await loadGames();
         if (!this._isMounted) return;
-        games = games.filter((game: IGame) => {
-            return game.phase === GamePhase.Init || (this.currentUserId && game.players.findIndex(p => p.id === this.currentUserId) > -1);
-        });
         this.setState({
             allGames: games
         });
@@ -75,7 +72,6 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     async createGame() {
         const game: IGame = emptyGame();
         game.name = this.state.newGameName;
-        game.host = this.currentUserId || '';
 
         const {id, playerId} = await createGame(game);
 
