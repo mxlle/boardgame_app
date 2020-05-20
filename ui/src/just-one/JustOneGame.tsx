@@ -1,8 +1,12 @@
 import React from 'react';
-import {GameField} from './GameField';
 import {GameLobby} from './GameLobby';
+import {GamePreparation} from './GamePreparation';
 import {GameEndView} from './GameEndView';
 import {GameStats} from './components/GameStats';
+import {HintWritingView} from './gamePhases/HintWritingView';
+import {HintComparingView} from './gamePhases/HintComparingView';
+import {GuessingView} from './gamePhases/GuessingView';
+import {SolutionView} from './gamePhases/SolutionView';
 import { IGame, GamePhase } from '../custom.d';
 
 import { loadGame } from '../shared/apiFunctions';
@@ -58,18 +62,29 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
 
         switch(currentGame.phase) {
             case GamePhase.Init:
+                gameContent = <GameLobby game={currentGame} setTheme={setTheme} />;
+                break;
             case GamePhase.Preparation:
-                gameContent = <GameLobby game={currentGame} setTheme={setTheme}></GameLobby>;
+                gameContent = <GamePreparation game={currentGame} />;
                 break;
             case GamePhase.HintWriting:
+                gameContent = <HintWritingView game={currentGame} />;
+                gameStats   = <GameStats game={currentGame} />;
+                break;
             case GamePhase.HintComparing:
+                gameContent = <HintComparingView game={currentGame} />;
+                gameStats   = <GameStats game={currentGame} />;
+                break;
             case GamePhase.Guessing:
+                gameContent = <GuessingView game={currentGame} />;
+                gameStats   = <GameStats game={currentGame} />;
+                break;
             case GamePhase.Solution:
-                gameStats = <GameStats game={currentGame}></GameStats>;
-                gameContent = <GameField game={currentGame}></GameField>;
+                gameContent = <SolutionView game={currentGame} />;
+                gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.End:
-                gameContent = <GameEndView game={currentGame}></GameEndView>;
+                gameContent = <GameEndView game={currentGame} />;
                 break;
         }
 

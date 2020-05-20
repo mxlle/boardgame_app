@@ -150,12 +150,16 @@ header {
   }
 }
 
-.Game-end-view {
+.Game-end-view, .Game-lobby {
   .Word-card {
     max-width: 200px;
     height: 125px;
     font-size: 16px;
     margin: $gridSize;
+  }
+}
+.Game-end-view {
+  .Word-card {
     align-items: flex-start;
     span:first-child {
       margin-top: 5*$gridSize;
