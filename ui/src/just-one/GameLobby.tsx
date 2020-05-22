@@ -1,6 +1,7 @@
 import React from 'react';
 import { IGame, IUser } from '../custom.d';
 import { Button, Paper, Typography } from '@material-ui/core';
+import { Trans } from 'react-i18next';
 import { WordHint } from './components/WordHint';
 import { NewPlayer } from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
@@ -99,7 +100,9 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     { 
                         isInGame ? (
                             <Paper className="StatusInfo">
-                                Warten auf Mitspieler ... Sobald alle Mitspieler da sind, { isHost ? 'kannst du' : 'kann der Spielleiter'} das Spiel starten. 
+                                <Trans i18nKey="GAME.LOBBY.WAIT_MESSAGE" tOptions={{context: isHost ? 'HOST' : 'PLAYER'}}>
+                                    Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
+                                </Trans> 
                             </Paper>
                         ) : (
                             <NewPlayer currentPlayer={currentPlayer}
@@ -111,13 +114,15 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                         isHost && isInGame && (
                             <Button variant="contained" color="primary" 
                                 disabled={game.players.length < 3}
-                                onClick={this.selectNumRounds}>Alle Spieler sind da</Button>
+                                onClick={this.selectNumRounds}>
+                                <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>
+                            </Button>
                         )
                     }
                 </div>
                 <div className="Player-list">
                     <Typography variant="h5">
-                        Mitspieler
+                        <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
                     </Typography>
                     {listOfPlayers}
                     {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}

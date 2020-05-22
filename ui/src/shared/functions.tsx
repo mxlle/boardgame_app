@@ -1,6 +1,7 @@
-import { APP_TITLE, SETTING_ID } from './constants';
+import { SETTING_ID } from './constants';
 import { IGame, IUser } from '../custom.d';
-import shortid from 'shortid'; 
+import shortid from 'shortid';
+import i18n from '../i18n'; 
 
 export function getCurrentUserId() {
 	let userId = localStorage.getItem(SETTING_ID) || '';
@@ -20,13 +21,15 @@ export function getUserInGame(game: IGame, userId?: string): IUser|undefined {
 }
 
 export function generateId() {
+	shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZüÜ');
 	return shortid();
 }
 
 export function setDocumentTitle(gameName?: string) {
+	const appTitleFallback = 'Nur ein Wort!';
     if (gameName) {
-        document.title = `${APP_TITLE} - ${gameName}`;
+        document.title = `${i18n.t('APP_TITLE', appTitleFallback)} - ${gameName}`;
     } else {
-        document.title = APP_TITLE;
+        document.title = i18n.t('APP_TITLE', appTitleFallback);
     }
 }

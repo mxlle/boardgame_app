@@ -1,40 +1,40 @@
 import React from 'react';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemText from '@material-ui/core/ListItemText';
-import DialogTitle from '@material-ui/core/DialogTitle';
-import Dialog from '@material-ui/core/Dialog';
+import { List, ListItem, ListItemText, DialogTitle, Dialog } from '@material-ui/core';
+import { Trans } from 'react-i18next';
 
 type UserConfigProps = {
-  onClose: (value: string)=>void,
-  selectedValue: string,
-  possibleValues: string[],
-  open: boolean
+    tKey: string,
+    onClose: (value: string)=>void,
+    selectedValue: string,
+    possibleValues: {val: string, tKey: string}[],
+    open: boolean
 };
 
 export class UserConfig extends React.Component<UserConfigProps> {
-  render() {
-    const { open, onClose, selectedValue, possibleValues } = this.props;
+    render() {
+        const { tKey, open, onClose, selectedValue, possibleValues } = this.props;
 
-    const handleClose = () => {
-      onClose(selectedValue);
-    };
+        const handleClose = () => {
+            onClose(selectedValue);
+        };
 
-    const handleListItemClick = (value: string) => {
-      onClose(value);
-    };
+        const handleListItemClick = (value: string) => {
+            onClose(value);
+        };
 
-    return (
-      <Dialog onClose={handleClose} open={open}>
-        <DialogTitle>Nachtmodus</DialogTitle>
-        <List>
-          {possibleValues.map((value: string) => (
-            <ListItem button onClick={() => handleListItemClick(value)} key={value} selected={selectedValue === value}>
-              <ListItemText primary={value} />
-            </ListItem>
-          ))}
-        </List>
-      </Dialog>
-    );
-  }
+        return (
+            <Dialog onClose={handleClose} open={open}>
+                <DialogTitle>
+                    <Trans i18nKey={tKey}>Einstellung</Trans>
+                </DialogTitle>
+                <List>
+                    {possibleValues.map((value: {val: string, tKey: string}) => (
+                        <ListItem button onClick={() => handleListItemClick(value.val)} key={value.val} selected={selectedValue === value.val}>
+                            <ListItemText primary={<Trans i18nKey={value.tKey}>{value.val}</Trans>} />
+                        </ListItem>
+                    ))}
+                </List>
+            </Dialog>
+        );
+    }
 }

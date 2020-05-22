@@ -1,17 +1,19 @@
 import React from 'react';
 import { Button, TextField } from '@material-ui/core';
+import { Trans } from 'react-i18next';
 import { IGame } from '../custom.d';
 import { GameList } from './GameList';
 
 import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
 import { setDocumentTitle } from '../shared/functions';
 import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
+import i18n from '../i18n';
 
 const POLLING_INTERVAL = 3000;
 
 type JustOneHomeProps = {};
 type JustOneHomeState = {
-    newGameName: string,
+    newGameName: string|null,
     allGames: IGame[]
 };
 
@@ -29,9 +31,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
         this.handleChange = this.handleChange.bind(this);
         this.deleteGame = this.deleteGame.bind(this);
 
-        let newGameName = this.currentUserName ? `${this.currentUserName}s Spiel` : 'Neues Spiel';
-
-        this.state = { allGames: [], newGameName: newGameName };
+        this.state = { allGames: [], newGameName: null };
     }
 
     componentDidMount() {
@@ -71,7 +71,9 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
 
     async createGame() {
         const game: IGame = emptyGame();
-        game.name = this.state.newGameName;
+        let gameName = this.state.newGameName;
+        if (gameName === null) gameName = getInitialGameName(this.currentUserName);
+        game.name = gameName;
 
         const {id, playerId} = await createGame(game);
 
@@ -82,16 +84,23 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     }
 
     render() {
-        const {newGameName, allGames} = this.state;
+        let {newGameName, allGames} = this.state;
+        if (newGameName === null) newGameName = getInitialGameName(this.currentUserName);
 
         return (
             <div className="JustOneHome">
                 <TextField label={'Spielname'} value={newGameName} onChange={this.handleChange} />
-                <Button variant="contained" color="primary" onClick={this.createGame}>Neues Spiel</Button>
+                <Button variant="contained" color="primary" onClick={this.createGame}>
+                    <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
+                </Button>
                 <GameList allGames={allGames} deleteGame={this.deleteGame} />
             </div>
         );
     }
+}
+
+function getInitialGameName(userName?: string) {
+    return userName ? i18n.t('HOME.NEW_GAME_PERSONAL', 'Neues Spiel', {name: userName}) : i18n.t('HOME.NEW_GAME', 'Neues Spiel');
 }
 
 function emptyGame(): IGame {

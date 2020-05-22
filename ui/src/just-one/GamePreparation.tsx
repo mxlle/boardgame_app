@@ -1,4 +1,5 @@
 import React from 'react';
+import { Trans } from 'react-i18next';
 import { IGame, IUser } from '../custom.d';
 import { Paper, Typography } from '@material-ui/core';
 import { WordHint } from './components/WordHint';
@@ -53,7 +54,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
             )
         });
 
-        const myWordCards = myWords.map(word => <WordCard key={word} word={word}/>)
+        const myWordCards = myWords.map(word => <WordCard key={word} word={word} color={this.currentPlayer.color}/>)
 
         // TODO not in game users
         // TODO css classes
@@ -63,18 +64,22 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                     { 
                         allMyWordsEntered || !isInGame ? ( 
                             <Paper className="StatusInfo">
-                                Warten auf Mitspieler ... Sobald alle fertig sind, geht's los. 
+                                <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Warten auf Mitspieler ... Sobald alle fertig sind, geht's los.</Trans>
                             </Paper>
                         ) : (
                             <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
                         )
                     }
-                    {myWordCards.length > 0 && <Typography variant="subtitle1">{myWordCards.length > 1 ? 'Meine Begriffe' : 'Mein Begriff'}</Typography>}
+                    {myWordCards.length > 0 && (
+                        <Typography variant="subtitle1">
+                            <Trans i18nKey="GAME.PREP.MY_WORDS" count={myWords.length}>Meine Begriffe</Trans>
+                        </Typography>
+                    )}
                     {myWordCards}
                 </div>
                 <div className="Player-list">
                     <Typography variant="h5">
-                        Mitspieler
+                        <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
                     </Typography>
                     {listOfPlayers}
                 </div>

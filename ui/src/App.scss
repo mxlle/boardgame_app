@@ -39,6 +39,12 @@ body{
   }
 }
 
+.App-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 header {
   margin-bottom: 2*$standardMargin;
   padding: $gridSize;
@@ -65,6 +71,7 @@ header {
   font-family: $handwriting;
   margin-top: $standardMargin;
   padding-top: $gridSize;
+  text-transform: capitalize;
 }
 
 .MuiAlert-filledInfo {

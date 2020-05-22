@@ -1,4 +1,6 @@
 import React from 'react';
+import { Trans } from 'react-i18next';
+import i18n from '../../i18n';
 import { Button, Typography } from '@material-ui/core';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
@@ -27,7 +29,6 @@ export class SolutionView extends React.Component<SolutionViewProps> {
         const currentUser = getCurrentUserInGame(game);
         const guesser = getUserInGame(game, game.currentGuesser) ||  { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
-        const guesserName = isGuesser ? 'Ich' : guesser.name;
         const isRoundHost = currentUser && currentUser.id === game.roundHost;
 
         const currentWord = game.currentWord || '';
@@ -35,7 +36,7 @@ export class SolutionView extends React.Component<SolutionViewProps> {
         const currentHints = game.hints.map((hintObj: IHint, index: number) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.author;
             const author = getUserInGame(game, hintObj.author) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? 'Ich' : author.name;
+            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
                 <WordHint 
@@ -46,22 +47,35 @@ export class SolutionView extends React.Component<SolutionViewProps> {
                 />
             );
         });
-        let solutionButton1 = <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>Super, weiter geht's</Button>;
+        let solutionButton1 = (
+            <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
+                <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
+            </Button>
+        );
         let solutionButton2;
         if (!game.guessedRight) {
-            solutionButton1 = <Button variant="contained" onClick={() => this.resolveRound(true)}>Das zählt trotzdem</Button>;
-            solutionButton2 = <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>Leider falsch</Button>;
+            solutionButton1 = (
+                <Button variant="contained" onClick={() => this.resolveRound(true)}>
+                    <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
+                </Button>
+            );
+            solutionButton2 = (
+                <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
+                    <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
+                </Button>
+            );
         }
 
         return (
             <div className="Game-field">
                 <div className="Current-word">
                     <Typography variant="h5">
-                        Begriff
+                        <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
                     </Typography>
                     <WordCard 
                         word={currentWord} 
-                        guesser={guesserName} 
+                        guesser={guesser.name} 
+                        isGuesser={isGuesser}
                         color={guesser.color} 
                         guess={currentGuess} 
                         guessedRight={game.guessedRight}/>
@@ -70,7 +84,7 @@ export class SolutionView extends React.Component<SolutionViewProps> {
                 </div>
                 <div className="Current-hints">
                     <Typography variant="h5">
-                        Spieler-Hinweise
+                        <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
                     </Typography>
                     <div className="WordHint-list">{currentHints}</div>
                 </div>
