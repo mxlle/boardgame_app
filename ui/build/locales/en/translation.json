@@ -1,0 +1,92 @@
+{
+    "APP_TITLE": "Only one word!",
+    "COMMON": {
+        "TEAMMATES": "teammates",
+        "ME": "Me"
+    },
+    "HOME": {
+        "NEW_GAME": "New game",
+        "NEW_GAME_PERSONAL": "{{name}}'s game",
+        "GAME_LIST": {
+            "DONE": "My finished games",
+            "NEW": "New games",
+            "ONGOING": "My ongoing games",
+            "PLAYERS": "Players: {{playersString}}"
+        }
+    },
+    "GAME": {
+        "COMMON": {
+            "WORD": "Word",
+            "PLAYER_HINTS": "Player hints",
+            "ENTER_HINT": "Enter a hint",
+            "TURN_GUESSING": "{{guesserName}}'s turn to guess",
+            "TURN_GUESSING_ME": "My turn to guess",
+            "GUESS": "Guess",
+            "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",
+            "CURRENT_GUESS": "{{guesserName}}'s guess: {{guess}}",
+            "CURRENT_GUESS_ME": "My guess: {{guess}}"
+        },
+        "LOBBY": {
+            "ROUND_SELECT": {
+                "HEADING": "Set the number of rounds",
+                "NUM": "One round",
+                "NUM_plural": "{{count}} rounds",
+                "WORDS": "One word per player",
+                "WORDS_plural": "{{count}} words per player"
+            },
+            "START_BUTTON": "All $t(COMMON.TEAMMATES) joined",
+            "WAIT_MSG": "Waiting for $t(COMMON.TEAMMATES)... As soon as all $t(COMMON.TEAMMATES) joined",
+            "WAIT_MESSAGE_HOST": "$t(GAME.LOBBY.WAIT_MSG) you can start the game.",
+            "WAIT_MESSAGE_PLAYER": "$t(GAME.LOBBY.WAIT_MSG) the game host can start the game."
+        },
+        "PREP": {
+            "MY_WORDS": "My word",
+            "MY_WORDS_plural": "My words",
+            "WAIT_MESSAGE": "Waiting for $t(COMMON.TEAMMATES)... As soon as everyone is ready the game begins.",
+            "WORD_ADDER": {
+                "BUTTON": "Submit word",
+                "BUTTON_plural": "Submit words",
+                "HEADING": "Enter a word for the game",
+                "HEADING_plural": "Enter {{count}} words for the game",
+                "LABEL": "Word", 
+                "LABEL_plural": "Word {{index}}",
+                "PLACEHOLDER": "Enter word to guess"
+            }
+        },
+        "STATS": {
+            "ROUND": "Round {{round}}/{{roundCount}}",
+            "RIGHT": "Correct: {{rightCount}}",
+            "WRONG": "Wrong: {{wrongCount}}",
+            "PHASE": "Phase",
+            "PHASE_WRITING": "{{ playersString }} are writing down hints...",
+            "PHASE_COMPARING": "{{ roundHostName }} is checking the hints for duplicate or invalid words...",
+            "PHASE_GUESSING": "{{ guesserName }} is trying to guess the word...",
+            "PHASE_SOLUTION": "{{ guesserName }} was right!",
+            "PHASE_SOLUTION_WRONG": " {{ guesserName }} wrong! {{ roundHostName }} is deciding if it still counts..."
+        },
+        "COMPARING": {
+            "INFO": "Use the smiley buttons on the hints to mark duplicate or invalid words",
+            "BUTTON": "{{guesserName}} can start guessing!"
+        },
+        "SOLUTION": {
+            "CONTINUE": "Great! Let's continue",
+            "CONTINUE_WRONG": "That's wrong!",
+            "CONTINUE_RIGHT": "As good as correct"
+        },
+        "END": {
+            "RIGHT": "Correct ({{count}})",
+            "WRONG": "Wrong ({{count}})"
+        }
+    },
+    "THEMEPICK": {
+        "HEADING": "Theme",
+        "AUTO": "System preference",
+        "BRIGHT": "Bright",
+        "DARK": "Dark"
+    },
+    "LANGPICK": {
+        "HEADING": "Language",
+        "DE": "Deutsch",
+        "EN": "English"
+    }
+}
