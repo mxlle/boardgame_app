@@ -89,7 +89,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
 
         return (
             <div className="JustOneHome">
-                <TextField label={'Spielname'} value={newGameName} onChange={this.handleChange} />
+                <TextField label={<Trans i18nKey="HOME.GAME_NAME">Spielname</Trans>} value={newGameName} onChange={this.handleChange} />
                 <Button variant="contained" color="primary" onClick={this.createGame}>
                     <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                 </Button>

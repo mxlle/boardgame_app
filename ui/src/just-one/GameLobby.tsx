@@ -16,7 +16,8 @@ type GameLobbyProps = {
 }
 type GameLobbyState = {
     currentPlayer: IUser,
-    roundDialogOpen: boolean
+    roundDialogOpen: boolean,
+    playerAdded?: boolean
 }
 
 export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -59,7 +60,8 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             this.props.setTheme(player.color);
         }
         this.setState({
-            currentPlayer: player
+            currentPlayer: player,
+            playerAdded: true
         });
     }
 
@@ -79,7 +81,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
     render() {
         const { game } = this.props;
-        const { currentPlayer, roundDialogOpen } = this.state;
+        const { currentPlayer, roundDialogOpen, playerAdded } = this.state;
         const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
         const isHost: boolean = !!currentUserId && game.host === currentUserId;
         let isInGame: boolean = false;
@@ -91,6 +93,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 <WordHint key={player.id} hint={player.name} color={player.color}></WordHint>
             )
         });
+        isInGame = isInGame || !!playerAdded;
         const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
         const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
 

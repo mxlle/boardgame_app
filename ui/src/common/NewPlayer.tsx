@@ -1,4 +1,5 @@
 import React from 'react';
+import { Trans } from 'react-i18next';
 import { IUser } from '../custom.d';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
@@ -50,7 +51,7 @@ export class NewPlayer extends React.Component<NewPlayerProps> {
                 <ColorPicker select={this.setColor} selected={currentPlayer.color}/>
                 <Button variant="contained" color="primary" 
                     disabled={!currentPlayer.name} 
-                    onClick={this.addPlayer}>Mitspielen</Button>
+                    onClick={this.addPlayer}><Trans i18nKey="GAME.LOBBY.JOIN">Mitspielen</Trans></Button>
             </div>
         );
     }

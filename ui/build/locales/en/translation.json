@@ -5,6 +5,7 @@
         "ME": "Me"
     },
     "HOME": {
+        "GAME_NAME": "Game name",
         "NEW_GAME": "New game",
         "NEW_GAME_PERSONAL": "{{name}}'s game",
         "GAME_LIST": {
@@ -34,6 +35,7 @@
                 "WORDS": "One word per player",
                 "WORDS_plural": "{{count}} words per player"
             },
+            "JOIN": "Join",
             "START_BUTTON": "All $t(COMMON.TEAMMATES) joined",
             "WAIT_MSG": "Waiting for $t(COMMON.TEAMMATES)... As soon as all $t(COMMON.TEAMMATES) joined",
             "WAIT_MESSAGE_HOST": "$t(GAME.LOBBY.WAIT_MSG) you can start the game.",

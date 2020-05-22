@@ -5,6 +5,7 @@
         "ME": "Ich"
     },
     "HOME": {
+        "GAME_NAME": "Spielname",
         "NEW_GAME": "Neues Spiel",
         "NEW_GAME_PERSONAL": "{{name}}s Spiel",
         "GAME_LIST": {
@@ -30,10 +31,11 @@
             "ROUND_SELECT": {
                 "HEADING": "Lege die Rundenanzahl fest",
                 "NUM": "Eine Runde",
-                "NUM_PLURAL": "{{count}} Runden",
+                "NUM_plural": "{{count}} Runden",
                 "WORDS": "Ein Begriff pro Spieler",
-                "WORDS_PLURAL": "{{count}} Begriffe pro Spieler"
+                "WORDS_plural": "{{count}} Begriffe pro Spieler"
             },
+            "JOIN": "Mitspielen",
             "START_BUTTON": "Alle $t(COMMON.TEAMMATES) sind da",
             "WAIT_MSG": "Warten auf $t(COMMON.TEAMMATES)... Sobald alle $t(COMMON.TEAMMATES) da sind,",
             "WAIT_MESSAGE_HOST": "$t(GAME.LOBBY.WAIT_MSG) kannst du das Spiel starten.",
@@ -44,8 +46,8 @@
             "MY_WORDS_plural": "Meine Begriffe",
             "WAIT_MESSAGE": "Warten auf Mitspieler ... Sobald alle fertig sind, geht's los.",
             "WORD_ADDER": {
-                "BUTTON": "Begiff absenden",
-                "BUTTON_plural": "Begiffe absenden",
+                "BUTTON": "Begriff absenden",
+                "BUTTON_plural": "Begriffe absenden",
                 "HEADING": "Gib einen Begriff f�r das Spiel ein",
                 "HEADING_plural": "Gib {{count}} Begriffe f�r das Spiel ein",
                 "LABEL": "Wort", 
@@ -59,19 +61,19 @@
             "WRONG": "Falsche: {{wrongCount}}",
             "PHASE": "Phase",
             "PHASE_WRITING": "{{ playersString }} schreiben Hinweise auf...",
-            "PHASE_COMPARING": "{{ roundHostName }} überprüft die Hinweise auf ungültige oder doppelte Wörter...",
+            "PHASE_COMPARING": "{{ roundHostName }} �berpr�ft die Hinweise auf ung�ltige oder doppelte W�rter...",
             "PHASE_GUESSING": "{{ guesserName }} versucht den Begriff zu erraten...",
             "PHASE_SOLUTION": "{{ guesserName }} lag genau richtig!",
-            "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem zählt..."
+            "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem z�hlt..."
         },
         "COMPARING": {
-            "INFO": "Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ungültige Werte zu markieren.",
+            "INFO": "Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ung�ltige Werte zu markieren.",
             "BUTTON": "{{guesserName}} kann losraten!"
         },
         "SOLUTION": {
             "CONTINUE": "Super, weiter geht's",
             "CONTINUE_WRONG": "Leider falsch",
-            "CONTINUE_RIGHT": "Das zählt trotzdem"
+            "CONTINUE_RIGHT": "Das z�hlt trotzdem"
         },
         "END": {
             "RIGHT": "Richtig ({{count}})",
