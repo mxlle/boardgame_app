@@ -39,6 +39,10 @@
                 "WORDS": "Ein Begriff pro Spieler",
                 "WORDS_plural": "{{count}} Begriffe pro Spieler"
             },
+            "INVITE_PLAYERS": "Andere einladen",
+            "INVITE_PLAYERS_MESSAGE": "Spiele mit mir online",
+            "COPIED_LINK": "Link zum Spiel wurde in die Zwischenablage kopiert",
+            "COPIED_LINK_ERROR": "Kopieren des Spiel-Links fehlgeschlagen, bitte manuell kopieren",
             "JOIN": "Mitspielen",
             "START_BUTTON": "Alle $t(COMMON.TEAMMATES) sind da",
             "WAIT_MSG": "Warten auf $t(COMMON.TEAMMATES)... Sobald alle $t(COMMON.TEAMMATES) da sind,",
