@@ -51,7 +51,7 @@ export function checkPrevResult(game: IGame, showSnackbar: any, onClose: ()=>voi
             variant = 'error';
         }
         if (wordResult.word.trim().toLowerCase() !== wordResult.guess.trim().toLowerCase()) {
-            showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', { context: context, word: prevWord }), {
+            showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', { context: context, word: wordResult.guess }), {
                 variant: variant,
                 preventDuplicate: true,
                 onClose: onClose

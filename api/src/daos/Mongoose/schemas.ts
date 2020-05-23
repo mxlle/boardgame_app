@@ -30,6 +30,7 @@ export const GameSchema: Schema = new Schema({
     currentGuesser: {type: String, required: false},
     currentGuess: {type: String, required: false},
     guessedRight: {type: Boolean, required: false},
+    roundHost: {type: String, required: false},
     hints: [HintSchema],
     correctWords: [WordResultSchema],
     wrongWords: [WordResultSchema],

@@ -87,8 +87,8 @@
             "RESULT": "{{guesserName}} guessed",
             "RESULT_CORRECT": "{{guesserName}} guessed correctly",
             "RESULT_WRONG": "{{guesserName}} guessed wrong",
-            "PREV_RESULT_CORRECT": "{{word}} counts anyway!",
-            "PREV_RESULT_WRONG": "{{word}} doesn't count!",
+            "PREV_RESULT_CORRECT": "\"{{word}}\" counts anyway!",
+            "PREV_RESULT_WRONG": "\"{{word}}\" doesn't count!",
             "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
             "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Enter a hint.",
             "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Mark invalid hints",
@@ -106,5 +106,10 @@
         "HEADING": "Language",
         "DE": "Deutsch",
         "EN": "English"
+    },
+    "ERROR": {
+        "NO_CONNECTION": "No connection!",
+        "LOAD_GAMES": "$t(ERROR.NO_CONNECTION)",
+        "CREATE_GAME": "$t(ERROR.NO_CONNECTION)"
     }
 }

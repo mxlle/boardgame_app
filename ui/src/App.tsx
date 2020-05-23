@@ -61,9 +61,9 @@ export const App = () =>    {
     if (prefersDarkMode) classNames.push('App-dark');
 
     return (
-        <Router>
-            <ThemeProvider theme={theme}>
-                <Suspense fallback={<Loader classes={classNames}/>}>
+        <ThemeProvider theme={theme}>
+            <Suspense fallback={<Loader classes={classNames}/>}>
+                <Router>
                     <SnackbarProvider maxSnack={2} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}}>
                         <Paper square elevation={0} className={classNames.join(' ')}>
                             <HeaderBar userTheme={userTheme} applyUserTheme={applyUserTheme}/>
@@ -73,9 +73,9 @@ export const App = () =>    {
                             </Switch> 
                         </Paper>
                     </SnackbarProvider>
-                </Suspense>
-            </ThemeProvider>
-        </Router>
+                </Router>
+            </Suspense>
+        </ThemeProvider>
     );    
 }
 

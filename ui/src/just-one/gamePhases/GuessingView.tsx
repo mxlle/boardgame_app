@@ -20,11 +20,20 @@ type GuessingViewState = {
 
 class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> {
     public state: GuessingViewState = { shownMessage: false };
+    private _isMounted: boolean = false;
 
     constructor(props: GuessingViewProps) {
         super(props);
 
         this.guess = this.guess.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     guess(guess: string) {
@@ -42,7 +51,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'GUESSING' }), {
                 variant: 'info',
                 preventDuplicate: true,
-                onClose: () => this.setState({shownMessage: true})
+                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
             });
         }
 

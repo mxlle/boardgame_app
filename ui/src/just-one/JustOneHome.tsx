@@ -1,4 +1,5 @@
 import React from 'react';
+import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { Button, TextField } from '@material-ui/core';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
@@ -11,7 +12,7 @@ import { setDocumentTitle } from '../shared/functions';
 import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
 import i18n from '../i18n';
 
-type JustOneHomeProps = {}&WithSnackbarProps;
+type JustOneHomeProps = {}&WithSnackbarProps&RouteComponentProps;
 type JustOneHomeState = {
     newGameName: string|null,
     allGames: IGame[],
@@ -54,12 +55,19 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.setState({
             gamesLoading: true
         });
-        let games = await loadGames();
-        if (!this._isMounted) return;
-        this.setState({
-            allGames: games,
-            gamesLoading: false
-        });
+        try {
+            let games = await loadGames();
+            if (!this._isMounted) return;     
+            this.setState({
+                allGames: games,
+                gamesLoading: false
+            });
+        } catch(e) {
+            this.props.enqueueSnackbar(i18n.t('ERROR.LOAD_GAMES', 'Fehler'), { variant: 'error' });
+            this.setState({
+                gamesLoading: false
+            });
+        }
     }
 
     triggerDeleteGame(gameId: string) {
@@ -100,12 +108,18 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         if (gameName === null) gameName = getInitialGameName(this.currentUserName);
         game.name = gameName;
 
-        const {id, playerId} = await createGame(game);
+        try {
+            const {id, playerId} = await createGame(game);
 
-        if(this.currentUserId !== playerId) {
-            localStorage.setItem(SETTING_ID, playerId);
+            if(this.currentUserId !== playerId) {
+                localStorage.setItem(SETTING_ID, playerId);
+            }
+
+            this.props.history.push('/'+id);
+
+        } catch(e) {
+            this.props.enqueueSnackbar(i18n.t('ERROR.CREATE_GAME', 'Fehler'), { variant: 'error' });
         }
-        window.location.href = '/' + id;
     }
 
     render() {
@@ -119,7 +133,7 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                 </Button>
                 <ActionButton loading={gamesLoading}>
-                    <Button variant="contained" onClick={this.loadGames} disabled={gamesLoading}>
+                    <Button variant="contained" onClick={this.loadGames}>
                         <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
                     </Button>
                 </ActionButton>
@@ -137,4 +151,4 @@ function emptyGame(): IGame {
     return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
-export default withSnackbar(JustOneHome);
+export default withRouter(withSnackbar(JustOneHome));

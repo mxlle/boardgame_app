@@ -20,12 +20,21 @@ type HintComparingViewState = {
 
 class HintComparingView extends React.Component<HintComparingViewProps,HintComparingViewState> {
     public state: HintComparingViewState = { shownMessage: false };
+    private _isMounted: boolean = false;
 
     constructor(props: HintComparingViewProps) {
         super(props);
 
         this.toggleDuplicate = this.toggleDuplicate.bind(this);
         this.showHints = this.showHints.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     toggleDuplicate(hintIndex: number) {
@@ -49,7 +58,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_COMPARING' }), {
                 variant: 'info',
                 preventDuplicate: true,
-                onClose: () => this.setState({shownMessage: true})
+                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
             });
         }
 

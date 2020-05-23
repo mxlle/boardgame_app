@@ -15,6 +15,16 @@ type HintWritingViewState = {
 
 class GameEndView extends React.Component<GameEndViewProps> {
     public state: HintWritingViewState = { shownPrevResult: false };
+    private _isMounted: boolean = false;
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
+        this.props.closeSnackbar();
+    }
 
     render() {
         const game: IGame = this.props.game;
@@ -26,7 +36,11 @@ class GameEndView extends React.Component<GameEndViewProps> {
             return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={false}/>
         });
 
-        if (!shownPrevResult) checkPrevResult(game, this.props.enqueueSnackbar, ()=>this.setState({shownPrevResult: true}));
+        if (!shownPrevResult) {
+            checkPrevResult(game, this.props.enqueueSnackbar, ()=>{ 
+                if(this._isMounted) this.setState({shownPrevResult: true}); 
+            });
+        }
 
         return (
             <div className="Game-end-view">

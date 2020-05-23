@@ -21,11 +21,20 @@ type SolutionViewState = {
 
 class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> {
     public state: SolutionViewState = { shownMessage: false, shownResult: false };
+    private _isMounted: boolean = false;
 
     constructor(props: SolutionViewProps) {
         super(props);
 
         this.resolveRound = this.resolveRound.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     resolveRound(correct: boolean = true) {
@@ -62,7 +71,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'SOLUTION' }), {
                 variant: 'info',
                 preventDuplicate: true,
-                onClose: () => this.setState({shownMessage: true})
+                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
             });
         }
 

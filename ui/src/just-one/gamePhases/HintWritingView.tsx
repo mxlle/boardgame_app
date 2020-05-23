@@ -21,11 +21,20 @@ type HintWritingViewState = {
 
 class HintWritingView extends React.Component<HintWritingViewProps, HintWritingViewState> {
     public state: HintWritingViewState = { shownMessage: false, shownPrevResult: false };
+    private _isMounted: boolean = false;
 
     constructor(props: HintWritingViewProps) {
         super(props);
 
         this.submitHint = this.submitHint.bind(this);
+    }
+
+    componentDidMount() {
+        this._isMounted = true;
+    }
+
+    componentWillUnmount() {
+        this._isMounted = false;
     }
 
     submitHint(hint: string) {
@@ -39,7 +48,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         const guesser = getUserInGame(game, game.currentGuesser) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
 
-        if (!shownPrevResult) checkPrevResult(game, this.props.enqueueSnackbar, ()=>this.setState({shownPrevResult: true}));
+        if (!shownPrevResult) checkPrevResult(game, this.props.enqueueSnackbar, ()=>{ if(this._isMounted) this.setState({shownPrevResult: true}); });
 
         const currentWord = isGuesser ? '?' : (game.currentWord || '');
         const currentHints = game.hints.map((hintObj: IHint, index: number) => {
@@ -54,7 +63,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                 this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_WRITING' }), {
                     variant: 'info',
                     preventDuplicate: true,
-                    onClose: () => this.setState({shownMessage: true})
+                    onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
                 });
             }
 
