@@ -1,23 +1,24 @@
 import React from 'react';
 import { Button, TextField } from '@material-ui/core';
 import { Trans } from 'react-i18next';
+import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
 import { IGame } from '../custom.d';
 import { GameList } from './GameList';
+import { ActionButton } from '../common/ActionButton';
 
 import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
 import { setDocumentTitle } from '../shared/functions';
 import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
 import i18n from '../i18n';
 
-const POLLING_INTERVAL = 3000;
-
-type JustOneHomeProps = {};
+type JustOneHomeProps = {}&WithSnackbarProps;
 type JustOneHomeState = {
     newGameName: string|null,
-    allGames: IGame[]
+    allGames: IGame[],
+    gamesLoading: boolean
 };
 
-export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
+class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
@@ -28,10 +29,12 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
         super(props);
 
         this.createGame = this.createGame.bind(this);
+        this.loadGames = this.loadGames.bind(this);
         this.handleChange = this.handleChange.bind(this);
+        this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
         this.deleteGame = this.deleteGame.bind(this);
 
-        this.state = { allGames: [], newGameName: null };
+        this.state = { allGames: [], newGameName: null, gamesLoading: true };
     }
 
     componentDidMount() {
@@ -40,7 +43,6 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
         setDocumentTitle();
 
         this.loadGames();
-        this._interval = window.setInterval(this.loadGames.bind(this), POLLING_INTERVAL);
     }
 
     componentWillUnmount() {
@@ -49,20 +51,43 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     }
 
     async loadGames() {
+        this.setState({
+            gamesLoading: true
+        });
         let games = await loadGames();
         if (!this._isMounted) return;
         this.setState({
-            allGames: games
+            allGames: games,
+            gamesLoading: false
         });
     }
 
-    deleteGame(gameId: string) {
-        deleteGame(gameId);
+    triggerDeleteGame(gameId: string) {
         this.setState((state) => {
             return {
                 allGames: state.allGames.filter(g => g.id !== gameId)
             }
         });
+        const action = (key: string) => (
+            <React.Fragment>
+                <Button onClick={() => { this.props.closeSnackbar(key); this.loadGames(); }} color="inherit">
+                    <Trans i18nKey="COMMON.UNDO">Rückgängig</Trans>
+                </Button>
+            </React.Fragment>
+        );
+        this.props.enqueueSnackbar(i18n.t('HOME.DELETED_GAME', 'Spiel gelöscht'), {
+            action: action,
+            onClose: (_: any, reason: CloseReason) => {
+                if (reason !== 'instructed') {
+                    this.deleteGame(gameId);
+                }
+            }
+        });
+    }
+
+    async deleteGame(gameId: string) {
+        await deleteGame(gameId);
+        this.loadGames();
     }
 
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
@@ -84,7 +109,7 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
     }
 
     render() {
-        let {newGameName, allGames} = this.state;
+        let {newGameName, allGames, gamesLoading} = this.state;
         if (newGameName === null) newGameName = getInitialGameName(this.currentUserName);
 
         return (
@@ -93,7 +118,12 @@ export class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeSta
                 <Button variant="contained" color="primary" onClick={this.createGame}>
                     <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                 </Button>
-                <GameList allGames={allGames} deleteGame={this.deleteGame} />
+                <ActionButton loading={gamesLoading}>
+                    <Button variant="contained" onClick={this.loadGames} disabled={gamesLoading}>
+                        <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
+                    </Button>
+                </ActionButton>
+                <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
             </div>
         );
     }
@@ -106,3 +136,5 @@ function getInitialGameName(userName?: string) {
 function emptyGame(): IGame {
     return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
+
+export default withSnackbar(JustOneHome);

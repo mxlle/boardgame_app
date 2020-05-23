@@ -9,12 +9,13 @@ import './App.scss';
 import { Paper, CircularProgress } from '@material-ui/core';
 import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
+import { SnackbarProvider } from 'notistack';
 
 import { SETTING_COLOR, SETTING_THEME, 
          ThemeMode, DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR } from './shared/constants';
 
 import {HeaderBar} from './common/HeaderBar';
-import {JustOneHome} from './just-one/JustOneHome';
+import JustOneHome from './just-one/JustOneHome';
 import {JustOneGame} from './just-one/JustOneGame';
 
 import './i18n';
@@ -62,14 +63,16 @@ export const App = () =>    {
     return (
         <Router>
             <ThemeProvider theme={theme}>
-                <Suspense fallback={<Loader />}>
-                    <Paper square elevation={0} className={classNames.join(' ')}>
-                        <HeaderBar userTheme={userTheme} applyUserTheme={applyUserTheme}/>
-                        <Switch>
-                            <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOneGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
-                            <Route children={<JustOneHome/>} />
-                        </Switch> 
-                    </Paper>
+                <Suspense fallback={<Loader classes={classNames}/>}>
+                    <SnackbarProvider maxSnack={2} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}}>
+                        <Paper square elevation={0} className={classNames.join(' ')}>
+                            <HeaderBar userTheme={userTheme} applyUserTheme={applyUserTheme}/>
+                            <Switch>
+                                <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOneGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
+                                <Route children={<JustOneHome/>} />
+                            </Switch> 
+                        </Paper>
+                    </SnackbarProvider>
                 </Suspense>
             </ThemeProvider>
         </Router>
@@ -79,8 +82,12 @@ export const App = () =>    {
 export default App;
 
 // TODO 
-const Loader = () => (
-    <Paper square elevation={0} className="App App-loading">
-        <CircularProgress />
-    </Paper>
-);
+const Loader = (props: {classes: string[]}) => {
+    let {classes} = props;
+    classes.push('App-loading');
+    return (
+        <Paper square elevation={0} className={classes.join(' ')}>
+            <CircularProgress />
+        </Paper>
+    );
+};

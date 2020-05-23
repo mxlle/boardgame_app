@@ -2,6 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import { Button, Typography } from '@material-ui/core';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
@@ -11,9 +12,16 @@ import * as api from '../../shared/apiFunctions';
 
 type SolutionViewProps = {
     game: IGame
+}&WithSnackbarProps;
+
+type SolutionViewState = {
+    shownMessage: boolean,
+    shownResult: boolean
 };
 
-export class SolutionView extends React.Component<SolutionViewProps> {
+class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> {
+    public state: SolutionViewState = { shownMessage: false, shownResult: false };
+
     constructor(props: SolutionViewProps) {
         super(props);
 
@@ -26,8 +34,10 @@ export class SolutionView extends React.Component<SolutionViewProps> {
 
     render() {
         const game: IGame = this.props.game;
+        const { shownMessage, shownResult } = this.state;
         const currentUser = getCurrentUserInGame(game);
         const guesser = getUserInGame(game, game.currentGuesser) ||  { name: '?', id: '?' };
+        const guesserName = guesser.name;
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const isRoundHost = currentUser && currentUser.id === game.roundHost;
 
@@ -47,6 +57,25 @@ export class SolutionView extends React.Component<SolutionViewProps> {
                 />
             );
         });
+
+        if (isRoundHost && !game.guessedRight && !shownMessage) {
+            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'SOLUTION' }), {
+                variant: 'info',
+                preventDuplicate: true,
+                onClose: () => this.setState({shownMessage: true})
+            });
+        }
+
+        if (!shownResult) {
+            const context = game.guessedRight ? 'CORRECT' : 'WRONG';
+            const variant = game.guessedRight ? 'success' : 'warning';
+            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName }), {
+                variant: variant,
+                preventDuplicate: true,
+                onClose: () => this.setState({shownResult: true})
+            });
+        }
+
         let solutionButton1 = (
             <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
                 <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
@@ -74,7 +103,7 @@ export class SolutionView extends React.Component<SolutionViewProps> {
                     </Typography>
                     <WordCard 
                         word={currentWord} 
-                        guesser={guesser.name} 
+                        guesser={guesserName} 
                         isGuesser={isGuesser}
                         color={guesser.color} 
                         guess={currentGuess} 
@@ -92,3 +121,5 @@ export class SolutionView extends React.Component<SolutionViewProps> {
         );
     }
 }
+
+export default withSnackbar(SolutionView);

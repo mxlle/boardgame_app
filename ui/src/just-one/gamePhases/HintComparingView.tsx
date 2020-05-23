@@ -2,6 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import { Button, Typography } from '@material-ui/core';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
@@ -11,9 +12,15 @@ import * as api from '../../shared/apiFunctions';
 
 type HintComparingViewProps = {
     game: IGame
+}&WithSnackbarProps;
+
+type HintComparingViewState = {
+    shownMessage: boolean
 };
 
-export class HintComparingView extends React.Component<HintComparingViewProps> {
+class HintComparingView extends React.Component<HintComparingViewProps,HintComparingViewState> {
+    public state: HintComparingViewState = { shownMessage: false };
+
     constructor(props: HintComparingViewProps) {
         super(props);
 
@@ -31,11 +38,20 @@ export class HintComparingView extends React.Component<HintComparingViewProps> {
 
     render() {
         const game: IGame = this.props.game;
+        const { shownMessage } = this.state;
         const currentUser = getCurrentUserInGame(game);
         const guesser = getUserInGame(game, game.currentGuesser) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = guesser.name;
         const isRoundHost = currentUser && currentUser.id === game.roundHost;
+
+        if (isRoundHost && !shownMessage) {
+            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_COMPARING' }), {
+                variant: 'info',
+                preventDuplicate: true,
+                onClose: () => this.setState({shownMessage: true})
+            });
+        }
 
         const currentWord = isGuesser ? '?' : (game.currentWord || '');
         const currentHints = game.hints.map((hintObj: IHint, index: number) => {
@@ -89,3 +105,5 @@ export class HintComparingView extends React.Component<HintComparingViewProps> {
         );
     }
 }
+
+export default withSnackbar(HintComparingView);

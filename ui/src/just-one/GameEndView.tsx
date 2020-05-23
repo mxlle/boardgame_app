@@ -1,21 +1,32 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
 import {WordCard} from './components/WordCard';
 import { IGame } from '../custom.d';
+import { checkPrevResult } from '../shared/functions';
 
 type GameEndViewProps = {
     game: IGame
+}&WithSnackbarProps;
+
+type HintWritingViewState = {
+    shownPrevResult: boolean
 };
 
-export class GameEndView extends React.Component<GameEndViewProps> {
+class GameEndView extends React.Component<GameEndViewProps> {
+    public state: HintWritingViewState = { shownPrevResult: false };
+
     render() {
         const game: IGame = this.props.game;
+        const { shownPrevResult } = this.state;
         const correctWords = game.correctWords.map(wordResult => {
             return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={true}/>
         });
         const wrongWords = game.wrongWords.map(wordResult => {
             return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={false}/>
         });
+
+        if (!shownPrevResult) checkPrevResult(game, this.props.enqueueSnackbar, ()=>this.setState({shownPrevResult: true}));
 
         return (
             <div className="Game-end-view">
@@ -31,3 +42,5 @@ export class GameEndView extends React.Component<GameEndViewProps> {
         );
     }
 }
+
+export default withSnackbar(GameEndView);

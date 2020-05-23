@@ -6,268 +6,279 @@ $pageContentWidth: 900px;
 $handwriting: 'Gloria Hallelujah', cursive;
 
 html, #root, .App {
-  height: 100%;
-  width: 100%;
-  min-height: 100vh;
+    height: 100%;
+    width: 100%;
+    min-height: 100vh;
 }
 
 body{
-  width: 100%;
-  height: auto;
-  min-height: 100%;
+    width: 100%;
+    height: auto;
+    min-height: 100%;
 }
 
 .MuiPaper-root {
-  &.App {
-    background-color: $appBackground;
-  }
+    &.App {
+        background-color: $appBackground;
+    }
 
-  &.App-dark {
-    background-color: $appBackgroundDark;
-  }
+    &.App-dark {
+        background-color: $appBackgroundDark;
+    }
 }
 
 .App {
-  text-align: center;
-  >div {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-      Button {
-        margin: $gridSize;
-      }
-  }
+    text-align: center;
+    >div {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+            Button {
+                margin: $gridSize;
+            }
+    }
 }
 
 .App-loading {
-  display: flex;
-  align-items: center;
-  justify-content: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 header {
-  margin-bottom: 2*$standardMargin;
-  padding: $gridSize;
-  .appTitle {
-    flex: 1;
-    font-family: $handwriting;
-    letter-spacing: 4px;
-    font-size: 4vw // relativ to width
-  } 
-  .MuiChip-root {
-    font-family: $handwriting;
-  }
+    margin-bottom: 2*$standardMargin;
+    padding: $gridSize;
+    .appTitle {
+        flex: 1;
+        font-family: $handwriting;
+        letter-spacing: 4px;
+        font-size: 4vw // relativ to width
+    } 
+    .MuiChip-root {
+        font-family: $handwriting;
+    }
 }
 
 .GameList {
-  width: calc(100vw - #{2*$standardMargin});
-  max-width: 600px;
-  .GameListItem {
-    
-  }
+    width: calc(100vw - #{2*$standardMargin});
+    max-width: 600px;
+    .GameListItem {
+        
+    }
+}
+
+.buttonWithLoading {
+    position: relative;
+    .loadingInButton {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        margin-top: -12px; // TODO
+        margin-left: -12px;
+    }
 }
 
 .MuiTypography-root.MuiTypography-h5 {
-  font-family: $handwriting;
-  margin-top: $standardMargin;
-  padding-top: $gridSize;
-  text-transform: capitalize;
+    font-family: $handwriting;
+    margin-top: $standardMargin;
+    padding-top: $gridSize;
+    text-transform: capitalize;
 }
 
 .MuiAlert-filledInfo {
-  align-items: center;
+    align-items: center;
 }
 
 .Game-content {
-  max-width: 100%;
+    max-width: 100%;
 }
 
 .New-player, .Player-list, .Word-adder {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center; 
-  max-width: 100%;
-  Button, .MuiFormControl-root {
-    margin: $gridSize;
-  }
-  .Word-hint.Word-hint-writing {
-    border-style: dotted
-  }
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center; 
+    max-width: 100%;
+    Button, .MuiFormControl-root {
+        margin: $gridSize;
+    }
+    .Word-hint.Word-hint-writing {
+        border-style: dotted
+    }
 }
 
 .Game-lobby, .Game-field, .Game-end-view {
-  display: flex;
-  min-width: 0;
-  width: calc(100vw - #{2*$standardMargin});
-  max-width: $pageContentWidth;
-  margin: $standardMargin;
-  flex-wrap: wrap
+    display: flex;
+    min-width: 0;
+    width: calc(100vw - #{2*$standardMargin});
+    max-width: $pageContentWidth;
+    margin: $standardMargin;
+    flex-wrap: wrap
 }
 
 .MuiPaper-root.StatusInfo {
-  padding: $standardMargin;
-  margin: $standardMargin;
+    padding: $standardMargin;
+    margin: $standardMargin;
 }
 
 .Current-word, .Current-hints, .Correct-words, .Wrong-words {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  max-width: 100%;
-  margin-bottom: 2*$standardMargin;
-  align-items: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 100%;
+    margin-bottom: 2*$standardMargin;
+    align-items: center;
 }
 
 .Word-card {
-  width: calc(100vw - #{2*$standardMargin});
-  min-width: 0;
-  max-width: 400px;
-  height: 250px;
-  max-height: 30vh;
-  min-height: 150px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: white;
-  border-radius: $gridSize;
-  font-size: 32px;
-  margin: $standardMargin;
-  border: 2px solid black;
-  white-space: nowrap;
-  position: relative;
+    width: calc(100vw - #{2*$standardMargin});
+    min-width: 0;
+    max-width: 400px;
+    height: 250px;
+    max-height: 30vh;
+    min-height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: white;
+    border-radius: $gridSize;
+    font-size: 32px;
+    margin: $standardMargin;
+    border: 2px solid black;
+    white-space: nowrap;
+    position: relative;
 
-  &.Word-card-correct {
-    border-color: green !important;
-  }
-  &.Word-card-wrong {
-    border-color: red !important;
-  }
+    &.Word-card-correct {
+        border-color: green !important;
+    }
+    &.Word-card-wrong {
+        border-color: red !important;
+    }
 
-  .Author-tag {
-    font-family: $handwriting;
-    text-decoration: none !important;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-    line-height: 16px;
-    margin: $standardMargin+$gridSize;
-    white-space: normal;
-  }
+    .Author-tag {
+        font-family: $handwriting;
+        text-decoration: none !important;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        font-size: 16px;
+        line-height: 16px;
+        margin: $standardMargin+$gridSize;
+        white-space: normal;
+    }
 }
 
 .Game-end-view, .Game-lobby {
-  .Word-card {
-    max-width: 200px;
-    height: 125px;
-    font-size: 16px;
-    margin: $gridSize;
-  }
+    .Word-card {
+        max-width: 200px;
+        height: 125px;
+        font-size: 16px;
+        margin: $gridSize;
+    }
 }
 .Game-end-view {
-  .Word-card {
-    align-items: flex-start;
-    span:first-child {
-      margin-top: 5*$gridSize;
+    .Word-card {
+        align-items: flex-start;
+        span:first-child {
+            margin-top: 5*$gridSize;
+        }
     }
-  }
 }
 
 .Word-hint-input {
-  display: flex;
-  justify-content: center;
+    display: flex;
+    justify-content: center;
 
-  button {
-    margin-left: 8px;
-  } 
+    button {
+        margin-left: 8px;
+    } 
 }
 
 .WordHint-list {
-  max-width: 100vw;
+    max-width: 100vw;
 }
 
 .Word-hint {
-  height: 100px;
-  width: calc(100vw - #{2*$standardMargin});
-  min-width: 0;
-  max-width: 400px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 48px;
-  margin: $standardMargin;
-  border: 2px solid black;
-  font-family: $handwriting;
-  white-space: nowrap;
-  position: relative;
-  
-  &.Word-hint-writing {
-    border-style: dotted
-  }
+    height: 100px;
+    width: calc(100vw - #{2*$standardMargin});
+    min-width: 0;
+    max-width: 400px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 48px;
+    margin: $standardMargin;
+    border: 2px solid black;
+    font-family: $handwriting;
+    white-space: nowrap;
+    position: relative;
+    
+    &.Word-hint-writing {
+        border-style: dotted
+    }
 
-  &.Word-hint-duplicate {
-    text-decoration: line-through;
-    font-size: 32px;
-  }
+    &.Word-hint-duplicate {
+        text-decoration: line-through;
+        font-size: 32px;
+    }
 
-  &.Word-hint-long {
-    font-size: 32px;
-  }
+    &.Word-hint-long {
+        font-size: 32px;
+    }
 
-  &.Word-hint-huge {
-    font-size: 24px;
-  }
+    &.Word-hint-huge {
+        font-size: 24px;
+    }
 
-  .Author-tag {
-    text-decoration: none;
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    font-size: 16px;
-    line-height: 16px;
-    margin: $gridSize;
-  }
+    .Author-tag {
+        text-decoration: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        font-size: 16px;
+        line-height: 16px;
+        margin: $gridSize;
+    }
 
-  .Duplicate-toggle {
-    position: absolute;
-    right: $gridSize;
-  }
+    .Duplicate-toggle {
+        position: absolute;
+        right: $gridSize;
+    }
 
-  .Done-icon {
-    font-size: 80px;
-  }
+    .Done-icon {
+        font-size: 80px;
+    }
 }
 
 .Game-progress {
-  display: flex;
-  flex-direction: column;
-  margin: $standardMargin;
-  div + div {
-    margin-top: $gridSize
-  }
+    display: flex;
+    flex-direction: column;
+    margin: $standardMargin;
+    div + div {
+        margin-top: $gridSize
+    }
 }
 
 .ButtonLink {
-  color: inherit;
+    color: inherit;
 }
 
 $colorButtonSize: 4*$gridSize;
 $iconSize: 3*$gridSize;
 .Color-picker {
-  width: 4*$colorButtonSize;
-  margin: $standardMargin;
-  .Color-button {
-    border-radius: 0;
-    margin: 0;
-    padding: $colorButtonSize/2;
+    width: 4*$colorButtonSize;
+    margin: $standardMargin;
+    .Color-button {
+        border-radius: 0;
+        margin: 0;
+        padding: $colorButtonSize/2;
 
-    &.Color-selected {
-      padding: $colorButtonSize/2-$iconSize/2;
-      color: white;
+        &.Color-selected {
+            padding: $colorButtonSize/2-$iconSize/2;
+            color: white;
+        }
     }
-  }
 }
 
 $pencilWidth: 12px;
@@ -275,30 +286,30 @@ $pencilLength: 4*$pencilWidth;
 $pencilNib: 1px;
 
 .pencil {
-  width: $pencilWidth;
-  margin-left:$pencilLength/2;
-  margin-top:0px;
-  transform:rotate(35deg);
-  animation: pencil .5s forwards;
-  animation-iteration-count: infinite;
-  .nib{
-    width: 2*$pencilNib;
-    height: 0;
-    border-top: $pencilWidth solid #000000;
-    border-left: $pencilWidth/2-$pencilNib solid transparent;
-    border-right: $pencilWidth/2-$pencilNib solid transparent;
-   }
-  .body{
     width: $pencilWidth;
-    height: $pencilLength;
-    background-color: #000000;
-    border-top-left-radius: $pencilWidth/4;
-    border-top-right-radius: $pencilWidth/4;
-  }
+    margin-left:$pencilLength/2;
+    margin-top:0px;
+    transform:rotate(35deg);
+    animation: pencil .5s forwards;
+    animation-iteration-count: infinite;
+    .nib{
+        width: 2*$pencilNib;
+        height: 0;
+        border-top: $pencilWidth solid #000000;
+        border-left: $pencilWidth/2-$pencilNib solid transparent;
+        border-right: $pencilWidth/2-$pencilNib solid transparent;
+     }
+    .body{
+        width: $pencilWidth;
+        height: $pencilLength;
+        background-color: #000000;
+        border-top-left-radius: $pencilWidth/4;
+        border-top-right-radius: $pencilWidth/4;
+    }
 }
 
 @keyframes pencil{
-  0% {transform:rotate(35deg);}
-  50% {transform:rotateZ(25deg);}
-  100% {transform:rotateZ(35deg);}
+    0% {transform:rotate(35deg);}
+    50% {transform:rotateZ(25deg);}
+    100% {transform:rotateZ(35deg);}
 }

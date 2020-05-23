@@ -19,6 +19,7 @@
     "i18next-browser-languagedetector": "^4.2.0",
     "i18next-http-backend": "^1.0.12",
     "node-sass": "^4.14.1",
+    "notistack": "^0.9.16",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
     "react-i18next": "^11.4.0",

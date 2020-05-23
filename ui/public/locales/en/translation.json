@@ -2,10 +2,13 @@
     "APP_TITLE": "Only one word!",
     "COMMON": {
         "TEAMMATES": "teammates",
-        "ME": "Me"
+        "ME": "Me",
+        "UNDO": "Undo",
+        "YOUR_TURN": "Your turn!"
     },
     "HOME": {
         "GAME_NAME": "Game name",
+        "LOAD_GAMES": "Reload games",
         "NEW_GAME": "New game",
         "NEW_GAME_PERSONAL": "{{name}}'s game",
         "GAME_LIST": {
@@ -13,7 +16,8 @@
             "NEW": "New games",
             "ONGOING": "My ongoing games",
             "PLAYERS": "Players: {{playersString}}"
-        }
+        },
+        "DELETED_GAME": "Game deleted"
     },
     "GAME": {
         "COMMON": {
@@ -67,7 +71,7 @@
             "PHASE_SOLUTION_WRONG": " {{ guesserName }} wrong! {{ roundHostName }} is deciding if it still counts..."
         },
         "COMPARING": {
-            "INFO": "Use the smiley buttons on the hints to mark duplicate or invalid words",
+            "INFO": "Use the smiley buttons on the hints to mark duplicate or invalid hints",
             "BUTTON": "{{guesserName}} can start guessing!"
         },
         "SOLUTION": {
@@ -78,6 +82,18 @@
         "END": {
             "RIGHT": "Correct ({{count}})",
             "WRONG": "Wrong ({{count}})"
+        },
+        "MESSAGE": {
+            "RESULT": "{{guesserName}} guessed",
+            "RESULT_CORRECT": "{{guesserName}} guessed correctly",
+            "RESULT_WRONG": "{{guesserName}} guessed wrong",
+            "PREV_RESULT_CORRECT": "{{word}} counts anyway!",
+            "PREV_RESULT_WRONG": "{{word}} doesn't count!",
+            "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
+            "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Enter a hint.",
+            "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Mark invalid hints",
+            "YOUR_TURN_GUESSING": "$t(COMMON.YOUR_TURN) Try to guess the word.",
+            "YOUR_TURN_SOLUTION": "$t(COMMON.YOUR_TURN) Decide if it counts anyway."
         }
     },
     "THEMEPICK": {

@@ -2,10 +2,13 @@
     "APP_TITLE": "Nur ein Wort!",
     "COMMON": {
         "TEAMMATES": "Mitspieler",
-        "ME": "Ich"
+        "ME": "Ich",
+        "UNDO": "Rückgängig",
+        "YOUR_TURN": "Du bist dran!"
     },
     "HOME": {
         "GAME_NAME": "Spielname",
+        "LOAD_GAMES": "Spiele aktualisieren",
         "NEW_GAME": "Neues Spiel",
         "NEW_GAME_PERSONAL": "{{name}}s Spiel",
         "GAME_LIST": {
@@ -13,7 +16,8 @@
             "NEW": "Neue Spiele",
             "ONGOING": "Meine laufenden Spiele",
             "PLAYERS": "Spieler: {{playersString}}"
-        }
+        },
+        "DELETED_GAME": "Spiel gelöscht"
     },
     "GAME": {
         "COMMON": {
@@ -61,7 +65,7 @@
             "WRONG": "Falsche: {{wrongCount}}",
             "PHASE": "Phase",
             "PHASE_WRITING": "{{ playersString }} schreiben Hinweise auf...",
-            "PHASE_COMPARING": "{{ roundHostName }} �berpr�ft die Hinweise auf ung�ltige oder doppelte W�rter...",
+            "PHASE_COMPARING": "{{ roundHostName }} überpr�ft die Hinweise auf ung�ltige oder doppelte W�rter...",
             "PHASE_GUESSING": "{{ guesserName }} versucht den Begriff zu erraten...",
             "PHASE_SOLUTION": "{{ guesserName }} lag genau richtig!",
             "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem z�hlt..."
@@ -78,6 +82,18 @@
         "END": {
             "RIGHT": "Richtig ({{count}})",
             "WRONG": "Falsch ({{count}})"
+        },
+        "MESSAGE": {
+            "RESULT": "{{guesserName}} hat geraten",
+            "RESULT_CORRECT": "{{guesserName}} lag richtig!",
+            "RESULT_WRONG": "{{guesserName}} lag falsch!",
+            "PREV_RESULT_CORRECT": "{{word}} zählt trotzdem!",
+            "PREV_RESULT_WRONG": "{{word}} zählt nicht!",
+            "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
+            "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Gib einen Hinweis ein.",
+            "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Markiere ungültige Hinweise.",
+            "YOUR_TURN_GUESSING": "$t(COMMON.YOUR_TURN) Versuche den Begriff zu erraten.",
+            "YOUR_TURN_SOLUTION": "$t(COMMON.YOUR_TURN) Entscheide ob es trotzdem zählt."
         }
     },
     "THEMEPICK": {

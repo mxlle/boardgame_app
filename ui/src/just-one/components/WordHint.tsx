@@ -20,42 +20,41 @@ type WordHintProps = {
 export class WordHint extends React.Component<WordHintProps> {
 
     render() {
-    	const currentHint = this.props.hint;
-        const color = this.props.color;
+        const { hint, color, author, 
+                showPencil, showCheck, showInput, submitHint,
+                showDuplicateToggle, toggleDuplicate, duplicate 
+        } = this.props;
         const styleObj = {
         	'color': color,
             'borderColor': color
         };
-        const author = this.props.author;
-        const showPencil = this.props.showPencil || !this.props.hint;
-        const showCheck = this.props.showCheck;
-        const showDuplicateToggle = this.props.showDuplicateToggle;
-        const toggleDuplicate = this.props.toggleDuplicate;
+        const doShowPencil = showPencil || !this.props.hint;
+        const isDuplicate = duplicate || false;
 
         const classes = ['Word-hint'];
-        if (showPencil) classes.push('Word-hint-writing');
-        if (this.props.duplicate) classes.push('Word-hint-duplicate');
-        if (currentHint && currentHint.length > 20) classes.push('Word-hint-huge');
-        else if (currentHint && currentHint.length > 14) classes.push('Word-hint-long');
+        if (doShowPencil) classes.push('Word-hint-writing');
+        if (isDuplicate) classes.push('Word-hint-duplicate');
+        if (hint && hint.length > 20) classes.push('Word-hint-huge');
+        else if (hint && hint.length > 14) classes.push('Word-hint-long');
         const extraClasses = classes.join(' ');
 
-        if (this.props.showInput && this.props.submitHint) {
+        if (showInput && submitHint) {
             return (
                 <Paper className={extraClasses} style={styleObj}>
-                    <WordHintInput submitHint={this.props.submitHint}/>
+                    <WordHintInput submitHint={submitHint}/>
                     {author && <span className="Author-tag">{author}</span>}
                 </Paper>
             );
         } else {
             return (
                 <Paper className={extraClasses} style={styleObj}>
-                    {!showCheck && currentHint}
+                    {!showCheck && hint}
                     {showCheck && <span className="Done-icon">✓</span>}
-                    {showPencil && <PencilAnimation color={color}></PencilAnimation>}
+                    {doShowPencil && <PencilAnimation color={color}></PencilAnimation>}
                     {showDuplicateToggle && toggleDuplicate && (
                         <Checkbox className="Duplicate-toggle" 
                             icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
-                            checked={this.props.duplicate}
+                            checked={isDuplicate}
                             onChange={()=>toggleDuplicate()}/>
                     )}
                     {author && <span className="Author-tag">{author}</span>}

@@ -1,12 +1,12 @@
 import React from 'react';
 import {GameLobby} from './GameLobby';
 import {GamePreparation} from './GamePreparation';
-import {GameEndView} from './GameEndView';
+import GameEndView from './GameEndView';
 import {GameStats} from './components/GameStats';
-import {HintWritingView} from './gamePhases/HintWritingView';
-import {HintComparingView} from './gamePhases/HintComparingView';
-import {GuessingView} from './gamePhases/GuessingView';
-import {SolutionView} from './gamePhases/SolutionView';
+import HintWritingView from './gamePhases/HintWritingView';
+import HintComparingView from './gamePhases/HintComparingView';
+import GuessingView from './gamePhases/GuessingView';
+import SolutionView from './gamePhases/SolutionView';
 import { IGame, GamePhase } from '../custom.d';
 
 import { loadGame } from '../shared/apiFunctions';
