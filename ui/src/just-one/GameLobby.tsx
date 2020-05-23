@@ -88,11 +88,10 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         const gameUrl = window.location.href;
         if (navigator.share) {
             navigator.share({
-                title: document.title,
+                title: document.title || i18n.t('APP_TITLE', 'Nur ein Wort!'),
                 text: i18n.t('GAME.LOBBY.INVITE_PLAYERS_MESSAGE', 'Spiele online mit mir'),
                 url: gameUrl,
-            })
-            .catch(() => this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK_ERROR">Fehler beim Link kopieren</Trans>, {variant: 'error'}));
+            });
         } else {
             try {
                 navigator.clipboard.writeText(gameUrl);
