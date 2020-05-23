@@ -39,6 +39,10 @@
                 "WORDS": "One word per player",
                 "WORDS_plural": "{{count}} words per player"
             },
+            "INVITE_PLAYERS": "Invite others",
+            "INVITE_PLAYERS_MESSAGE": "Play with me online",
+            "COPIED_LINK": "Copied game link to clipboard",
+            "COPIED_LINK_ERROR": "Copying of game link failed, please copy manually",
             "JOIN": "Join",
             "START_BUTTON": "All $t(COMMON.TEAMMATES) joined",
             "WAIT_MSG": "Waiting for $t(COMMON.TEAMMATES)... As soon as all $t(COMMON.TEAMMATES) joined",

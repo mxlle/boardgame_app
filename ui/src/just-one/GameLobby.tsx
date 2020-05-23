@@ -1,7 +1,10 @@
 import React from 'react';
 import { IGame, IUser } from '../custom.d';
 import { Button, Paper, Typography } from '@material-ui/core';
+import ShareIcon from '@material-ui/icons/Share';
 import { Trans } from 'react-i18next';
+import i18n from '../i18n';
+import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { WordHint } from './components/WordHint';
 import { NewPlayer } from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
@@ -13,14 +16,15 @@ import * as api from '../shared/apiFunctions';
 type GameLobbyProps = {
     game: IGame,
     setTheme?: (color: string)=>void
-}
+}&WithSnackbarProps;
+
 type GameLobbyState = {
     currentPlayer: IUser,
     roundDialogOpen: boolean,
     playerAdded?: boolean
-}
+};
 
-export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
+class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
     public state: GameLobbyState = { 
         currentPlayer: {
@@ -38,6 +42,7 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         this.setPlayerProps = this.setPlayerProps.bind(this);
         this.selectNumRounds = this.selectNumRounds.bind(this);
         this.startPreparation = this.startPreparation.bind(this);
+        this.shareGame = this.shareGame.bind(this);
     }
 
     setPlayerProps(player: IUser) {
@@ -79,6 +84,25 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         api.startPreparation(this.props.game.id, wordsPerPlayer);
     }
 
+    shareGame() {
+        const gameUrl = window.location.href;
+        if (navigator.share) {
+            navigator.share({
+                title: document.title,
+                text: i18n.t('GAME.LOBBY.INVITE_PLAYERS_MESSAGE', 'Spiele online mit mir'),
+                url: gameUrl,
+            })
+            .catch(() => this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK_ERROR">Fehler beim Link kopieren</Trans>, {variant: 'error'}));
+        } else {
+            try {
+                navigator.clipboard.writeText(gameUrl);
+                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK">Link kopiert</Trans>);
+            } catch (e) {
+                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK_ERROR">Fehler beim Link kopieren</Trans>, {variant: 'error'});
+            }      
+        }
+    }
+
     render() {
         const { game } = this.props;
         const { currentPlayer, roundDialogOpen, playerAdded } = this.state;
@@ -114,6 +138,15 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                         )
                     }
                     {
+                        isInGame && (
+                            <Button variant="contained"
+                                startIcon={<ShareIcon />}
+                                onClick={this.shareGame}>
+                                <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Personen einladen</Trans>
+                            </Button>
+                        )
+                    }
+                    {
                         isHost && isInGame && (
                             <Button variant="contained" color="primary" 
                                 disabled={game.players.length < 3}
@@ -136,3 +169,5 @@ export class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
 }
+
+export default withSnackbar(GameLobby);

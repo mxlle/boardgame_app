@@ -81,7 +81,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName }), {
                 variant: variant,
                 preventDuplicate: true,
-                onClose: () => this.setState({shownResult: true})
+                onClose: () =>{ if(this._isMounted) this.setState({shownResult: true}); }
             });
         }
 

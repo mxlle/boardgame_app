@@ -11,6 +11,7 @@ type WordHintProps = {
     author?: string,
     showPencil?: boolean,
     showCheck?: boolean,
+    showCross?: boolean,
     showInput?: boolean,
     submitHint?: (hint:string)=>void,
     showDuplicateToggle?: boolean,
@@ -21,7 +22,8 @@ export class WordHint extends React.Component<WordHintProps> {
 
     render() {
         const { hint, color, author, 
-                showPencil, showCheck, showInput, submitHint,
+                showPencil, showCheck, showCross, 
+                showInput, submitHint,
                 showDuplicateToggle, toggleDuplicate, duplicate 
         } = this.props;
         const styleObj = {
@@ -34,6 +36,7 @@ export class WordHint extends React.Component<WordHintProps> {
         const classes = ['Word-hint'];
         if (doShowPencil) classes.push('Word-hint-writing');
         if (isDuplicate) classes.push('Word-hint-duplicate');
+        if (showCross) classes.push('Word-hint-showCross');
         if (hint && hint.length > 20) classes.push('Word-hint-huge');
         else if (hint && hint.length > 14) classes.push('Word-hint-long');
         const extraClasses = classes.join(' ');
@@ -47,9 +50,10 @@ export class WordHint extends React.Component<WordHintProps> {
             );
         } else {
             return (
-                <Paper className={extraClasses} style={styleObj}>
-                    {!showCheck && hint}
-                    {showCheck && <span className="Done-icon">✓</span>}
+                <Paper className={extraClasses} style={isDuplicate?undefined:styleObj}>
+                    {!showCheck && !showCross && hint}
+                    {showCheck && !showCross && <span className="Done-icon">✓</span>}
+                    {showCross && <span className="Invalid-icon">✗</span>}
                     {doShowPencil && <PencilAnimation color={color}></PencilAnimation>}
                     {showDuplicateToggle && toggleDuplicate && (
                         <Checkbox className="Duplicate-toggle" 
@@ -57,7 +61,7 @@ export class WordHint extends React.Component<WordHintProps> {
                             checked={isDuplicate}
                             onChange={()=>toggleDuplicate()}/>
                     )}
-                    {author && <span className="Author-tag">{author}</span>}
+                    {author && <span className="Author-tag" style={styleObj}>{author}</span>}
                 </Paper>
             );
         }

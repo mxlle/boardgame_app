@@ -57,20 +57,17 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
 
         const currentWord = isGuesser ? '?' : (game.currentWord || '');
         const currentHints = game.hints.map((hintObj: IHint, index: number) => {
-            let hint: string = hintObj.hint;
+            const hint: string = hintObj.hint;
             const hintIsMine = currentUser && currentUser.id === hintObj.author;
             const author = getUserInGame(game, hintObj.author) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
-
-            if (isGuesser && hintObj.isDuplicate) {
-                hint = 'LEIDER DOPPELT';
-            } 
 
             return (
                 <WordHint 
                     key={hintObj.author+index} 
                     hint={hint} 
                     color={author.color}
+                    showCross={isGuesser&&hintObj.isDuplicate}
                     duplicate={hintObj.isDuplicate}
                     author={authorName}
                 />

@@ -155,6 +155,12 @@ header {
     &.Word-card-wrong {
         border-color: red !important;
     }
+    &.Word-card-guess {
+        font-size: 48px;
+       .Word {
+            font-family: $handwriting;
+        }
+    }
 
     .Author-tag {
         font-family: $handwriting;
@@ -167,13 +173,23 @@ header {
         margin: $standardMargin+$gridSize;
         white-space: normal;
     }
+
+    .Orig-word-tag {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+        font-size: 16px;
+        line-height: 16px;
+        margin: $standardMargin+$gridSize;
+        white-space: normal;
+    }
 }
 
 .Game-end-view, .Game-lobby {
     .Word-card {
         max-width: 200px;
         height: 125px;
-        font-size: 16px;
+        font-size: 24px;
         margin: $gridSize;
     }
 }
@@ -219,8 +235,12 @@ header {
     }
 
     &.Word-hint-duplicate {
-        text-decoration: line-through;
-        font-size: 32px;
+        border-style: dashed;
+        color: #aaaaaa;
+        border-color: #aaaaaa;
+        &:not(.Word-hint-showCross) {
+            text-decoration: line-through;
+        }
     }
 
     &.Word-hint-long {
@@ -244,9 +264,10 @@ header {
     .Duplicate-toggle {
         position: absolute;
         right: $gridSize;
+        z-index: 1;
     }
 
-    .Done-icon {
+    .Done-icon, .Invalid-icon {
         font-size: 80px;
     }
 }

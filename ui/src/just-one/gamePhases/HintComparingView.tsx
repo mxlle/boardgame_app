@@ -74,6 +74,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                     hint={hintObj.hint} 
                     color={author.color}
                     showCheck={isGuesser}
+                    showCross={isGuesser&&hintObj.isDuplicate}
                     duplicate={hintObj.isDuplicate}
                     showDuplicateToggle={isRoundHost}
                     toggleDuplicate={()=>this.toggleDuplicate(index)}

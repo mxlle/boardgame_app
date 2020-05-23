@@ -23,11 +23,12 @@ export class RoundSelector extends React.Component<RoundSelectorProps> {
         const options = [];
         for (let i = 0; i < 3; i++) {
             const wordCount = i+1;
+            const roundCount = wordCount*numOfPlayers;
             options.push(
                 <ListItem button onClick={() => handleListItemClick(wordCount)} key={wordCount}>
                     <ListItemText 
-                        primary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.NUM" count={wordCount*numOfPlayers}>{wordCount*numOfPlayers} Runden</Trans>}
-                        secondary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{wordCount} Begriff(e) pro Spieler</Trans>} />
+                        primary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.NUM" count={roundCount}>{{roundCount}} Runden</Trans>}
+                        secondary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{{wordCount}} Begriff(e) pro Spieler</Trans>} />
                 </ListItem>
             );
         }

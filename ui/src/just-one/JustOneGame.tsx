@@ -1,5 +1,5 @@
 import React from 'react';
-import {GameLobby} from './GameLobby';
+import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
 import {GameStats} from './components/GameStats';

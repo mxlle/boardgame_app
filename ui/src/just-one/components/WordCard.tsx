@@ -21,17 +21,15 @@ export class WordCard extends React.Component<WordCardProps> {
         const { word, guesser, color, isGuesser, guess, guessedRight, showInput, submitHint} = this.props
         const guesserName = guesser;
         let guesserText;
-        if (guesser) {
-            if (guess) {
-                guesserText = <Trans i18nKey="GAME.COMMON.CURRENT_GUESS" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesserName}}s    Rateversuch: {{guess}}</Trans>;
-            } else {
-                guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesserName}} muss raten</Trans>;
-            }
-        } else if (guess) {
-            guesserText = <Trans i18nKey="GAME.COMMON.GUESS_SPEC">Rateversuch: {{guess}}</Trans>;
+        let originalWord;
+        if (guess) {
+            originalWord = i18n.t('GAME.COMMON.WORD', 'Begriff') + ': ' + word;
+        } else if (guesser) {
+            guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesserName}} muss raten</Trans>;
         }
         const classes = ['Word-card'];
         if (guess) {
+            classes.push('Word-card-guess');
             if (guessedRight) {
                 classes.push('Word-card-correct');
             } else {
@@ -44,9 +42,10 @@ export class WordCard extends React.Component<WordCardProps> {
 	        	{
                     (showInput && submitHint) ? 
                     <WordHintInput submitHint={submitHint} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> : 
-                    <span>{word}</span>
+                    <span className="Word" style={{color: guess && color}}>{guess || word}</span>
                 }
                 {guesserText && <span className="Author-tag" style={{color: color}}>{guesserText}</span>}
+                {originalWord && <span className="Orig-word-tag">{originalWord}</span>}
 	        </Paper>
         );
     }
