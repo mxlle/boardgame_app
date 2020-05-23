@@ -3,6 +3,7 @@ import { MockDaoMock } from '../MockDb/MockDao.mock';
 import { IUserDao } from './UserDao';
 import { generateId } from '@shared/functions';
 
+export { IUserDao };
 
 class UserDao extends MockDaoMock implements IUserDao {
 

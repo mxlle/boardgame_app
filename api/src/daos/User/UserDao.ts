@@ -1,5 +1,5 @@
 import { IUser } from '@entities/User';
-
+import { UserModel } from "@daos/Mongoose/models";
 
 export interface IUserDao {
     getOne: (email: string) => Promise<IUser | null>;
@@ -16,8 +16,7 @@ class UserDao implements IUserDao {
      * @param email
      */
     public async getOne(email: string): Promise<IUser | null> {
-        // TODO
-        return [] as any;
+        return await UserModel.findOne({email: email}).exec();
     }
 
 
@@ -25,8 +24,7 @@ class UserDao implements IUserDao {
      *
      */
     public async getAll(): Promise<IUser[]> {
-        // TODO
-        return [] as any;
+        return await UserModel.find().exec();
     }
 
 
@@ -35,8 +33,7 @@ class UserDao implements IUserDao {
      * @param user
      */
     public async add(user: IUser): Promise<void> {
-        // TODO
-        return {} as any;
+        await new UserModel(user).save();
     }
 
 
@@ -45,8 +42,7 @@ class UserDao implements IUserDao {
      * @param user
      */
     public async update(user: IUser): Promise<void> {
-        // TODO
-        return {} as any;
+        await user.save();
     }
 
 
@@ -55,8 +51,7 @@ class UserDao implements IUserDao {
      * @param id
      */
     public async delete(id: string): Promise<void> {
-        // TODO
-        return {} as any;
+        await UserModel.findOneAndDelete({id: id});
     }
 }
 

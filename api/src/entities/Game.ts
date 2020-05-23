@@ -1,5 +1,5 @@
 import { IUser } from './User';
-export { IUser }; // reexport
+import { Document } from 'mongoose';
 
 export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 
@@ -24,7 +24,7 @@ export interface WordResult {
     guess: string;
 }
 
-export interface IGame {
+export interface IGame extends Document {
     id: string;
     name: string;
     words: string[];
@@ -45,7 +45,7 @@ export interface IGame {
 }
 
 export function addPlayer(game: IGame, player: IUser) {
-    if (!game.host) game.host = player.id; // TODO still needed? 
+    if (!game.host) game.host = player.id; // TODO still needed?
     if (!player.enteredWords) player.enteredWords = [];
     game.players.push(player);
 
