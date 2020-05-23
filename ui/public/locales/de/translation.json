@@ -52,8 +52,8 @@
             "WORD_ADDER": {
                 "BUTTON": "Begriff absenden",
                 "BUTTON_plural": "Begriffe absenden",
-                "HEADING": "Gib einen Begriff f�r das Spiel ein",
-                "HEADING_plural": "Gib {{count}} Begriffe f�r das Spiel ein",
+                "HEADING": "Gib einen Begriff für das Spiel ein",
+                "HEADING_plural": "Gib {{count}} Begriffe für das Spiel ein",
                 "LABEL": "Wort", 
                 "LABEL_plural": "Wort {{index}}",
                 "PLACEHOLDER": "Ratebegriff eingeben"
@@ -65,19 +65,19 @@
             "WRONG": "Falsche: {{wrongCount}}",
             "PHASE": "Phase",
             "PHASE_WRITING": "{{ playersString }} schreiben Hinweise auf...",
-            "PHASE_COMPARING": "{{ roundHostName }} überpr�ft die Hinweise auf ung�ltige oder doppelte W�rter...",
+            "PHASE_COMPARING": "{{ roundHostName }} überprüft die Hinweise auf ungültige oder doppelte Wörter...",
             "PHASE_GUESSING": "{{ guesserName }} versucht den Begriff zu erraten...",
             "PHASE_SOLUTION": "{{ guesserName }} lag genau richtig!",
-            "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem z�hlt..."
+            "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem zählt..."
         },
         "COMPARING": {
-            "INFO": "Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ung�ltige Werte zu markieren.",
+            "INFO": "Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ungültige Werte zu markieren.",
             "BUTTON": "{{guesserName}} kann losraten!"
         },
         "SOLUTION": {
             "CONTINUE": "Super, weiter geht's",
             "CONTINUE_WRONG": "Leider falsch",
-            "CONTINUE_RIGHT": "Das z�hlt trotzdem"
+            "CONTINUE_RIGHT": "Das zählt trotzdem"
         },
         "END": {
             "RIGHT": "Richtig ({{count}})",

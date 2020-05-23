@@ -3,8 +3,9 @@ import { BAD_REQUEST, CREATED, OK, NOT_FOUND, FORBIDDEN } from 'http-status-code
 import { ParamsDictionary } from 'express-serve-static-core';
 import { generateId } from '@shared/functions';
 
-import GameDao from '@daos/Game/GameDao.mock';
+import GameDao from '@daos/Game';
 import * as GameController from '@entities/Game';
+import { IUser } from "@entities/User";
 import { paramMissingError, gameNotFoundError, forebiddenError } from '@shared/constants';
 
 // Init shared
@@ -169,7 +170,7 @@ router.put('/:id/hint', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.players.findIndex(p => p.id === userId) === -1) {
+    if (game.players.findIndex((p: IUser) => p.id === userId) === -1) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -273,7 +274,7 @@ router.put('/:id/resolve', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.players.findIndex(p => p.id === userId) === -1) {
+    if (game.players.findIndex((p: IUser) => p.id === userId) === -1) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });

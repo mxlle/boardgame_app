@@ -1,5 +1,5 @@
 import { IGame } from '@entities/Game';
-
+import { GameModel } from "@daos/Mongoose/models";
 
 export interface IGameDao {
     getOne: (id: string) => Promise<IGame | null>;
@@ -11,13 +11,8 @@ export interface IGameDao {
 
 class GameDao implements IGameDao {
 
-
-    /**
-     * @param email
-     */
     public async getOne(id: string): Promise<IGame | null> {
-        // TODO
-        return [] as any;
+        return await GameModel.findOne({id: id}).exec();
     }
 
 
@@ -25,8 +20,7 @@ class GameDao implements IGameDao {
      *
      */
     public async getAll(): Promise<IGame[]> {
-        // TODO
-        return [] as any;
+        return await GameModel.find().exec();
     }
 
 
@@ -35,8 +29,7 @@ class GameDao implements IGameDao {
      * @param game
      */
     public async add(game: IGame): Promise<void> {
-        // TODO
-        return {} as any;
+        await new GameModel(game).save();
     }
 
 
@@ -45,8 +38,7 @@ class GameDao implements IGameDao {
      * @param game
      */
     public async update(game: IGame): Promise<void> {
-        // TODO
-        return {} as any;
+        await game.save();
     }
 
 
@@ -55,8 +47,7 @@ class GameDao implements IGameDao {
      * @param id
      */
     public async delete(id: string): Promise<void> {
-        // TODO
-        return {} as any;
+        await GameModel.findOneAndDelete({id: id});
     }
 }
 

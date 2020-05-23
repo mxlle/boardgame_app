@@ -3,9 +3,7 @@ import { MockDaoMock } from '../MockDb/MockDao.mock';
 import { IGameDao } from './GameDao';
 import { generateId } from '@shared/functions';
 
-
 class GameDao extends MockDaoMock implements IGameDao {
-
 
     public async getOne(id: string): Promise<IGame | null> {
         try {
