@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Paper } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 import { WordHintInput } from './WordHintInput';
 
 type WordCardProps = {
@@ -38,15 +38,17 @@ export class WordCard extends React.Component<WordCardProps> {
         }
 
         return (
-	        <Paper className={classes.join(' ')} style={{borderColor: color}}>
-	        	{
-                    (showInput && submitHint) ? 
-                    <WordHintInput submitHint={submitHint} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> : 
-                    <span className="Word" style={{color: guess && color}}>{guess || word}</span>
-                }
-                {guesserText && <span className="Author-tag" style={{color: color}}>{guesserText}</span>}
-                {originalWord && <span className="Orig-word-tag">{originalWord}</span>}
-	        </Paper>
+            <Grid item xs={12} className="Word-card-wrapper">
+    	        <Paper className={classes.join(' ')} style={{borderColor: color}}>
+    	        	{
+                        (showInput && submitHint) ? 
+                        <WordHintInput submitHint={submitHint} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> : 
+                        <span className="Word" style={{color: guess && color}}>{guess || word}</span>
+                    }
+                    {guesserText && <span className="Author-tag" style={{color: color}}>{guesserText}</span>}
+                    {originalWord && <span className="Orig-word-tag">{originalWord}</span>}
+    	        </Paper>
+            </Grid>
         );
     }
 

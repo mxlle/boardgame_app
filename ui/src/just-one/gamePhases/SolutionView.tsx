@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Button, Typography } from '@material-ui/core';
+import { Grid, Button, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
@@ -63,6 +63,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                     hint={hintObj.hint} 
                     color={author.color}
                     author={authorName}
+                    duplicate={hintObj.isDuplicate}
                 />
             );
         });
@@ -78,7 +79,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         if (!shownResult) {
             const context = game.guessedRight ? 'CORRECT' : 'WRONG';
             const variant = game.guessedRight ? 'success' : 'warning';
-            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName }), {
+            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName, guess: game.currentGuess }), {
                 variant: variant,
                 preventDuplicate: true,
                 onClose: () =>{ if(this._isMounted) this.setState({shownResult: true}); }
@@ -86,30 +87,36 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         }
 
         let solutionButton1 = (
-            <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
-                <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
-            </Button>
+            <Grid item xs={12}>
+                <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
+                    <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
+                </Button>
+            </Grid>
         );
         let solutionButton2;
         if (!game.guessedRight) {
             solutionButton1 = (
-                <Button variant="contained" onClick={() => this.resolveRound(true)}>
-                    <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
-                </Button>
+                <Grid item xs={12}>
+                    <Button variant="contained" onClick={() => this.resolveRound(true)}>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
+                    </Button>
+                </Grid>
             );
             solutionButton2 = (
-                <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
-                    <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
-                </Button>
+                <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
+                    </Button>
+                </Grid>
             );
         }
 
         return (
-            <div className="Game-field">
-                <div className="Current-word">
-                    <Typography variant="h5">
+            <Grid container spacing={4} className="Game-field">
+                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Typography>
+                    </Grid>
                     <WordCard 
                         word={currentWord} 
                         guesser={guesserName} 
@@ -119,14 +126,14 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                         guessedRight={game.guessedRight}/>
                     {(isRoundHost || game.guessedRight) && solutionButton1}
                     {isRoundHost && solutionButton2}
-                </div>
-                <div className="Current-hints">
-                    <Typography variant="h5">
+                </Grid>
+                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Typography>
-                    <div className="WordHint-list">{currentHints}</div>
-                </div>
-            </div>
+                    </Grid>
+                    {currentHints}
+                </Grid>
+            </Grid>
         );
     }
 }

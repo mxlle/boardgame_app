@@ -1,4 +1,5 @@
 import React from 'react';
+import { Container } from '@material-ui/core';
 import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
@@ -89,10 +90,10 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
         }
 
         return (
-            <div className="Game-content">
+            <Container maxWidth="lg" className="Game-content">
                 {gameStats}
                 {gameContent}
-            </div>
+            </Container>
         );
     }
 }

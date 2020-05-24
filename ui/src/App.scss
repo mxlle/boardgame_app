@@ -1,9 +1,23 @@
+// --- global stylesheet ---
+
+// variables and mixins
+
 $appBackground: #fff8f5;
 $appBackgroundDark: #222222;
 $gridSize: 8px;
 $standardMargin: 2*$gridSize;
 $pageContentWidth: 900px;
 $handwriting: 'Gloria Hallelujah', cursive;
+$breakPoint_md: 720px; // TODO
+$breakPoint_lg: 960px; // TODO
+
+@mixin flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+// app styles
 
 html, #root, .App {
     height: 100%;
@@ -29,41 +43,43 @@ body{
 
 .App {
     text-align: center;
-    >div {
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-            Button {
-                margin: $gridSize;
-            }
-    }
 }
 
 .App-loading {
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include flex-center;
+}
+
+.MuiContainer-root {
+    padding-bottom: 4*$gridSize; // TODO - because negative margin
 }
 
 header {
     margin-bottom: 2*$standardMargin;
     padding: $gridSize;
     .appTitle {
-        flex: 1;
+        flex: 1 1 auto;
         font-family: $handwriting;
         letter-spacing: 4px;
-        font-size: 4vw // relativ to width
-    } 
-    .MuiChip-root {
-        font-family: $handwriting;
+        font-size: 4vw; // relativ to width
+        @media (min-width: $breakPoint_lg) {
+            font-size: 40px;
+        }
     }
 }
 
-.GameList {
-    width: calc(100vw - #{2*$standardMargin});
-    max-width: 600px;
-    .GameListItem {
-        
+.JustOneHome {
+    @include flex-center;
+    flex-direction: column;
+
+    .newGameBox {
+        @include flex-center;
+        flex-direction: column;
+        padding: $standardMargin;
+        margin: $standardMargin 0;
+
+        button {
+            margin-top: $standardMargin;
+        }
     }
 }
 
@@ -89,62 +105,36 @@ header {
     align-items: center;
 }
 
-.Game-content {
-    max-width: 100%;
+.MuiGrid-container {
+    @include flex-center;
 }
 
-.New-player, .Player-list, .Word-adder {
-    flex: 1;
-    display: flex;
+.New-player, .Word-adder {
+    @include flex-center;
     flex-direction: column;
-    align-items: center;
-    justify-content: center; 
-    max-width: 100%;
+
     Button, .MuiFormControl-root {
         margin: $gridSize;
-    }
-    .Word-hint.Word-hint-writing {
-        border-style: dotted
     }
 }
 
 .Game-lobby, .Game-field, .Game-end-view {
-    display: flex;
-    min-width: 0;
-    width: calc(100vw - #{2*$standardMargin});
-    max-width: $pageContentWidth;
-    margin: $standardMargin;
-    flex-wrap: wrap
+    justify-content: center;
+    @media(min-width: $breakPoint_md) {
+        justify-content: space-between;
+    }
 }
 
 .MuiPaper-root.StatusInfo {
     padding: $standardMargin;
-    margin: $standardMargin;
-}
-
-.Current-word, .Current-hints, .Correct-words, .Wrong-words {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    max-width: 100%;
-    margin-bottom: 2*$standardMargin;
-    align-items: center;
 }
 
 .Word-card {
-    width: calc(100vw - #{2*$standardMargin});
-    min-width: 0;
-    max-width: 400px;
-    height: 250px;
+    @include flex-center;
+    height: 220px;
     max-height: 30vh;
     min-height: 150px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background-color: white;
-    border-radius: $gridSize;
     font-size: 32px;
-    margin: $standardMargin;
     border: 2px solid black;
     white-space: nowrap;
     position: relative;
@@ -183,17 +173,27 @@ header {
         margin: $standardMargin+$gridSize;
         white-space: normal;
     }
+
+    .Word-hint-input {
+        margin-left: 5*$gridSize; // TODO
+    }
 }
 
 .Game-end-view, .Game-lobby {
+    .Word-card-wrapper {
+        @include flex-center;
+        width: 100%;
+    }
     .Word-card {
-        max-width: 200px;
+        max-width: 250px;
         height: 125px;
         font-size: 24px;
-        margin: $gridSize;
+        flex: 1 1 auto;
     }
 }
 .Game-end-view {
+    align-items: flex-start; 
+
     .Word-card {
         align-items: flex-start;
         span:first-child {
@@ -203,28 +203,24 @@ header {
 }
 
 .Word-hint-input {
-    display: flex;
-    justify-content: center;
+    @include flex-center;
+    width: 100%;
+    margin-left: 7*$gridSize; // TODO
+    margin-right: 2*$gridSize;
+
+    >div {
+        width: 100%;
+    }
 
     button {
         margin-left: 8px;
     } 
 }
 
-.WordHint-list {
-    max-width: 100vw;
-}
-
 .Word-hint {
+    @include flex-center;
     height: 100px;
-    width: calc(100vw - #{2*$standardMargin});
-    min-width: 0;
-    max-width: 400px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     font-size: 48px;
-    margin: $standardMargin;
     border: 2px solid black;
     font-family: $handwriting;
     white-space: nowrap;
@@ -285,11 +281,14 @@ header {
     color: inherit;
 }
 
+
+// color picker styles
+
 $colorButtonSize: 4*$gridSize;
 $iconSize: 3*$gridSize;
 .Color-picker {
     width: 4*$colorButtonSize;
-    margin: $standardMargin;
+    margin: 2*$standardMargin;
     .Color-button {
         border-radius: 0;
         margin: 0;
@@ -301,6 +300,8 @@ $iconSize: 3*$gridSize;
         }
     }
 }
+
+// pencil animation styles
 
 $pencilWidth: 12px;
 $pencilLength: 4*$pencilWidth;

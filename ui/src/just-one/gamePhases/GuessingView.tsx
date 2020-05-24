@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Typography } from '@material-ui/core';
+import { Grid, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
@@ -75,11 +75,11 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         });
 
         return (
-            <div className="Game-field">
-                <div className="Current-word">
-                    <Typography variant="h5">
+            <Grid container spacing={4} className="Game-field">
+                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Typography>
+                    </Grid>
                     <WordCard 
                         word={currentWord} 
                         guesser={guesser.name} 
@@ -87,14 +87,14 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                         color={guesser.color} 
                         showInput={isGuesser}
                         submitHint={this.guess}/>
-                </div>
-                <div className="Current-hints">
-                    <Typography variant="h5">
+                </Grid>
+                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Typography>
-                    <div className="WordHint-list">{currentHints}</div>
-                </div>
-            </div>
+                    </Grid>
+                    {currentHints}
+                </Grid>
+            </Grid>
         );
     }
 }

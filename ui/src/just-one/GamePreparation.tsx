@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import { IGame, IUser } from '../custom.d';
-import { Paper, Typography } from '@material-ui/core';
+import { Grid, Paper, Typography } from '@material-ui/core';
 import { WordHint } from './components/WordHint';
 import { WordCard } from './components/WordCard';
 import { WordAdder } from './components/WordAdder';
@@ -59,31 +59,35 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
         // TODO not in game users
         // TODO css classes
         return (
-            <div className="Game-lobby">
-                <div className="New-player">
+            <Grid container spacing={4} className="Game-lobby">
+                <Grid item xs={12} sm={6} container spacing={2} className="New-player">
                     { 
-                        allMyWordsEntered || !isInGame ? ( 
-                            <Paper className="StatusInfo">
-                                <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Warten auf Mitspieler ... Sobald alle fertig sind, geht's los.</Trans>
-                            </Paper>
+                        allMyWordsEntered || !isInGame ? (
+                            <Grid item xs={12}> 
+                                <Paper className="StatusInfo">
+                                    <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Warten auf Mitspieler ... Sobald alle fertig sind, geht's los.</Trans>
+                                </Paper>
+                            </Grid>
                         ) : (
-                            <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
+                            <Grid item xs={12}>
+                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
+                            </Grid>
                         )
                     }
                     {myWordCards.length > 0 && (
-                        <Typography variant="subtitle1">
+                        <Grid item xs={12} component={Typography} variant="subtitle1">
                             <Trans i18nKey="GAME.PREP.MY_WORDS" count={myWords.length}>Meine Begriffe</Trans>
-                        </Typography>
+                        </Grid>
                     )}
                     {myWordCards}
-                </div>
-                <div className="Player-list">
-                    <Typography variant="h5">
+                </Grid>
+                <Grid item xs={12} sm={6} container spacing={2} alignItems="center" className="Player-list">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
-                    </Typography>
+                    </Grid>
                     {listOfPlayers}
-                </div>
-            </div>
+                </Grid>
+            </Grid>
         );
     }
 

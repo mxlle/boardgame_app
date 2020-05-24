@@ -1,6 +1,6 @@
 import React from 'react';
 import { IGame, IUser } from '../custom.d';
-import { Button, Paper, Typography } from '@material-ui/core';
+import { Grid, Button, Paper, Typography } from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
 import { Trans } from 'react-i18next';
 import i18n from '../i18n';
@@ -121,49 +121,57 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
 
         return (
-            <div className="Game-lobby">
-                <div className="New-player">
+            <Grid container spacing={4} className="Game-lobby">
+                <Grid item xs={12} sm={6} container spacing={2} className="New-player">
                     { 
                         isInGame ? (
-                            <Paper className="StatusInfo">
-                                <Trans i18nKey="GAME.LOBBY.WAIT_MESSAGE" tOptions={{context: isHost ? 'HOST' : 'PLAYER'}}>
-                                    Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
-                                </Trans> 
-                            </Paper>
+                            <Grid item xs={12}>
+                                <Paper className="StatusInfo">
+                                    <Trans i18nKey="GAME.LOBBY.WAIT_MESSAGE" tOptions={{context: isHost ? 'HOST' : 'PLAYER'}}>
+                                        Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
+                                    </Trans> 
+                                </Paper>
+                            </Grid>
                         ) : (
-                            <NewPlayer currentPlayer={currentPlayer}
-                                updatePlayer={this.setPlayerProps}
-                                addPlayer={this.addPlayer}/>
+                            <Grid item xs={12}>
+                                <NewPlayer currentPlayer={currentPlayer}
+                                    updatePlayer={this.setPlayerProps}
+                                    addPlayer={this.addPlayer}/>
+                            </Grid>
                         )
                     }
                     {
                         isInGame && (
-                            <Button variant="contained"
-                                startIcon={<ShareIcon />}
-                                onClick={this.shareGame}>
-                                <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Personen einladen</Trans>
-                            </Button>
+                            <Grid item xs={12}>
+                                <Button variant="contained"
+                                    startIcon={<ShareIcon />}
+                                    onClick={this.shareGame}>
+                                    <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Personen einladen</Trans>
+                                </Button>
+                            </Grid>
                         )
                     }
                     {
                         isHost && isInGame && (
-                            <Button variant="contained" color="primary" 
-                                disabled={game.players.length < 3}
-                                onClick={this.selectNumRounds}>
-                                <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>
-                            </Button>
+                            <Grid item xs={12}>
+                                <Button variant="contained" color="primary" 
+                                    disabled={game.players.length < 3}
+                                    onClick={this.selectNumRounds}>
+                                    <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>
+                                </Button>
+                            </Grid>
                         )
                     }
-                </div>
-                <div className="Player-list">
-                    <Typography variant="h5">
+                </Grid>
+                <Grid item xs={12} sm={6} container spacing={2} alignItems="center" className="Player-list">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
-                    </Typography>
+                    </Grid>
                     {listOfPlayers}
                     {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}
-                </div>
+                </Grid>
                 <RoundSelector numOfPlayers={game.players.length} open={roundDialogOpen} onClose={this.startPreparation}/>
-            </div>
+            </Grid>
         );
     }
 

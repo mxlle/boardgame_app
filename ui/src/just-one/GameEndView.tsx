@@ -1,6 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
+import { Grid, Typography } from '@material-ui/core';
 import {WordCard} from './components/WordCard';
 import { IGame } from '../custom.d';
 import { checkPrevResult } from '../shared/functions';
@@ -43,16 +44,20 @@ class GameEndView extends React.Component<GameEndViewProps> {
         }
 
         return (
-            <div className="Game-end-view">
-                <div className="Correct-words">
-                    <h2><Trans i18nKey="GAME.END.RIGHT" count={game.correctWords.length}>Richtig</Trans></h2>
+            <Grid container spacing={4} className="Game-end-view">
+                <Grid item xs={12} md={6} container spacing={2} className="Correct-words">
+                    <Grid item xs={12} component={Typography} variant="h4">
+                        <Trans i18nKey="GAME.END.RIGHT" count={game.correctWords.length}>Richtig</Trans>
+                    </Grid>
                     {correctWords}
-                </div>
-                <div className="Wrong-words">
-                    <h2><Trans i18nKey="GAME.END.WRONG" count={game.wrongWords.length}>Falsch</Trans></h2>
+                </Grid>
+                <Grid item xs={12} md={6} container spacing={2} className="Wrong-words">
+                    <Grid item xs={12} component={Typography} variant="h4">
+                        <Trans i18nKey="GAME.END.WRONG" count={game.wrongWords.length}>Falsch</Trans>
+                    </Grid>
                     {wrongWords}
-                </div>
-            </div>
+                </Grid>
+            </Grid>
         );
     }
 }

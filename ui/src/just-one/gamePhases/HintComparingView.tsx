@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Button, Typography } from '@material-ui/core';
+import { Grid, Button, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
@@ -84,34 +84,36 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         });
 
         return (
-            <div className="Game-field">
-                <div className="Current-word">
-                    <Typography variant="h5">
+            <Grid container spacing={4} className="Game-field">
+                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Typography>
+                    </Grid>
                     <WordCard 
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
                         color={guesser.color} />
-                </div>
-                <div className="Current-hints">
-                    <Typography variant="h5">
+                </Grid>
+                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
+                    <Grid item xs={12} component={Typography} variant="h5">
                         <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Typography>
-                    <div className="WordHint-list">{currentHints}</div>
+                    </Grid>
+                    {currentHints}
                     { isRoundHost && (
-                        <Typography variant="subtitle1">
+                        <Grid item xs={12} component={Typography} variant="subtitle1">
                             <Trans i18nKey="GAME.COMPARING.INFO">Markiere ungültige Hinweise</Trans>
-                        </Typography>
+                        </Grid>
                     )}
                     {isRoundHost && (
-                        <Button variant="contained" color="primary" onClick={this.showHints}>
-                            <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
-                        </Button>
+                        <Grid item xs={12}>
+                            <Button variant="contained" color="primary" onClick={this.showHints}>
+                                <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
+                            </Button>
+                        </Grid>
                     )}
-                </div>
-            </div>
+                </Grid>
+            </Grid>
         );
     }
 }

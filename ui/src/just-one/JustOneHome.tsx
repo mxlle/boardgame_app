@@ -1,6 +1,6 @@
 import React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Button, TextField } from '@material-ui/core';
+import { Container, Box, Button, TextField } from '@material-ui/core';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
 import { IGame } from '../custom.d';
@@ -127,18 +127,20 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         if (newGameName === null) newGameName = getInitialGameName(this.currentUserName);
 
         return (
-            <div className="JustOneHome">
-                <TextField label={<Trans i18nKey="HOME.GAME_NAME">Spielname</Trans>} value={newGameName} onChange={this.handleChange} />
-                <Button variant="contained" color="primary" onClick={this.createGame}>
-                    <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
-                </Button>
+            <Container maxWidth="sm" className="JustOneHome">
+                <Box className="newGameBox">
+                    <TextField label={<Trans i18nKey="HOME.GAME_NAME">Spielname</Trans>} value={newGameName} onChange={this.handleChange} />
+                    <Button variant="contained" color="primary" onClick={this.createGame}>
+                        <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
+                    </Button>         
+                </Box>
                 <ActionButton loading={gamesLoading}>
                     <Button variant="contained" onClick={this.loadGames}>
                         <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
                     </Button>
                 </ActionButton>
                 <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
-            </div>
+            </Container>
         );
     }
 }

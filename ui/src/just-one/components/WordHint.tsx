@@ -1,7 +1,7 @@
 import React from 'react';
 import { WordHintInput } from './WordHintInput';
 import { PencilAnimation } from '../../common/PencilAnimation';
-import { Checkbox, Paper } from '@material-ui/core';
+import { Grid, Checkbox, Paper } from '@material-ui/core';
 import { Mood as MoodIcon, MoodBad as MoodBadIcon } from '@material-ui/icons';
 
 type WordHintProps = {
@@ -43,26 +43,30 @@ export class WordHint extends React.Component<WordHintProps> {
 
         if (showInput && submitHint) {
             return (
-                <Paper className={extraClasses} style={styleObj}>
-                    <WordHintInput submitHint={submitHint}/>
-                    {author && <span className="Author-tag">{author}</span>}
-                </Paper>
+                <Grid item xs={12}>
+                    <Paper className={extraClasses} style={styleObj}>
+                        <WordHintInput submitHint={submitHint}/>
+                        {author && <span className="Author-tag">{author}</span>}
+                    </Paper>
+                </Grid>
             );
         } else {
             return (
-                <Paper className={extraClasses} style={isDuplicate?undefined:styleObj}>
-                    {!showCheck && !showCross && hint}
-                    {showCheck && !showCross && <span className="Done-icon">✓</span>}
-                    {showCross && <span className="Invalid-icon">✗</span>}
-                    {doShowPencil && <PencilAnimation color={color}></PencilAnimation>}
-                    {showDuplicateToggle && toggleDuplicate && (
-                        <Checkbox className="Duplicate-toggle" 
-                            icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
-                            checked={isDuplicate}
-                            onChange={()=>toggleDuplicate()}/>
-                    )}
-                    {author && <span className="Author-tag" style={styleObj}>{author}</span>}
-                </Paper>
+                <Grid item xs={12}>
+                    <Paper className={extraClasses} style={isDuplicate?undefined:styleObj}>
+                        {!showCheck && !showCross && hint}
+                        {showCheck && !showCross && <span className="Done-icon">✓</span>}
+                        {showCross && <span className="Invalid-icon">✗</span>}
+                        {doShowPencil && <PencilAnimation color={color}></PencilAnimation>}
+                        {showDuplicateToggle && toggleDuplicate && (
+                            <Checkbox className="Duplicate-toggle" 
+                                icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
+                                checked={isDuplicate}
+                                onChange={()=>toggleDuplicate()}/>
+                        )}
+                        {author && <span className="Author-tag" style={styleObj}>{author}</span>}
+                    </Paper>
+                </Grid>
             );
         }
 
