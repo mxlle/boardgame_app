@@ -90,7 +90,7 @@
         "MESSAGE": {
             "RESULT": "{{guesserName}} guessed",
             "RESULT_CORRECT": "{{guesserName}} guessed correctly",
-            "RESULT_WRONG": "{{guesserName}} guessed wrong",
+            "RESULT_WRONG": "{{guesserName}}'s guess: \"{{guess}}\"",
             "PREV_RESULT_CORRECT": "\"{{word}}\" counts anyway!",
             "PREV_RESULT_WRONG": "\"{{word}}\" doesn't count!",
             "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
