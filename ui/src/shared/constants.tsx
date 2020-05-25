@@ -1,5 +1,5 @@
 // api url
-const isProd = window.location.hostname === 'justone.okj.name';
+const isProd = window.location.protocol === 'https:';
 const apiPort = isProd ? '' : ':9000';
 export const API_URL = window.location.protocol + '//' + window.location.hostname + apiPort + '/api';
 export const GAME_URL = API_URL + '/games';
