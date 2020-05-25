@@ -15,7 +15,7 @@ import { SETTING_COLOR, SETTING_THEME, ThemeMode } from './shared/constants';
 import { getTheme, STYLES } from './theme';
 import HeaderBar from './common/HeaderBar';
 import JustOneHome from './just-one/JustOneHome';
-import {JustOneGame} from './just-one/JustOneGame';
+import JustOneGame from './just-one/JustOneGame';
 
 import './i18n';
 

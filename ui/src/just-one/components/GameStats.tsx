@@ -1,15 +1,49 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
+import i18n from '../../i18n';
 import { IGame, GamePhase } from '../../custom.d';
 import { getUserInGame } from '../../shared/functions';
+import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
+import CardIcon, { CardTypes } from "./CardIcon";
 
 type GameStatsProps = {
     game: IGame
-};
+} & WithStyles<typeof styles>;
 
-export class GameStats extends React.Component<GameStatsProps> {
+const styles = (theme: Theme) => createStyles({
+    root: {
+        width: '100%',
+        height: 50,
+    },
+    appbar: {
+        top: 'auto',
+        bottom: 0,
+        marginBottom: 0,
+    },
+    contents: {
+        display: 'flex',
+        justifyContent: 'space-between',
+        padding: theme.spacing(1)
+    },
+    body: {
+        '& .MuiCollapse-wrapperInner': {
+            transform: 'translateY(-40px)',
+        }
+    }
+});
+
+class GameStats extends React.Component<GameStatsProps> {
+    componentDidMount() {
+        document.body.classList.add(this.props.classes.body);
+    }
+
+    componentWillUnmount() {
+        document.body.classList.remove(this.props.classes.body);
+    }
+
     render() {
-        const game: IGame = this.props.game;
+        const {game, classes} = this.props;
+
         const roundHost = getUserInGame(game, game.roundHost) || { name: '?' };
         const roundHostName = roundHost.name;
         const guesser = getUserInGame(game, game.currentGuesser) || { name: '?' };
@@ -43,18 +77,24 @@ export class GameStats extends React.Component<GameStatsProps> {
         const wrongCount = game.wrongWords.length;
 
         return (
-            <div className="Game-progress">
-                <div>
-                    <Trans i18nKey="GAME.STATS.ROUND">
-                        Runde {{round}}/{{roundCount}}
-                    </Trans>, <Trans i18nKey="GAME.STATS.RIGHT">
-                        Richtige: {{rightCount}}
-                    </Trans>, <Trans i18nKey="GAME.STATS.WRONG">
-                        Falsche: {{wrongCount}}
-                    </Trans>
-                </div>
-                <div><Trans i18nKey="GAME.STATS.PHASE">Phase</Trans>: {gamePhase}</div>
+            <div className={classes.root}>
+                <AppBar position="fixed" color="default" className={classes.appbar}>
+                    <div className={classes.contents}>
+                        <div>
+                            <Trans i18nKey="GAME.STATS.ROUND">
+                                Runde {{round}}/{{roundCount}}
+                            </Trans>
+                        </div>
+                        <div><Trans i18nKey="GAME.STATS.PHASE">Phase</Trans>: {gamePhase}</div>
+                        <div>
+                            <CardIcon type={CardTypes.CORRECT} title={i18n.t('GAME.STATS.RIGHT', {rightCount}).toString()}>{rightCount}</CardIcon>
+                            <CardIcon type={CardTypes.WRONG} title={i18n.t('GAME.STATS.WRONG', {wrongCount}).toString()}>{wrongCount}</CardIcon>
+                        </div>
+                    </div>
+                </AppBar>
             </div>
         );
     }
 }
+
+export default withStyles(styles)(GameStats);

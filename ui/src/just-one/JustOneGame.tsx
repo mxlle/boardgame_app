@@ -3,7 +3,7 @@ import { Container } from '@material-ui/core';
 import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
-import {GameStats} from './components/GameStats';
+import GameStats from './components/GameStats';
 import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
@@ -23,7 +23,7 @@ type JustOneGameState = {
     currentGame?: IGame
 };
 
-export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameState> {
+export default class JustOneGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = {};
     private _interval: number|undefined;
     private _isMounted: boolean = false;
@@ -91,8 +91,8 @@ export class JustOneGame extends React.Component<JustOneGameProps,JustOneGameSta
 
         return (
             <Container maxWidth="lg" className="Game-content">
-                {gameStats}
                 {gameContent}
+                {gameStats}
             </Container>
         );
     }
