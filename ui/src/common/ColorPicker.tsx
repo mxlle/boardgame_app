@@ -1,5 +1,5 @@
 import React from 'react';
-import { IconButton } from '@material-ui/core';
+import { IconButton, Box } from '@material-ui/core';
 import CheckIcon from '@material-ui/icons/Check';
 
 export const allColors: string[] = [
@@ -34,25 +34,41 @@ type ColorPickerProps = {
     select: (color: string)=>void;
 }
 
+const BTN_SIZE = 32;
+const ICON_SIZE = 24;
+
 export class ColorPicker extends React.Component<ColorPickerProps> {
 
     render() {
     	const { selected, select } = this.props;
 
         const colorButtons = allColors.map((color: string) => {
-            const classes = ['Color-button'];
-            if (selected === color) classes.push('Color-selected');
+            const isSelected = selected === color;
+            const padding = isSelected ? BTN_SIZE/2-ICON_SIZE/2 : BTN_SIZE/2;
+            // TODO - do nicer (Box didnt work)
+            const style = {
+                backgroundColor: color,
+                padding: padding
+            };
             return (
-                <IconButton className={classes.join(' ')} onClick={() => select(color)} style={{ backgroundColor: color }} key={color}>
-                    {selected === color && <CheckIcon/>}
+                <IconButton onClick={() => select(color)} style={style} key={color}>
+                    {isSelected && <CheckIcon/>}
                 </IconButton>
             )
         });
 
         return (
-            <div className="Color-picker">
+            <Box width={4*BTN_SIZE} m={4} className="Color-picker">
                 { colorButtons }
-            </div>
+
+                <style jsx>{`
+                    .Color-picker button {
+                        margin: 0;
+                        border-radius: 0;
+                        color: white;
+                    }
+                `}</style>
+            </Box>
         );
     }
 

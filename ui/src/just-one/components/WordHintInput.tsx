@@ -1,6 +1,6 @@
 import React from 'react';
 import i18n from '../../i18n';
-import { IconButton } from '@material-ui/core';
+import { Box, IconButton } from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 import TextField from '@material-ui/core/TextField';
 
@@ -39,18 +39,24 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
     }
 
     render() {
+        const { label } = this.props;
+        const { value } = this.state;
+
+        // TODO ml calc based on label
+
         return (
-	        <div className="Word-hint-input">
-	        	<TextField label={this.props.label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
-	        		value={this.state.value} 
+	        <Box width={1} ml={label ? 5 : 7} mr={2} className="Word-hint-input flex-center">
+	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
+                    fullWidth
+	        		value={value} 
 	        		onChange={this.handleChange} 
 	        		onKeyPress={this.keyPressed} />
-    			<IconButton color="primary" 
-    				disabled={!this.state.value} 
+    			<IconButton color="primary"
+    				disabled={!value} 
     				onClick={this.submitHint}>
                     <SendIcon></SendIcon>
                 </IconButton>
-	        </div>
+	        </Box>
         );
     }
 

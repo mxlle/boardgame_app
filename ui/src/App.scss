@@ -17,6 +17,11 @@ $breakPoint_lg: 960px; // TODO
     justify-content: center;
 }
 
+// common classes 
+.flex-center {
+    @include flex-center;
+}
+
 // app styles
 
 html, #root, .App {
@@ -173,10 +178,6 @@ header {
         margin: $standardMargin+$gridSize;
         white-space: normal;
     }
-
-    .Word-hint-input {
-        margin-left: 5*$gridSize; // TODO
-    }
 }
 
 .Game-end-view, .Game-lobby {
@@ -200,21 +201,6 @@ header {
             margin-top: 5*$gridSize;
         }
     }
-}
-
-.Word-hint-input {
-    @include flex-center;
-    width: 100%;
-    margin-left: 7*$gridSize; // TODO
-    margin-right: 2*$gridSize;
-
-    >div {
-        width: 100%;
-    }
-
-    button {
-        margin-left: 8px;
-    } 
 }
 
 .Word-hint {
@@ -281,25 +267,6 @@ header {
     color: inherit;
 }
 
-
-// color picker styles
-
-$colorButtonSize: 4*$gridSize;
-$iconSize: 3*$gridSize;
-.Color-picker {
-    width: 4*$colorButtonSize;
-    margin: 2*$standardMargin;
-    .Color-button {
-        border-radius: 0;
-        margin: 0;
-        padding: $colorButtonSize/2;
-
-        &.Color-selected {
-            padding: $colorButtonSize/2-$iconSize/2;
-            color: white;
-        }
-    }
-}
 
 // pencil animation styles
 
