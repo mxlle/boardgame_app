@@ -86,11 +86,11 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
 
         if (isRoundHost) { // TODO - maybe not use Grid for these elements (?)
             currentHints.push((
-                <Grid item xs={12} component={Typography} variant="subtitle1">
+                <Grid item xs={12} component={Typography} variant="subtitle1" key="info">
                     <Trans i18nKey="GAME.COMPARING.INFO">Markiere ungültige Hinweise</Trans>
                 </Grid>
             ),(
-                <Grid item xs={12}>
+                <Grid item xs={12} key="button">
                     <Button variant="contained" color="primary" onClick={this.showHints}>
                         <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
                     </Button>

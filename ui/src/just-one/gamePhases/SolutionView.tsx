@@ -90,6 +90,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         const leftCol = [];
         leftCol.push(
             <WordCard 
+                key="wordCard"
                 word={currentWord} 
                 guesser={guesser.name} 
                 isGuesser={isGuesser}
@@ -99,7 +100,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         );
         if (game.guessedRight) {
             leftCol.push(
-                <Grid item xs={12}>
+                <Grid item xs={12} key="button1">
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
                     </Button>
@@ -107,12 +108,12 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             );
         } else if (isRoundHost) {
             leftCol.push(
-                <Grid item xs={12}>
+                <Grid item xs={12} key="button1">
                     <Button variant="contained" onClick={() => this.resolveRound(true)}>
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
                     </Button>
                 </Grid>,
-                <Grid item xs={12}>
+                <Grid item xs={12} key="button2">
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
                     </Button>
