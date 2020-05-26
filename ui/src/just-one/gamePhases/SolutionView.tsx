@@ -1,11 +1,12 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Grid, Button, Typography } from '@material-ui/core';
+import { Grid, Button } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
+import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
@@ -86,23 +87,31 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             });
         }
 
-        let solutionButton1 = (
-            <Grid item xs={12}>
-                <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
-                    <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
-                </Button>
-            </Grid>
+        const leftCol = [];
+        leftCol.push(
+            <WordCard 
+                word={currentWord} 
+                guesser={guesser.name} 
+                isGuesser={isGuesser}
+                color={guesser.color}
+                guess={currentGuess} 
+                guessedRight={game.guessedRight} />
         );
-        let solutionButton2;
-        if (!game.guessedRight) {
-            solutionButton1 = (
+        if (game.guessedRight) {
+            leftCol.push(
+                <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
+                    </Button>
+                </Grid>
+            );
+        } else if (isRoundHost) {
+            leftCol.push(
                 <Grid item xs={12}>
                     <Button variant="contained" onClick={() => this.resolveRound(true)}>
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
                     </Button>
-                </Grid>
-            );
-            solutionButton2 = (
+                </Grid>,
                 <Grid item xs={12}>
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
@@ -112,28 +121,10 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         }
 
         return (
-            <Grid container spacing={4} className="Game-field">
-                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Grid>
-                    <WordCard 
-                        word={currentWord} 
-                        guesser={guesserName} 
-                        isGuesser={isGuesser}
-                        color={guesser.color} 
-                        guess={currentGuess} 
-                        guessedRight={game.guessedRight}/>
-                    {(isRoundHost || game.guessedRight) && solutionButton1}
-                    {isRoundHost && solutionButton2}
-                </Grid>
-                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Grid>
-                    {currentHints}
-                </Grid>
-            </Grid>
+            <GameField
+                leftCol={leftCol}
+                rightCol={currentHints}
+            />
         );
     }
 }

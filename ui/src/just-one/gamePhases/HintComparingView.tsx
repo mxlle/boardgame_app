@@ -6,6 +6,7 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
+import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
@@ -83,37 +84,32 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
             );
         });
 
+        if (isRoundHost) { // TODO - maybe not use Grid for these elements (?)
+            currentHints.push((
+                <Grid item xs={12} component={Typography} variant="subtitle1">
+                    <Trans i18nKey="GAME.COMPARING.INFO">Markiere ungültige Hinweise</Trans>
+                </Grid>
+            ),(
+                <Grid item xs={12}>
+                    <Button variant="contained" color="primary" onClick={this.showHints}>
+                        <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
+                    </Button>
+                </Grid>
+            ));
+        }
+
         return (
-            <Grid container spacing={4} className="Game-field">
-                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Grid>
+            <GameField
+                leftCol={(
                     <WordCard 
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
                         color={guesser.color} />
-                </Grid>
-                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Grid>
-                    {currentHints}
-                    { isRoundHost && (
-                        <Grid item xs={12} component={Typography} variant="subtitle1">
-                            <Trans i18nKey="GAME.COMPARING.INFO">Markiere ungültige Hinweise</Trans>
-                        </Grid>
-                    )}
-                    {isRoundHost && (
-                        <Grid item xs={12}>
-                            <Button variant="contained" color="primary" onClick={this.showHints}>
-                                <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
-                            </Button>
-                        </Grid>
-                    )}
-                </Grid>
-            </Grid>
+                )}
+
+                rightCol={currentHints}
+            />
         );
     }
 }

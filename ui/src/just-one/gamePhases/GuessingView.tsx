@@ -1,11 +1,10 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Grid, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
+import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
@@ -75,11 +74,8 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         });
 
         return (
-            <Grid container spacing={4} className="Game-field">
-                <Grid item xs={12} md={5} container spacing={2} className="Current-word">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.WORD">Begriff</Trans>
-                    </Grid>
+            <GameField
+                leftCol={(
                     <WordCard 
                         word={currentWord} 
                         guesser={guesser.name} 
@@ -87,14 +83,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                         color={guesser.color} 
                         showInput={isGuesser}
                         submitHint={this.guess}/>
-                </Grid>
-                <Grid item xs={12} md={7} container spacing={2} className="Current-hints">
-                    <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="GAME.COMMON.PLAYER_HINTS">Spieler-Hinweise</Trans>
-                    </Grid>
-                    {currentHints}
-                </Grid>
-            </Grid>
+                )}
+
+                rightCol={currentHints}
+            />
         );
     }
 }

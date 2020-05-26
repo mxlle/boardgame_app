@@ -1,11 +1,10 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Grid, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
 import { WordCard } from '../components/WordCard';
 import { WordHint } from '../components/WordHint';
+import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame, checkPrevResult } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
@@ -81,6 +80,22 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         });
 
         return (
+            <GameField
+                leftCol={(
+                    <WordCard 
+                        word={currentWord} 
+                        guesser={guesser.name} 
+                        isGuesser={isGuesser}
+                        color={guesser.color} />
+                )}
+
+                rightCol={currentHints}
+            />
+        );
+    }
+}
+
+/*
             <Grid container spacing={4} className="Game-field">
                 <Grid item xs={12} md={5} container spacing={2} className="Current-word">
                     <Grid item xs={12} component={Typography} variant="h5">
@@ -98,9 +113,6 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                     </Grid>
                     {currentHints}
                 </Grid>
-            </Grid>
-        );
-    }
-}
+            </Grid>*/
 
 export default withSnackbar(HintWritingView);
