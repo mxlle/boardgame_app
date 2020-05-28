@@ -1,5 +1,6 @@
 import React from 'react';
 import { IconButton, Box } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import CheckIcon from '@material-ui/icons/Check';
 
 export const allColors: string[] = [
@@ -29,18 +30,30 @@ export function getRandomColor(color?: string|null): string {
     }
 }
 
-type ColorPickerProps = {
-	selected?: string;
-    select: (color: string)=>void;
-}
-
 const BTN_SIZE = 32;
 const ICON_SIZE = 24;
 
-export class ColorPicker extends React.Component<ColorPickerProps> {
+const styles = (theme: Theme) => createStyles({
+    root: {
+        margin: 32, // TODO how to use theme?
+        width: 4*BTN_SIZE
+    },
+    button: {
+        margin: 0,
+        borderRadius: 0,
+        color: 'white',
+    }
+});
+
+type ColorPickerProps = {
+	selected?: string;
+    select: (color: string)=>void;
+}&WithStyles<typeof styles>;
+
+class ColorPicker extends React.Component<ColorPickerProps> {
 
     render() {
-    	const { selected, select } = this.props;
+    	const { selected, select, classes } = this.props;
 
         const colorButtons = allColors.map((color: string) => {
             const isSelected = selected === color;
@@ -51,25 +64,19 @@ export class ColorPicker extends React.Component<ColorPickerProps> {
                 padding: padding
             };
             return (
-                <IconButton onClick={() => select(color)} style={style} key={color}>
+                <IconButton className={classes.button} onClick={() => select(color)} style={style} key={color}>
                     {isSelected && <CheckIcon/>}
                 </IconButton>
             )
         });
 
         return (
-            <Box width={4*BTN_SIZE} m={4} className="Color-picker">
+            <Box className={classes.root}>
                 { colorButtons }
-
-                <style jsx>{`
-                    .Color-picker button {
-                        margin: 0;
-                        border-radius: 0;
-                        color: white;
-                    }
-                `}</style>
             </Box>
         );
     }
 
 }
+
+export default withStyles(styles)(ColorPicker);

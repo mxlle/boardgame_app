@@ -118,7 +118,7 @@ header {
     @include flex-center;
     flex-direction: column;
 
-    Button, .MuiFormControl-root {
+    .MuiButton-root, .MuiFormControl-root {
         margin: $gridSize;
     }
 }
@@ -265,40 +265,4 @@ header {
 
 .ButtonLink {
     color: inherit;
-}
-
-
-// pencil animation styles
-
-$pencilWidth: 12px;
-$pencilLength: 4*$pencilWidth;
-$pencilNib: 1px;
-
-.pencil {
-    width: $pencilWidth;
-    margin-left:$pencilLength/2;
-    margin-top:0px;
-    transform:rotate(35deg);
-    animation: pencil .5s forwards;
-    animation-iteration-count: infinite;
-    .nib{
-        width: 2*$pencilNib;
-        height: 0;
-        border-top: $pencilWidth solid #000000;
-        border-left: $pencilWidth/2-$pencilNib solid transparent;
-        border-right: $pencilWidth/2-$pencilNib solid transparent;
-     }
-    .body{
-        width: $pencilWidth;
-        height: $pencilLength;
-        background-color: #000000;
-        border-top-left-radius: $pencilWidth/4;
-        border-top-right-radius: $pencilWidth/4;
-    }
-}
-
-@keyframes pencil{
-    0% {transform:rotate(35deg);}
-    50% {transform:rotateZ(25deg);}
-    100% {transform:rotateZ(35deg);}
 }

@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 import { IUser } from '../custom.d';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
-import { ColorPicker } from '../common/ColorPicker';
+import ColorPicker from '../common/ColorPicker';
 
 type NewPlayerProps = {
     addPlayer: (player: IUser) => void,

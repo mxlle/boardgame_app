@@ -1,6 +1,6 @@
 import React from 'react';
 import { WordHintInput } from './WordHintInput';
-import { PencilAnimation } from '../../common/PencilAnimation';
+import PencilAnimation from '../../common/PencilAnimation';
 import { Grid, Checkbox, Paper } from '@material-ui/core';
 import { Mood as MoodIcon, MoodBad as MoodBadIcon } from '@material-ui/icons';
 
