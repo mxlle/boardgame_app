@@ -1,4 +1,4 @@
-import cookieParser from 'cookie-parser';
+import Cookies from 'cookies';
 import morgan from 'morgan';
 import path from 'path';
 import helmet from 'helmet';
@@ -11,7 +11,6 @@ import 'express-async-errors';
 import BaseRouter from './routes';
 import logger from '@shared/Logger';
 
-
 // Init express
 const app = express();
 
@@ -23,7 +22,13 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
+
+const cookieSecret = <string> process.env.COOKIE_SECRET;
+if (!cookieSecret || !cookieSecret.length) {
+    throw new Error('No cookie secret defined!');
+}
+app.use(Cookies.express([cookieSecret]));
+// app.use(cookieParser(cookieSecret));
 
 // Show routes called in console during development
 if (process.env.NODE_ENV === 'development') {

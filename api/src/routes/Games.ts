@@ -17,8 +17,21 @@ const gameDao = new GameDao();
  *                      Get All Games - "GET /api/games/all"
  ******************************************************************************/
 
+// Generate userId if none has been set
+router.use(function(req: Request, res: Response, next) {
+    if (!req.signedCookies.userId) {
+        req.signedCookies.userId = generateId();
+        res.cookie('userId', req.signedCookies.userId, {
+            sameSite: true,
+            signed: true,
+        });
+    }
+    console.log(req.signedCookies.userId);
+    next();
+});
+
 router.get('/all', async (req: Request, res: Response) => {
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     let games = await gameDao.getAll();
     games = games.filter((game: GameController.IGame) => {
         return game.phase === GameController.GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
@@ -41,7 +54,7 @@ router.get('/:id', async (req: Request, res: Response) => {
 
 router.post('/add', async (req: Request, res: Response) => {
     const { game } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     if (!game) {
         return res.status(BAD_REQUEST).json({
             error: paramMissingError,
@@ -77,7 +90,7 @@ router.put('/update', async (req: Request, res: Response) => {
 
 router.put('/:id/startPreparation', async (req: Request, res: Response) => {
     const { wordsPerPlayer } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!game) {
         return res.status(NOT_FOUND).json({
@@ -102,7 +115,7 @@ router.put('/:id/startPreparation', async (req: Request, res: Response) => {
 
 router.put('/:id/addPlayer', async (req: Request, res: Response) => {
     const { player } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!player) {
         return res.status(BAD_REQUEST).json({
@@ -128,7 +141,7 @@ router.put('/:id/addPlayer', async (req: Request, res: Response) => {
 
 router.put('/:id/updatePlayer', async (req: Request, res: Response) => {
     const { player } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!player) {
         return res.status(BAD_REQUEST).json({
@@ -158,7 +171,7 @@ router.put('/:id/updatePlayer', async (req: Request, res: Response) => {
 
 router.put('/:id/hint', async (req: Request, res: Response) => {
     const { hint } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!hint) {
         return res.status(BAD_REQUEST).json({
@@ -188,7 +201,7 @@ router.put('/:id/hint', async (req: Request, res: Response) => {
 
 router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
     const { hintIndex } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!game) {
         return res.status(NOT_FOUND).json({
@@ -213,7 +226,7 @@ router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
 
 router.put('/:id/showHints', async (req: Request, res: Response) => {
     const game = await gameDao.getOne(req.params.id);
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     if (!game) {
         return res.status(NOT_FOUND).json({
             error: gameNotFoundError,
@@ -237,7 +250,7 @@ router.put('/:id/showHints', async (req: Request, res: Response) => {
 
 router.put('/:id/guess', async (req: Request, res: Response) => {
     const { guess } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!guess) {
         return res.status(BAD_REQUEST).json({
@@ -267,7 +280,7 @@ router.put('/:id/guess', async (req: Request, res: Response) => {
 
 router.put('/:id/resolve', async (req: Request, res: Response) => {
     const { correct } = req.body;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!game) {
         return res.status(NOT_FOUND).json({
@@ -292,7 +305,7 @@ router.put('/:id/resolve', async (req: Request, res: Response) => {
 
 router.delete('/delete/:id', async (req: Request, res: Response) => {
     const { id } = req.params as ParamsDictionary;
-    const userId = req.headers.authorization;
+    const userId = req.signedCookies.userId;
     const game = await gameDao.getOne(req.params.id);
     if (!game) {
         return res.status(NOT_FOUND).json({
