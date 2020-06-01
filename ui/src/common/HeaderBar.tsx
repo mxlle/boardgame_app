@@ -12,7 +12,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 
 import { SETTING_NAME, ThemeMode } from '../shared/constants';
 
-import { UserConfig } from '../common/UserConfig';
+import { UserConfig } from './UserConfig';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -22,7 +22,7 @@ const styles = (theme: Theme) => createStyles({
     title: {
         flex: '1 1 auto',
         letterSpacing: 4,
-        fontSize: '4vw', // relativ to width
+        fontSize: '4vw', // relative to width
         [theme.breakpoints.up('lg')]: {
             fontSize: 40,
         },
@@ -113,14 +113,14 @@ const HeaderBar = (props: HeaderBarProps) => {
                     onClose={(theme: string) => { applyUserTheme(theme); setThemeConfigOpen(false); }}
                     selectedValue={userTheme} 
                     possibleValues={availableThemes}
-                ></UserConfig>
+                />
                 <UserConfig 
                     tKey="LANGPICK.HEADING"
                     open={languageConfigOpen} 
                     onClose={(lng: string) => { changeLanguage(lng); setLanguageConfigOpen(false); }}
                     selectedValue={language} 
                     possibleValues={availableLanguages}
-                ></UserConfig>
+                />
             </Toolbar>
         </AppBar>
     );    

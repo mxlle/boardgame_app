@@ -11,24 +11,14 @@ $breakPoint_md: 720px; // TODO
     justify-content: center;
 }
 
-// app styles
-
-html, #root {
-    height: 100%;
-    width: 100%;
-    min-height: 100vh;
-}
-
-body{
-    width: 100%;
-    height: auto;
-    min-height: 100%;
-}
-
 // some material-ui overrides - TODO
 
 .MuiContainer-root {
     padding-bottom: 4*$gridSize; // TODO - because negative margin
+    &.Game-content { // TODO
+        min-height: 50vh;
+        @include flex-center;
+    }
 }
 
 .MuiAlert-filledInfo {
@@ -38,6 +28,8 @@ body{
 .MuiGrid-container {
     @include flex-center;
 }
+
+// app styles - TODO move to components
 
 .New-player, .Word-adder {
     @include flex-center;
@@ -57,13 +49,4 @@ body{
 
 .MuiPaper-root.StatusInfo {
     padding: $standardMargin;
-}
-
-.Game-progress {
-    display: flex;
-    flex-direction: column;
-    margin: $standardMargin;
-    div + div {
-        margin-top: $gridSize
-    }
 }

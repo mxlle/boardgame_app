@@ -2,7 +2,7 @@ import { ThemeOptions } from '@material-ui/core/styles';
 import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 const DEFAULT_PRIMARY_COLOR = '#43a047';
-const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
+const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark, used for duplicate checkbox color
 const DEFAULT_BG_BRIGHT = '#fff8f5';
 const DEFAULT_BG_DARK = '#222222';
 
@@ -42,7 +42,7 @@ export function getTheme(primaryColor: string|null, prefersDarkMode: boolean): T
     };
 }
 
-export const STYLES: { [key:string]: CSSProperties; } = {
+export const STYLES: { rootSizing: CSSProperties, flexCenter: CSSProperties, handwriting: CSSProperties } = {
     rootSizing: {
         height: '100%',
         width: '100%',

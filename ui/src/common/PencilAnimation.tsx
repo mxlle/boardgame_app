@@ -52,8 +52,8 @@ class PencilAnimation extends React.Component<PencilAnimationProps> {
 
         return (
 	        <div className={classes.pencil}>
-                <div className={classes.body} style={styleObj1}></div>
-                <div className={classes.nib} style={styleObj2}></div>
+                <div className={classes.body} style={styleObj1} />
+                <div className={classes.nib} style={styleObj2} />
             </div>
         );
     }

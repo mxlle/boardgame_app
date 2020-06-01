@@ -35,7 +35,7 @@ const ICON_SIZE = 24;
 
 const styles = (theme: Theme) => createStyles({
     root: {
-        margin: 32, // TODO how to use theme?
+        margin: theme.spacing(4),
         width: 4*BTN_SIZE
     },
     button: {
@@ -58,7 +58,6 @@ class ColorPicker extends React.Component<ColorPickerProps> {
         const colorButtons = allColors.map((color: string) => {
             const isSelected = selected === color;
             const padding = isSelected ? BTN_SIZE/2-ICON_SIZE/2 : BTN_SIZE/2;
-            // TODO - do nicer (Box didnt work)
             const style = {
                 backgroundColor: color,
                 padding: padding

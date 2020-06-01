@@ -1,17 +1,26 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import { IUser } from '../custom.d';
+import { IUser } from '../custom';
 import { Button } from '@material-ui/core';
 import TextField from '@material-ui/core/TextField';
 import ColorPicker from '../common/ColorPicker';
+import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
+import {STYLES} from "../theme";
+
+const styles = (theme: Theme) => createStyles({
+    root: {
+        ...STYLES.flexCenter,
+        flexDirection: 'column'
+    }
+});
 
 type NewPlayerProps = {
     addPlayer: (player: IUser) => void,
     updatePlayer: (player: IUser) => void,
     currentPlayer: IUser
-}
+}&WithStyles<typeof styles>;
 
-export class NewPlayer extends React.Component<NewPlayerProps> {
+class NewPlayer extends React.Component<NewPlayerProps> {
 
     constructor(props: NewPlayerProps) {
         super(props);
@@ -25,8 +34,7 @@ export class NewPlayer extends React.Component<NewPlayerProps> {
         if (event.target.name === 'name') {
             this.props.currentPlayer.name = event.target.value;
 
-            this.props.updatePlayer(this.props.currentPlayer);     
-
+            this.props.updatePlayer(this.props.currentPlayer);
         }
     }
 
@@ -40,11 +48,11 @@ export class NewPlayer extends React.Component<NewPlayerProps> {
     }
 
     render() {
-        const { currentPlayer } = this.props;
+        const { currentPlayer, classes } = this.props;
 
         return (
-            <div className="New-player">
-                <TextField required label="Spielername" 
+            <div className={classes.root}>
+                <TextField required label={<Trans i18nKey="COMMON.PLAYER_NAME">Spielername</Trans>}
                     name='name'
                     value={currentPlayer.name} 
                     onChange={this.handleChange}/>
@@ -57,3 +65,5 @@ export class NewPlayer extends React.Component<NewPlayerProps> {
     }
 
 }
+
+export default withStyles(styles)(NewPlayer);

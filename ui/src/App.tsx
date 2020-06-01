@@ -6,7 +6,7 @@ import {
     RouteComponentProps,
 } from 'react-router-dom';
 import './App.scss';
-import { Paper, CircularProgress } from '@material-ui/core';
+import { Paper } from '@material-ui/core';
 import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { SnackbarProvider } from 'notistack';
@@ -14,6 +14,7 @@ import { SnackbarProvider } from 'notistack';
 import { SETTING_COLOR, SETTING_THEME, ThemeMode } from './shared/constants';
 import { getTheme, STYLES } from './theme';
 import HeaderBar from './common/HeaderBar';
+import Loader from "./common/Loader";
 import JustOneHome from './just-one/JustOneHome';
 import JustOneGame from './just-one/JustOneGame';
 
@@ -48,11 +49,9 @@ export const App = () =>    {
 
     const theme = React.useMemo(() => createMuiTheme(getTheme(userColor, prefersDarkMode)), [userColor, prefersDarkMode]);
 
-    const classNames = ['App'];
-
     return (
         <ThemeProvider theme={theme}>
-            <Suspense fallback={<Loader/>}>
+            <Suspense fallback={<Loader className={classes.root}/>}>
                 <Router>
                     <SnackbarProvider maxSnack={2} anchorOrigin={{ vertical: 'bottom', horizontal: 'center'}}>
                         <Paper square elevation={0} className={classes.root} style={{backgroundColor: theme.palette.background.default}}>
@@ -70,13 +69,3 @@ export const App = () =>    {
 }
 
 export default App;
-
-// TODO 
-const Loader = () => {
-    const classes = useStyles();
-    return (
-        <Paper square elevation={0} className={`${classes.root} ${classes.loading}`}>
-            <CircularProgress />
-        </Paper>
-    );
-};

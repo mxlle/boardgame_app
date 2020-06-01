@@ -22,12 +22,13 @@ const styles = (theme: Theme) => createStyles({
     },
     contents: {
         display: 'flex',
+        alignItems: 'center',
         justifyContent: 'space-between',
         padding: theme.spacing(1)
     },
     body: {
         '& .MuiCollapse-wrapperInner': {
-            transform: 'translateY(-40px)',
+            transform: 'translateY(-48px)',
         }
     }
 });

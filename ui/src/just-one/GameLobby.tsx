@@ -6,7 +6,7 @@ import { Trans } from 'react-i18next';
 import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import WordHint from './components/WordHint';
-import { NewPlayer } from '../common/NewPlayer';
+import NewPlayer from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
@@ -113,7 +113,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 isInGame = true;
             } 
             return (
-                <WordHint key={player.id} hint={player.name} color={player.color}></WordHint>
+                <WordHint key={player.id} hint={player.name} color={player.color} />
             )
         });
         isInGame = isInGame || !!playerAdded;
@@ -168,7 +168,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                         <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
                     </Grid>
                     {listOfPlayers}
-                    {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true}></WordHint>}
+                    {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true} />}
                 </Grid>
                 <RoundSelector numOfPlayers={game.players.length} open={roundDialogOpen} onClose={this.startPreparation}/>
             </Grid>
