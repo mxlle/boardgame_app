@@ -2,6 +2,7 @@ import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { STYLES } from '../../theme';
 import WordHintInput from './WordHintInput';
+import CornerInfo from '../../common/CornerInfo';
 import PencilAnimation from '../../common/PencilAnimation';
 import { Grid, Checkbox, Paper, Typography, Box } from '@material-ui/core';
 import { Mood as MoodIcon, MoodBad as MoodBadIcon } from '@material-ui/icons';
@@ -26,21 +27,15 @@ const styles = (theme: Theme) => createStyles({
     },
     duplicate: {
         borderStyle: 'dashed',
-        color: '#aaaaaa', // TODO
-        borderColor: '#aaaaaa', // TODO
+        color: theme.palette.grey.A200,
+        borderColor: theme.palette.grey.A200,
     },
     lineThrough: {
         textDecoration: 'line-through',
     },
-    authorTag: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        margin: 8,
-    },
     toggleBtn: {
         position: 'absolute',
-        right: 8, 
+        right: theme.spacing(1), 
         zIndex: 1,
     },
 });
@@ -53,9 +48,7 @@ type WordHintProps = {
     showPencil?: boolean,
     showCheck?: boolean,
     showCross?: boolean,
-    showInput?: boolean,
     submitHint?: (hint:string)=>void,
-    showDuplicateToggle?: boolean,
     toggleDuplicate?: ()=>void
 }&WithStyles<typeof styles>;
 
@@ -64,8 +57,7 @@ class WordHint extends React.Component<WordHintProps> {
     render() {
         const { hint, color, author, 
                 showPencil, showCheck, showCross, 
-                showInput, submitHint,
-                showDuplicateToggle, toggleDuplicate, duplicate,
+                submitHint, toggleDuplicate, duplicate,
                 classes
         } = this.props;
 
@@ -75,52 +67,40 @@ class WordHint extends React.Component<WordHintProps> {
         };
 
         const classList = [classes.root];
-
-        if (showInput && submitHint) {
-            return (
-                <Grid item xs={12}>
-                    <Paper className={classList.join(' ')} style={styleObj}>
-                        <WordHintInput submitHint={submitHint}/>
-                        {author && <Typography variant="caption" className={classes.authorTag}>{author}</Typography>}
-                    </Paper>
-                </Grid>
-            );
+        if (showPencil) classList.push(classes.writing);
+        if (duplicate) classList.push(classes.duplicate);
+        
+        let content;
+        if (submitHint) {
+            content = <WordHintInput submitHint={submitHint}/>;
+        } else if (showCross) {
+            content = <Box fontSize={80}>✗</Box>;
+        } else if (showCheck) {
+            content = <Box fontSize={80}>✓</Box>;
         } else {
-            const doShowPencil = showPencil || !this.props.hint;
-            const isDuplicate = duplicate || false;
-            if (doShowPencil) classList.push(classes.writing);
-            if (isDuplicate) classList.push(classes.duplicate);
-            
-            let content;
-            if (showCross) {
-                content = <Box fontSize={80}>✗</Box>;
-            } else if (showCheck) {
-                content = <Box fontSize={80}>✓</Box>;
-            } else {
-                const hintClasses = [];
-                if (hint && hint.length > 18) hintClasses.push(classes.hugeWord);
-                else if (hint && hint.length > 12) hintClasses.push(classes.longWord);
-                if (isDuplicate) hintClasses.push(classes.lineThrough);
+            const hintClasses = [];
+            if (hint && hint.length > 18) hintClasses.push(classes.hugeWord);
+            else if (hint && hint.length > 12) hintClasses.push(classes.longWord);
+            if (duplicate) hintClasses.push(classes.lineThrough);
 
-                content = <Typography variant="h2" className={hintClasses.join(' ')}>{hint}</Typography>;
-            }
+            content = <Typography variant="h2" className={hintClasses.join(' ')}>{hint}</Typography>;
+        }
 
-            return (
-                <Grid item xs={12}>
-                    <Paper className={classList.join(' ')} style={isDuplicate?undefined:styleObj}>
-                        {content}
-                        {doShowPencil && <PencilAnimation color={color}></PencilAnimation>}
-                        {showDuplicateToggle && toggleDuplicate && (
-                            <Checkbox className={classes.toggleBtn} 
-                                icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
-                                checked={isDuplicate}
-                                onChange={()=>toggleDuplicate()}/>
-                        )}
-                        {author && <Typography variant="caption" className={classes.authorTag} style={styleObj}>{author}</Typography>}
-                    </Paper>
-                </Grid>
-            );
-        }      
+        return (
+            <Grid item xs={12}>
+                <Paper className={classList.join(' ')} style={duplicate?undefined:styleObj}>
+                    {content}
+                    {showPencil && <PencilAnimation color={color}></PencilAnimation>}
+                    {toggleDuplicate && (
+                        <Checkbox className={classes.toggleBtn} 
+                            icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
+                            checked={duplicate || false}
+                            onChange={()=>toggleDuplicate()}/>
+                    )}
+                    <CornerInfo bottom left handwriting color={color}>{author}</CornerInfo>
+                </Paper>
+            </Grid>
+        );     
     }
 }
 

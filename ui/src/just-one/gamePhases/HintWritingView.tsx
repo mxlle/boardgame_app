@@ -71,8 +71,8 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                     key={hintObj.author+index} 
                     hint={hint} 
                     color={author.color}
-                    showInput={showInput}
-                    submitHint={this.submitHint}
+                    showPencil={!showInput && !hint}
+                    submitHint={showInput ? this.submitHint : undefined}
                     showCheck={!showHint}
                     author={authorName}
                 />

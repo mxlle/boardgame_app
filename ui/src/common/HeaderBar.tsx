@@ -8,19 +8,38 @@ import {
     Translate as TranslateIcon, 
     BrightnessMedium as BrightnessMediumIcon 
 } from '@material-ui/icons';
+import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 
 import { SETTING_NAME, ThemeMode } from '../shared/constants';
 
 import { UserConfig } from '../common/UserConfig';
 
+const styles = (theme: Theme) => createStyles({
+    root: {
+        marginBottom: theme.spacing(2),
+        padding: theme.spacing(1)
+    }, 
+    title: {
+        flex: '1 1 auto',
+        letterSpacing: 4,
+        fontSize: '4vw', // relativ to width
+        [theme.breakpoints.up('lg')]: {
+            fontSize: 40,
+        },
+    },
+    linkBtn: {
+        color: 'inherit'
+    }
+});
+
 type HeaderBarProps = {
     userTheme: string,
     applyUserTheme: (color: string)=>void
-};
+}&WithStyles<typeof styles>;
 
-export const HeaderBar = (props: HeaderBarProps) => {
+const HeaderBar = (props: HeaderBarProps) => {
     const { i18n } = useTranslation();
-    const { userTheme, applyUserTheme } = props;
+    const { userTheme, applyUserTheme, classes } = props;
     const [themeConfigOpen, setThemeConfigOpen] = React.useState(false);
     const [languageConfigOpen, setLanguageConfigOpen] = React.useState(false);
     const [language, setLanguage] = React.useState(i18n.language);
@@ -54,19 +73,19 @@ export const HeaderBar = (props: HeaderBarProps) => {
     ];
 
     return (
-        <AppBar position="sticky">
+        <AppBar position="sticky" className={classes.root}>
             <Toolbar>
-                <Link to="/" className="ButtonLink">
+                <Link to="/" className={classes.linkBtn}>
                     <IconButton edge="start" color="inherit" aria-label="home">
                         <HomeIcon />
                     </IconButton>
                 </Link>
-                <Typography variant="h2" className="appTitle">
+                <Typography variant="h2" className={classes.title}>
                     <Trans i18nKey="APP_TITLE">Nur ein Wort!</Trans>
                 </Typography>
                 { 
                     currentUserName ? 
-                    <Button onClick={openMenu} className="Account-button" color="inherit" startIcon={<AccountCircleIcon />}>
+                    <Button onClick={openMenu} color="inherit" startIcon={<AccountCircleIcon />}>
                         {currentUserName}
                     </Button> : 
                     <IconButton onClick={openMenu} edge="end" color="inherit">
@@ -107,5 +126,5 @@ export const HeaderBar = (props: HeaderBarProps) => {
     );    
 }
 
-export default HeaderBar;
+export default withStyles(styles)(HeaderBar);
 

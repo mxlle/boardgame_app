@@ -1,18 +1,36 @@
 import React from 'react';
 import { withRouter, RouteComponentProps } from 'react-router-dom'
 import { Container, Box, Button, TextField } from '@material-ui/core';
+import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
 import { IGame } from '../custom.d';
 import { GameList } from './GameList';
-import { ActionButton } from '../common/ActionButton';
+import ActionButton from '../common/ActionButton';
 
 import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
 import { setDocumentTitle } from '../shared/functions';
 import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
+import { STYLES } from '../theme';
 import i18n from '../i18n';
 
-type JustOneHomeProps = {}&WithSnackbarProps&RouteComponentProps;
+const styles = (theme: Theme) => createStyles({
+    root: {
+        ...STYLES.flexCenter,
+        flexDirection: 'column',
+    }, 
+    newGame: {
+        ...STYLES.flexCenter,
+        flexDirection: 'column',
+        padding: theme.spacing(2),
+        margin: `${theme.spacing(2)}px 0`,
+        '& button': {
+            marginTop: theme.spacing(2)
+        }
+    }
+});
+
+type JustOneHomeProps = {}&WithSnackbarProps&RouteComponentProps&WithStyles<typeof styles>;
 type JustOneHomeState = {
     newGameName: string|null,
     allGames: IGame[],
@@ -123,12 +141,13 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     }
 
     render() {
+        let { classes } = this.props;
         let {newGameName, allGames, gamesLoading} = this.state;
         if (newGameName === null) newGameName = getInitialGameName(this.currentUserName);
 
         return (
-            <Container maxWidth="sm" className="JustOneHome">
-                <Box className="newGameBox">
+            <Container maxWidth="sm" className={classes.root}>
+                <Box className={classes.newGame}>
                     <TextField label={<Trans i18nKey="HOME.GAME_NAME">Spielname</Trans>} value={newGameName} onChange={this.handleChange} />
                     <Button variant="contained" color="primary" onClick={this.createGame}>
                         <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
@@ -155,4 +174,4 @@ function emptyGame(): IGame {
     return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
-export default withRouter(withSnackbar(JustOneHome));
+export default withRouter(withSnackbar(withStyles(styles)(JustOneHome)));

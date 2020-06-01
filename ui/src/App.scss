@@ -1,14 +1,9 @@
 // --- global stylesheet ---
 
 // variables and mixins
-
-$appBackground: #fff8f5;
-$appBackgroundDark: #222222;
 $gridSize: 8px;
 $standardMargin: 2*$gridSize;
-$handwriting: 'Gloria Hallelujah', cursive;
 $breakPoint_md: 720px; // TODO
-$breakPoint_lg: 960px; // TODO
 
 @mixin flex-center {
     display: flex;
@@ -16,14 +11,9 @@ $breakPoint_lg: 960px; // TODO
     justify-content: center;
 }
 
-// common classes 
-.flex-center {
-    @include flex-center;
-}
-
 // app styles
 
-html, #root, .App {
+html, #root {
     height: 100%;
     width: 100%;
     min-height: 100vh;
@@ -35,66 +25,10 @@ body{
     min-height: 100%;
 }
 
-.MuiPaper-root {
-    &.App {
-        background-color: $appBackground;
-    }
-
-    &.App-dark {
-        background-color: $appBackgroundDark;
-    }
-}
-
-.App {
-    text-align: center;
-}
-
-.App-loading {
-    @include flex-center;
-}
+// some material-ui overrides - TODO
 
 .MuiContainer-root {
     padding-bottom: 4*$gridSize; // TODO - because negative margin
-}
-
-header {
-    margin-bottom: 2*$standardMargin;
-    padding: $gridSize;
-    .appTitle {
-        flex: 1 1 auto;
-        letter-spacing: 4px;
-        font-size: 4vw; // relativ to width
-        @media (min-width: $breakPoint_lg) {
-            font-size: 40px;
-        }
-    }
-}
-
-.JustOneHome {
-    @include flex-center;
-    flex-direction: column;
-
-    .newGameBox {
-        @include flex-center;
-        flex-direction: column;
-        padding: $standardMargin;
-        margin: $standardMargin 0;
-
-        button {
-            margin-top: $standardMargin;
-        }
-    }
-}
-
-.buttonWithLoading {
-    position: relative;
-    .loadingInButton {
-        position: absolute;
-        top: 50%;
-        left: 50%;
-        margin-top: -12px; // TODO
-        margin-left: -12px;
-    }
 }
 
 .MuiAlert-filledInfo {
@@ -132,8 +66,4 @@ header {
     div + div {
         margin-top: $gridSize
     }
-}
-
-.ButtonLink {
-    color: inherit;
 }

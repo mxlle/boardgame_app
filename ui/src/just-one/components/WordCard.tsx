@@ -1,11 +1,12 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Grid, Paper, Typography } from '@material-ui/core';
+import { Grid, Paper } from '@material-ui/core';
 
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { STYLES } from '../../theme';
 import WordHintInput from './WordHintInput';
+import CornerInfo from '../../common/CornerInfo';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -31,21 +32,6 @@ const styles = (theme: Theme) => createStyles({
     wrong: {
         borderColor: theme.palette.error.main
     }, 
-    authorTag: {
-        position: 'absolute',
-        bottom: 0,
-        left: 0,
-        margin: 8,
-    },
-    origWordTag: {
-        position: 'absolute',
-        bottom: 0,
-        right: 0,
-        fontSize: 16,
-        lineHeight: 1,
-        margin: 8,
-        whiteSpace: 'normal',
-    },
     small: {
         maxWidth: 250,
         height: 125,
@@ -71,23 +57,17 @@ class WordCard extends React.Component<WordCardProps> {
 
     render() {
         const { word, guesser, color, isGuesser, guess, guessedRight, showInput, submitHint, small, classes} = this.props;
+
+        const classList = [classes.wordCard];
         const cardStyle = {borderColor: color};
-        const guesserName = guesser;
-        let guesserText;
-        let originalWord;
+        let guesserText, originalWord;
+        
         if (guess) {
             originalWord = i18n.t('GAME.COMMON.WORD', 'Begriff') + ': ' + word;
-        } else if (guesser) {
-            guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesserName}} muss raten</Trans>;
-        }
-        const classList = [classes.wordCard];
-        if (guess) {
+            classList.push(guessedRight ? classes.correct : classes.wrong);
             delete cardStyle.borderColor;
-            if (guessedRight) {
-                classList.push(classes.correct);
-            } else {
-                classList.push(classes.wrong);
-            }
+        } else if (guesser) {
+            guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesser}} muss raten</Trans>;
         }
         if (small) classList.push(classes.small);
 
@@ -99,8 +79,8 @@ class WordCard extends React.Component<WordCardProps> {
                         <WordHintInput submitHint={submitHint} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> : 
                         <span className={guess && classes.guess} style={{color: guess && color}}>{guess || word}</span>
                     }
-                    {guesserText && <Typography variant="caption" className={classes.authorTag} style={{color: color}}>{guesserText}</Typography>}
-                    {originalWord && <span className={classes.origWordTag}>{originalWord}</span>}
+                    <CornerInfo bottom left handwriting color={color} m={2}>{guesserText}</CornerInfo>
+                    <CornerInfo bottom right m={2}>{originalWord}</CornerInfo>
     	        </Paper>
             </Grid>
         );

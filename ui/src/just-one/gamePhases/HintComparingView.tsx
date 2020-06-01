@@ -77,8 +77,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                     showCheck={isGuesser}
                     showCross={isGuesser&&hintObj.isDuplicate}
                     duplicate={hintObj.isDuplicate}
-                    showDuplicateToggle={isRoundHost}
-                    toggleDuplicate={()=>this.toggleDuplicate(index)}
+                    toggleDuplicate={isRoundHost ? ()=>this.toggleDuplicate(index) : undefined}
                     author={authorName}
                 />
             );

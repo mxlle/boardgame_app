@@ -3,6 +3,8 @@ import { CSSProperties } from '@material-ui/core/styles/withStyles';
 
 const DEFAULT_PRIMARY_COLOR = '#43a047';
 const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
+const DEFAULT_BG_BRIGHT = '#fff8f5';
+const DEFAULT_BG_DARK = '#222222';
 
 export function getTheme(primaryColor: string|null, prefersDarkMode: boolean): ThemeOptions {
     return {
@@ -13,6 +15,9 @@ export function getTheme(primaryColor: string|null, prefersDarkMode: boolean): T
             secondary: {
                 main: DEFAULT_SECONDARY_COLOR,
             }, 
+            background: {
+                default: prefersDarkMode ? DEFAULT_BG_DARK : DEFAULT_BG_BRIGHT
+            },
             type: prefersDarkMode ? 'dark' : 'light',
         },
         breakpoints: {
@@ -32,23 +37,23 @@ export function getTheme(primaryColor: string|null, prefersDarkMode: boolean): T
                 ...STYLES.handwriting,
                 paddingTop: 8,
                 textTransform: 'capitalize',
-            },
-            caption: {
-                ...STYLES.handwriting,
-                fontSize: '1.2rem',
-                lineHeight: 1,
-            },
+            }
         },
     };
 }
 
 export const STYLES: { [key:string]: CSSProperties; } = {
-    'flexCenter': {
+    rootSizing: {
+        height: '100%',
+        width: '100%',
+        minHeight: '100vh',
+    },
+    flexCenter: {
         display: 'flex', 
         alignItems: 'center',
         justifyContent: 'center',
     },
-    'handwriting': {
+    handwriting: {
         fontFamily: ['Gloria Hallelujah', 'cursive'].join(','),
     }
 };
