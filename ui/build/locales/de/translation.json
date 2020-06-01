@@ -24,7 +24,7 @@
             "WORD": "Begriff",
             "PLAYER_HINTS": "Spieler-Hinweise",
             "ENTER_HINT": "Hinweis eingeben",
-            "TURN_GUESSING": "{{guesserName}} ist mit Raten dran",
+            "TURN_GUESSING": "{{guesser}} ist mit Raten dran",
             "TURN_GUESSING_ME": "Ich bin mit Raten dran",
             "GUESS": "Rateversuch",
             "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",

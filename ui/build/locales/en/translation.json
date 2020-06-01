@@ -24,7 +24,7 @@
             "WORD": "Word",
             "PLAYER_HINTS": "Player hints",
             "ENTER_HINT": "Enter a hint",
-            "TURN_GUESSING": "{{guesserName}}'s turn to guess",
+            "TURN_GUESSING": "{{guesser}}'s turn to guess",
             "TURN_GUESSING_ME": "My turn to guess",
             "GUESS": "Guess",
             "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",
