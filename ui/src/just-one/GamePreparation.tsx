@@ -2,8 +2,8 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import { IGame, IUser } from '../custom.d';
 import { Grid, Paper, Typography } from '@material-ui/core';
-import { WordHint } from './components/WordHint';
-import { WordCard } from './components/WordCard';
+import WordHint from './components/WordHint';
+import WordCard from './components/WordCard';
 import { WordAdder } from './components/WordAdder';
 import { getRandomColor } from '../common/ColorPicker';
 
@@ -54,7 +54,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
             )
         });
 
-        const myWordCards = myWords.map(word => <WordCard key={word} word={word} color={this.currentPlayer.color}/>)
+        const myWordCards = myWords.map(word => <WordCard key={word} small word={word} color={this.currentPlayer.color}/>)
 
         // TODO not in game users
         // TODO css classes

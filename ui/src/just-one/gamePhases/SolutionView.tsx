@@ -4,8 +4,8 @@ import i18n from '../../i18n';
 import { Grid, Button } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
-import { WordCard } from '../components/WordCard';
-import { WordHint } from '../components/WordHint';
+import WordCard from '../components/WordCard';
+import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';

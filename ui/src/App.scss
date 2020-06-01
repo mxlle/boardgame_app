@@ -6,7 +6,6 @@ $appBackground: #fff8f5;
 $appBackgroundDark: #222222;
 $gridSize: 8px;
 $standardMargin: 2*$gridSize;
-$pageContentWidth: 900px;
 $handwriting: 'Gloria Hallelujah', cursive;
 $breakPoint_md: 720px; // TODO
 $breakPoint_lg: 960px; // TODO
@@ -63,7 +62,6 @@ header {
     padding: $gridSize;
     .appTitle {
         flex: 1 1 auto;
-        font-family: $handwriting;
         letter-spacing: 4px;
         font-size: 4vw; // relativ to width
         @media (min-width: $breakPoint_lg) {
@@ -99,13 +97,6 @@ header {
     }
 }
 
-.MuiTypography-root.MuiTypography-h5 {
-    font-family: $handwriting;
-    margin-top: $standardMargin;
-    padding-top: $gridSize;
-    text-transform: capitalize;
-}
-
 .MuiAlert-filledInfo {
     align-items: center;
 }
@@ -132,126 +123,6 @@ header {
 
 .MuiPaper-root.StatusInfo {
     padding: $standardMargin;
-}
-
-.Word-card {
-    @include flex-center;
-    height: 220px;
-    max-height: 30vh;
-    min-height: 150px;
-    font-size: 32px;
-    border: 2px solid black;
-    white-space: nowrap;
-    position: relative;
-
-    &.Word-card-correct {
-        border-color: green !important;
-    }
-    &.Word-card-wrong {
-        border-color: red !important;
-    }
-    &.Word-card-guess {
-        font-size: 48px;
-       .Word {
-            font-family: $handwriting;
-        }
-    }
-
-    .Author-tag {
-        font-family: $handwriting;
-        text-decoration: none !important;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        font-size: 16px;
-        line-height: 16px;
-        margin: $standardMargin+$gridSize;
-        white-space: normal;
-    }
-
-    .Orig-word-tag {
-        position: absolute;
-        bottom: 0;
-        right: 0;
-        font-size: 16px;
-        line-height: 16px;
-        margin: $standardMargin+$gridSize;
-        white-space: normal;
-    }
-}
-
-.Game-end-view, .Game-lobby {
-    .Word-card-wrapper {
-        @include flex-center;
-        width: 100%;
-    }
-    .Word-card {
-        max-width: 250px;
-        height: 125px;
-        font-size: 24px;
-        flex: 1 1 auto;
-    }
-}
-.Game-end-view {
-    align-items: flex-start; 
-
-    .Word-card {
-        align-items: flex-start;
-        span:first-child {
-            margin-top: 5*$gridSize;
-        }
-    }
-}
-
-.Word-hint {
-    @include flex-center;
-    height: 100px;
-    font-size: 48px;
-    border: 2px solid black;
-    font-family: $handwriting;
-    white-space: nowrap;
-    position: relative;
-    
-    &.Word-hint-writing {
-        border-style: dotted
-    }
-
-    &.Word-hint-duplicate {
-        border-style: dashed;
-        color: #aaaaaa;
-        border-color: #aaaaaa;
-        &:not(.Word-hint-showCross) {
-            text-decoration: line-through;
-        }
-    }
-
-    &.Word-hint-long {
-        font-size: 32px;
-    }
-
-    &.Word-hint-huge {
-        font-size: 24px;
-    }
-
-    .Author-tag {
-        text-decoration: none;
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        font-size: 16px;
-        line-height: 16px;
-        margin: $gridSize;
-    }
-
-    .Duplicate-toggle {
-        position: absolute;
-        right: $gridSize;
-        z-index: 1;
-    }
-
-    .Done-icon, .Invalid-icon {
-        font-size: 80px;
-    }
 }
 
 .Game-progress {

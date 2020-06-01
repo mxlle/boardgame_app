@@ -134,11 +134,13 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                         <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                     </Button>         
                 </Box>
-                <ActionButton loading={gamesLoading}>
-                    <Button variant="contained" onClick={this.loadGames}>
-                        <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
-                    </Button>
-                </ActionButton>
+                <Box mb={2}>
+                    <ActionButton loading={gamesLoading}>
+                        <Button variant="contained" onClick={this.loadGames}>
+                            <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
+                        </Button>
+                    </ActionButton>
+                </Box>
                 <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
             </Container>
         );

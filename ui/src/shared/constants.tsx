@@ -12,8 +12,6 @@ export const SETTING_THEME = 'darkTheme';
 
 // app content and theming
 export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
-export const DEFAULT_PRIMARY_COLOR = '#43a047';
-export const DEFAULT_SECONDARY_COLOR = '#d32f2f'; // also error dark
 export enum ThemeMode {
     AUTO = 'automatisch',
     BRIGHT = 'hell',

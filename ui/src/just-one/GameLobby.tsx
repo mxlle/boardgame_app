@@ -5,7 +5,7 @@ import ShareIcon from '@material-ui/icons/Share';
 import { Trans } from 'react-i18next';
 import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { WordHint } from './components/WordHint';
+import WordHint from './components/WordHint';
 import { NewPlayer } from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';

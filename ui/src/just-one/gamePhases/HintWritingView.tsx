@@ -2,8 +2,8 @@ import React from 'react';
 import i18n from '../../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
-import { WordCard } from '../components/WordCard';
-import { WordHint } from '../components/WordHint';
+import WordCard from '../components/WordCard';
+import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame, checkPrevResult } from '../../shared/functions';

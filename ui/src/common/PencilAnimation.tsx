@@ -34,9 +34,9 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
-interface PencilAnimationProps extends WithStyles<typeof styles> {
+type PencilAnimationProps = {
 	color?: string,
-}
+}&WithStyles<typeof styles>;
 
 class PencilAnimation extends React.Component<PencilAnimationProps> {
 

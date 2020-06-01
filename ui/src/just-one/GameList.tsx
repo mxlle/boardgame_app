@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { 
+    Grid,
     List, 
     ListItem, 
     ListItemText, 
@@ -67,39 +68,27 @@ export class GameList extends React.Component<GameListProps,GameListState> {
         const onGoingGamesList = onGoingGames.map(createListItem);
         const doneGamesList = doneGames.map(createListItem);
 
+        const categories = [
+            { key: 'ongoing', elementList: onGoingGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.ONGOING">Meine laufenden Spiele</Trans> },
+            { key: 'new', elementList: newGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.NEW">Neue Spiele</Trans> },
+            { key: 'done', elementList: doneGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.DONE">Meine beendeten Spiele</Trans> },
+        ];
+
+        const content = categories.filter(category => category.elementList.length > 0).map((category, index) => (
+            <Grid item xs={12} key={category.key}>
+                <Paper>
+                    <Typography variant="h5">{category.heading}</Typography>
+                    <List>
+                        {category.elementList}
+                    </List> 
+                </Paper>
+            </Grid>
+        ));
+
         return (
-            <div className="GameList">
-                {
-                    onGoingGamesList.length > 0 && (
-                        <Paper>
-                            <Typography variant="h5"><Trans i18nKey="HOME.GAME_LIST.ONGOING">Meine laufenden Spiele</Trans></Typography>
-                            <List>
-                                {onGoingGamesList}
-                            </List> 
-                        </Paper>
-                    )
-                }
-                {
-                    newGamesList.length > 0 && (
-                        <Paper>
-                            <Typography variant="h5"><Trans i18nKey="HOME.GAME_LIST.NEW">Neue Spiele</Trans></Typography>
-                            <List>
-                                {newGamesList}
-                            </List> 
-                        </Paper>
-                    )
-                }
-                {
-                    doneGamesList.length > 0 && (
-                        <Paper>
-                            <Typography variant="h5"><Trans i18nKey="HOME.GAME_LIST.DONE">Meine beendeten Spiele</Trans></Typography>
-                            <List>
-                                {doneGamesList}
-                            </List> 
-                        </Paper>
-                    )
-                }
-            </div>
+            <Grid container spacing={2} className="GameList">
+                {content}
+            </Grid>
         );
     }
 }

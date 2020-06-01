@@ -2,7 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { Grid, Typography } from '@material-ui/core';
-import {WordCard} from './components/WordCard';
+import WordCard from './components/WordCard';
 import { IGame } from '../custom.d';
 import { checkPrevResult } from '../shared/functions';
 
@@ -31,10 +31,10 @@ class GameEndView extends React.Component<GameEndViewProps> {
         const game: IGame = this.props.game;
         const { shownPrevResult } = this.state;
         const correctWords = game.correctWords.map(wordResult => {
-            return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={true}/>
+            return <WordCard key={wordResult.word} small word={wordResult.word} guess={wordResult.guess} guessedRight={true}/>
         });
         const wrongWords = game.wrongWords.map(wordResult => {
-            return <WordCard key={wordResult.word} word={wordResult.word} guess={wordResult.guess} guessedRight={false}/>
+            return <WordCard key={wordResult.word} small word={wordResult.word} guess={wordResult.guess} guessedRight={false}/>
         });
 
         if (!shownPrevResult) {

@@ -11,9 +11,8 @@ import { createMuiTheme, ThemeProvider } from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import { SnackbarProvider } from 'notistack';
 
-import { SETTING_COLOR, SETTING_THEME, 
-         ThemeMode, DEFAULT_PRIMARY_COLOR, DEFAULT_SECONDARY_COLOR } from './shared/constants';
-
+import { SETTING_COLOR, SETTING_THEME, ThemeMode } from './shared/constants';
+import { getTheme } from './theme';
 import {HeaderBar} from './common/HeaderBar';
 import JustOneHome from './just-one/JustOneHome';
 import {JustOneGame} from './just-one/JustOneGame';
@@ -31,40 +30,12 @@ export const App = () =>    {
         prefersDarkMode = true;
     }
 
-    let primaryColor = userColor;
-    if (!primaryColor || !primaryColor.startsWith('#') || primaryColor.length !== 7) {
-        primaryColor = DEFAULT_PRIMARY_COLOR;
-    }
-
     const applyUserTheme = (value: string) => {
         setUserTheme(value);
         localStorage.setItem(SETTING_THEME, value);
     }
 
-    const theme = React.useMemo(
-        () =>
-            createMuiTheme({
-                palette: {
-                    primary: {
-                        main: primaryColor || DEFAULT_PRIMARY_COLOR
-                    },
-                    secondary: {
-                        main: DEFAULT_SECONDARY_COLOR,
-                    }, 
-                    type: prefersDarkMode ? 'dark' : 'light',
-                },
-                breakpoints: {
-                    values: {
-                        xs: 0,
-                        sm: 600,
-                        md: 720,
-                        lg: 960,
-                        xl: 1280,
-                    },
-                },
-            }),
-        [prefersDarkMode, primaryColor],
-    );
+    const theme = React.useMemo(() => createMuiTheme(getTheme(userColor, prefersDarkMode)), [userColor, prefersDarkMode]);
 
     const classNames = ['App'];
     if (prefersDarkMode) classNames.push('App-dark');

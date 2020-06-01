@@ -1,18 +1,26 @@
 import React from 'react';
+import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import i18n from '../../i18n';
 import { Box, IconButton } from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 import TextField from '@material-ui/core/TextField';
+import { STYLES } from '../../theme';
+
+const styles = (theme: Theme) => createStyles({
+    root: {
+        ...STYLES.flexCenter
+    }
+});
 
 type WordHintInputProps = {
     submitHint: (hint: string)=>void
     label?: string
-};
+}&WithStyles<typeof styles>;
 type WordHintInputState = {
     value: string, 
 };
 
-export class WordHintInput extends React.Component<WordHintInputProps,WordHintInputState> {
+class WordHintInput extends React.Component<WordHintInputProps,WordHintInputState> {
 
     constructor(props: WordHintInputProps) {
     	super(props);
@@ -39,13 +47,13 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
     }
 
     render() {
-        const { label } = this.props;
+        const { label, classes } = this.props;
         const { value } = this.state;
 
         // TODO ml calc based on label
 
         return (
-	        <Box width={1} ml={label ? 5 : 7} mr={2} className="Word-hint-input flex-center">
+	        <Box width={1} ml={label ? 5 : 7} mr={2} className={classes.root}>
 	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
                     fullWidth
 	        		value={value} 
@@ -61,3 +69,5 @@ export class WordHintInput extends React.Component<WordHintInputProps,WordHintIn
     }
 
 }
+
+export default withStyles(styles)(WordHintInput);
