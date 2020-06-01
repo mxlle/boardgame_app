@@ -17,7 +17,6 @@ $breakPoint_md: 720px; // TODO
     padding-bottom: 4*$gridSize; // TODO - because negative margin
     &.Game-content { // TODO
         min-height: 50vh;
-        @include flex-center;
     }
 }
 
