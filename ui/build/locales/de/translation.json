@@ -4,7 +4,8 @@
         "TEAMMATES": "Mitspieler",
         "ME": "Ich",
         "UNDO": "Rückgängig",
-        "YOUR_TURN": "Du bist dran!"
+        "YOUR_TURN": "Du bist dran!",
+        "PLAYER_NAME": "Spielername"
     },
     "HOME": {
         "GAME_NAME": "Spielname",

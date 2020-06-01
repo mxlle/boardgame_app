@@ -4,7 +4,8 @@
         "TEAMMATES": "teammates",
         "ME": "Me",
         "UNDO": "Undo",
-        "YOUR_TURN": "Your turn!"
+        "YOUR_TURN": "Your turn!",
+        "PLAYER_NAME": "Player name"
     },
     "HOME": {
         "GAME_NAME": "Game name",
