@@ -8,6 +8,8 @@ import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {nextTutorialStep} from "../tutorial";
+import {Button} from "@material-ui/core";
 
 type GuessingViewProps = {
     game: IGame
@@ -36,6 +38,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 
     guess(guess: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(guess); return; }
         api.guess(this.props.game.id, guess);
     }
 
@@ -73,17 +76,21 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
             );
         });
 
+        const tutorialButton = game.$isTutorial && !isGuesser ? <Button onClick={() => nextTutorialStep()} key="2">Weiter</Button> : <span key="2"/>;
+
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
                         color={guesser.color} 
                         showInput={isGuesser}
-                        submitHint={this.guess}/>
-                )}
+                        submitHint={this.guess}
+                        key="1" />),
+                    tutorialButton
+                ]}
 
                 rightCol={currentHints}
             />

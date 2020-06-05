@@ -9,6 +9,7 @@ import { getRandomColor } from '../common/ColorPicker';
 
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
+import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
 
 type GamePreparationProps = {
     game: IGame
@@ -29,6 +30,8 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
     }
 
     async addWords(words: string[]) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
+
         let player: IUser = this.currentPlayer;
         player.enteredWords = words;
 
@@ -54,6 +57,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
             )
         });
 
+        const defaultValue: string|undefined = game.$isTutorial ? TUTORIAL_WORDS[0] : undefined;
         const myWordCards = myWords.map(word => <WordCard key={word} small word={word} color={this.currentPlayer.color}/>)
 
         // TODO not in game users
@@ -70,7 +74,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                             </Grid>
                         ) : (
                             <Grid item xs={12}>
-                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
+                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer} defaultValue={defaultValue}/>
                             </Grid>
                         )
                     }

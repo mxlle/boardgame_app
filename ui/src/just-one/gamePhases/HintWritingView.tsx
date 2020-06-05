@@ -1,4 +1,5 @@
 import React from 'react';
+import {Button} from "@material-ui/core";
 import i18n from '../../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../custom.d';
@@ -8,6 +9,7 @@ import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame, checkPrevResult } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {nextTutorialStep} from "../tutorial";
 
 type HintWritingViewProps = {
     game: IGame
@@ -37,6 +39,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     submitHint(hint: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); return; }
         api.submitHint(this.props.game.id, hint);
     }
 
@@ -79,15 +82,19 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
             );
         });
 
+        const tutorialButton = game.$isTutorial && isGuesser ? <Button onClick={() => nextTutorialStep()} key="2">Weiter</Button> : <span key="2"/>;
+
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
-                        color={guesser.color} />
-                )}
+                        color={guesser.color}
+                        key="1" />),
+                    tutorialButton
+                ]}
 
                 rightCol={currentHints}
             />

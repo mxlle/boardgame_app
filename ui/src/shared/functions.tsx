@@ -1,4 +1,4 @@
-import { SETTING_ID } from './constants';
+import {DEFAULT_NUM_WORDS, SETTING_ID} from './constants';
 import { IGame, IUser, WordResult, GamePhase } from '../custom.d';
 import shortid from 'shortid';
 import i18n from '../i18n'; 
@@ -23,6 +23,10 @@ export function getUserInGame(game: IGame, userId?: string): IUser|undefined {
 export function generateId() {
 	shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZüÜ');
 	return shortid();
+}
+
+export function emptyGame(): IGame {
+    return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
 export function setDocumentTitle(gameName?: string) {

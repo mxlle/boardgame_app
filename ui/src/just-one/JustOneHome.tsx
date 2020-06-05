@@ -4,15 +4,16 @@ import { Container, Box, Button, TextField } from '@material-ui/core';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
-import { IGame } from '../custom.d';
+import { IGame } from '../custom';
 import { GameList } from './GameList';
 import ActionButton from '../common/ActionButton';
 
-import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
-import { setDocumentTitle } from '../shared/functions';
+import { SETTING_ID, SETTING_NAME } from '../shared/constants';
+import {emptyGame, setDocumentTitle} from '../shared/functions';
 import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
 import { STYLES } from '../theme';
 import i18n from '../i18n';
+import {TUTORIAL_ID} from "./tutorial";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -48,6 +49,7 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         super(props);
 
         this.createGame = this.createGame.bind(this);
+        this.startTutorial = this.startTutorial.bind(this);
         this.loadGames = this.loadGames.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
@@ -140,6 +142,10 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         }
     }
 
+    startTutorial() {
+        this.props.history.push('/' + TUTORIAL_ID);
+    }
+
     render() {
         let { classes } = this.props;
         let {newGameName, allGames, gamesLoading} = this.state;
@@ -152,6 +158,11 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     <Button variant="contained" color="primary" onClick={this.createGame}>
                         <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                     </Button>         
+                </Box>
+                <Box mb={2}>
+                    <Button variant="contained" onClick={this.startTutorial}>
+                        <Trans i18nKey="HOME.START_TUTORIAL">Tutorial</Trans>
+                    </Button>
                 </Box>
                 <Box mb={2}>
                     <ActionButton loading={gamesLoading}>
@@ -168,10 +179,6 @@ class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
 function getInitialGameName(userName?: string) {
     return userName ? i18n.t('HOME.NEW_GAME_PERSONAL', 'Neues Spiel', {name: userName}) : i18n.t('HOME.NEW_GAME', 'Neues Spiel');
-}
-
-function emptyGame(): IGame {
-    return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
 export default withRouter(withSnackbar(withStyles(styles)(JustOneHome)));

@@ -1,14 +1,16 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { Grid, Typography } from '@material-ui/core';
+import {Button, Grid, Typography} from '@material-ui/core';
 import WordCard from './components/WordCard';
 import { IGame } from '../custom.d';
 import { checkPrevResult } from '../shared/functions';
+import {removeTutorial} from "./tutorial";
+import {RouteComponentProps, withRouter} from "react-router-dom";
 
 type GameEndViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&RouteComponentProps;
 
 type HintWritingViewState = {
     shownPrevResult: boolean
@@ -43,8 +45,15 @@ class GameEndView extends React.Component<GameEndViewProps> {
             });
         }
 
+        const closeTutorial = () => {
+            removeTutorial();
+            this.props.history.push('/');
+        };
+        const returnButton = game.$isTutorial ? <Grid item xs={12}><Button onClick={closeTutorial}>Close Tutorial</Button></Grid> : null;
+
         return (
             <Grid container spacing={4} className="Game-end-view">
+                { returnButton }
                 <Grid item xs={12} md={6} container spacing={2} className="Correct-words">
                     <Grid item xs={12} component={Typography} variant="h4">
                         <Trans i18nKey="GAME.END.RIGHT" count={game.correctWords.length}>Richtig</Trans>
@@ -62,4 +71,4 @@ class GameEndView extends React.Component<GameEndViewProps> {
     }
 }
 
-export default withSnackbar(GameEndView);
+export default withRouter(withSnackbar(GameEndView));

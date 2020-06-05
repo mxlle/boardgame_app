@@ -49,4 +49,6 @@ export interface IGame {
     hints: IHint[];
     correctWords: WordResult[];
     wrongWords: WordResult[];
+
+    $isTutorial?: boolean;
 }

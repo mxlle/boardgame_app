@@ -10,6 +10,7 @@ import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {nextTutorialStep} from "../tutorial";
 
 type HintComparingViewProps = {
     game: IGame
@@ -39,10 +40,12 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 
     toggleDuplicate(hintIndex: number) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
         api.toggleDuplicate(this.props.game.id, hintIndex);
     }
 
     showHints() {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
         api.showHints(this.props.game.id);
     }
 
@@ -97,15 +100,19 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
             ));
         }
 
+        const tutorialButton = game.$isTutorial && !isRoundHost ? <Button onClick={() => nextTutorialStep()} key="2">Weiter</Button> : <span key="2"/>;
+
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
-                        color={guesser.color} />
-                )}
+                        color={guesser.color}
+                        key="1" />),
+                    tutorialButton
+                ]}
 
                 rightCol={currentHints}
             />

@@ -6,7 +6,8 @@ import i18n from '../../i18n';
 
 type WordAdderProps = {
     add: (words: string[])=>void,
-    numOfWords: number
+    numOfWords: number,
+    defaultValue?: string // for tutorial
 }
 
 type WordAdderState = {
@@ -15,12 +16,16 @@ type WordAdderState = {
 
 export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
 
-    public state: WordAdderState = {
-        words: []
-    };
-
     constructor(props: WordAdderProps) {
         super(props);
+
+        const words: string[] = [];
+        if (props.defaultValue) {
+            for (let i = 0; i < props.numOfWords; i++) {
+                words.push(props.defaultValue);
+            }
+        }
+        this.state = {words};
 
         this.handleChange = this.handleChange.bind(this);
         this.keyPressed = this.keyPressed.bind(this);
@@ -57,7 +62,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
                     placeholder={i18n.t("GAME.PREP.WORD_ADDER.PLACEHOLDER", "Ratebegriff eingeben")}
                     name={`word${i}`}
                     key={`word${i}`}
-                    value={words[i]||''} 
+                    value={words[i]||''}
                     onChange={this.handleChange} 
                     onKeyPress={this.keyPressed}/>
             );

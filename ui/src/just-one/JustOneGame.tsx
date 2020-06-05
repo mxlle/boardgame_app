@@ -12,6 +12,7 @@ import { IGame, GamePhase } from '../custom.d';
 
 import { loadGame } from '../shared/apiFunctions';
 import { setDocumentTitle } from '../shared/functions';
+import {loadTutorial, TUTORIAL_ID} from "./tutorial";
 
 const POLLING_INTERVAL = 1000;
 
@@ -43,7 +44,12 @@ export default class JustOneGame extends React.Component<JustOneGameProps,JustOn
 
     async loadGame() {
         const id = this.props.gameId;
-        const game = await loadGame(id);
+        let game;
+        if (id === TUTORIAL_ID) {
+            game = loadTutorial();
+        } else {
+            game = await loadGame(id);
+        }
         if (!this._isMounted) return;
         if (!game) return;
         setDocumentTitle(game.name);

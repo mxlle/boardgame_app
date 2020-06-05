@@ -10,8 +10,10 @@ import NewPlayer from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
+
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
+import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
 
 type GameLobbyProps = {
     game: IGame,
@@ -52,6 +54,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     async addPlayer(player: IUser) {
+        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); return; }
         const resultPlayer = await api.addPlayer(this.props.game.id, player);
         if (!resultPlayer) return;
         this.setLocalPlayer(resultPlayer);
@@ -71,6 +74,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     selectNumRounds() {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
+
         this.setState({
             roundDialogOpen: true
         });

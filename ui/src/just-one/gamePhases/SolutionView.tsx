@@ -10,6 +10,7 @@ import GameField from './GameField';
 
 import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {nextTutorialStep} from "../tutorial";
 
 type SolutionViewProps = {
     game: IGame
@@ -39,6 +40,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     resolveRound(correct: boolean = true) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); return; }
         api.resolveRound(this.props.game.id, correct);
     }
 
@@ -119,6 +121,9 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                     </Button>
                 </Grid>
             );
+        }
+        if (game.$isTutorial && !isRoundHost && !game.guessedRight) {
+            leftCol.push(<Button onClick={() => nextTutorialStep()} key="tutorial">Weiter</Button>);
         }
 
         return (
