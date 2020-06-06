@@ -4,8 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { generateId } from '@shared/functions';
 
 import GameDao from '@daos/Game';
-import * as GameController from '@entities/Game';
-import { IUser } from "@entities/User";
+import { GameController, IGame, IUser, GamePhase } from "@entities/Game";
 import { paramMissingError, gameNotFoundError, forebiddenError } from '@shared/constants';
 
 // Init shared
@@ -20,8 +19,8 @@ const gameDao = new GameDao();
 router.get('/all', async (req: Request, res: Response) => {
     const userId = req.headers.authorization;
     let games = await gameDao.getAll();
-    games = games.filter((game: GameController.IGame) => {
-        return game.phase === GameController.GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
+    games = games.filter((game: IGame) => {
+        return game.phase === GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
     });
     return res.status(OK).json({games});
 });
@@ -49,10 +48,10 @@ router.post('/add', async (req: Request, res: Response) => {
     }
 
     if (!game.id) game.id = generateId();
-    if (!game.host) game.host = userId;
+    if (!game.hostId) game.hostId = userId;
 
     await gameDao.add(game);
-    return res.status(CREATED).json({id: game.id, playerId: game.host});
+    return res.status(CREATED).json({id: game.id, playerId: game.hostId});
 });
 
 
@@ -84,7 +83,7 @@ router.put('/:id/startPreparation', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.host !== userId) {
+    if (game.hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -195,7 +194,7 @@ router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.roundHost !== userId) {
+    if (game.rounds[game.round].hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -219,7 +218,7 @@ router.put('/:id/showHints', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.roundHost !== userId) {
+    if (game.rounds[game.round].hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -249,7 +248,7 @@ router.put('/:id/guess', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.currentGuesser !== userId) {
+    if (game.rounds[game.round].guesserId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -299,7 +298,7 @@ router.delete('/delete/:id', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.host !== userId) {
+    if (game.hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });

@@ -1,7 +1,7 @@
-import {GamePhase, IGame, IUser} from "../custom.d";
-import {emptyGame, getCurrentUserId} from "../shared/functions";
+import {GamePhase, IGame, IUser} from "../types";
+import {getCurrentUserId} from "../shared/functions";
+import {addHint, createRounds, emptyGame, guess, newRound, resolveRound} from "./gameFunctions";
 import {getRandomColor} from "../common/ColorPicker";
-import {WordResult} from "../../../api/src/entities/Game";
 
 export const TUTORIAL_ID = 'tutorial';
 const SETTING_TUTORIAL = 'tutorial.game';
@@ -35,7 +35,7 @@ export function removeTutorial() {
 export function addPlayerToTutorial(player: IUser) {
     let game = loadTutorial();
     game.players.push(player);
-    game.host = player.id;
+    game.hostId = player.id;
     saveTutorial(game);
     triggerAddingPlayer(game);
 }
@@ -59,31 +59,14 @@ export function nextTutorialStep(word?: string) {
             game.phase = GamePhase.Guessing;
             break;
         case GamePhase.Guessing:
-            if (!word) word = game.currentWord;
-            const isCorrect = !!game.currentWord && justOne(word).toLowerCase() === game.currentWord.toLowerCase();
-            game.currentGuess = word;
-            game.guessedRight = isCorrect;
+            if (!word) word = game.rounds[game.round].word;
+
+            guess(game, word);
 
             game.phase = GamePhase.Solution;
             break;
         case GamePhase.Solution:
-            // TODO - copied from BE
-            const wordResult: WordResult = {
-                word: game.currentWord || '',
-                guess: game.currentGuess || ''
-            };
-
-            if (game.guessedRight || word) {
-                game.correctWords.push(wordResult);
-            } else {
-                game.wrongWords.push(wordResult);
-            }
-
-            if (game.round < game.words.length-1) {
-                newRound(game as any);
-            } else {
-                game.phase = GamePhase.End;
-            }
+            resolveRound(game, !!game.rounds[game.round].correct);
             break;
     }
     saveTutorial(game);
@@ -114,7 +97,7 @@ function triggerAddingWord(game: IGame) {
 function triggerAddingHint(game: IGame, index: number) {
     setTimeout(() => {
         if (index < TUTORIAL_PLAYERS.length) {
-            addHint(game as any, TUTORIAL_HINTS[game.round][index], TUTORIAL_PLAYERS[index].id);
+            addHint(game, TUTORIAL_HINTS[game.round][index], TUTORIAL_PLAYERS[index].id);
             saveTutorial(game);
             triggerAddingHint(game, index+1);
         }
@@ -133,8 +116,8 @@ function addWordToGame(game: IGame, index: number) {
 }
 
 function startGame(game: IGame) {
-    game.words = game.words.reverse();
-    newRound(game as any, true);
+    createRounds(game);
+    newRound(game, true);
     saveTutorial(game);
 }
 
@@ -163,12 +146,9 @@ const TUTORIAL_PLAYERS: IUser[] = [
     },
 ];
 
+// moved by one // TODO
 export const TUTORIAL_HINTS: string[][] = [
     [
-        'Cell',
-        'Touchscreen',
-        'Apps'
-    ], [
         'Pink',
         'Bird',
         'Leg'
@@ -180,50 +160,9 @@ export const TUTORIAL_HINTS: string[][] = [
         'Wizards',
         'Harry',
         'School'
+    ], [
+        'Cell',
+        'Touchscreen',
+        'Apps'
     ]
-].reverse(); // TODO - because words are reversed
-
-
-// TODO - copied from BE
-function newRound(game: IGame, gameStart: boolean = false) {
-    if (gameStart) {
-        game.round = 0;
-    } else {
-        game.round++;
-    }
-
-    game.phase = GamePhase.HintWriting;
-    game.currentWord = game.words[game.round];
-    game.currentGuesser = game.players[game.round % game.players.length].id;
-    game.roundHost = game.players[(game.round+1) % game.players.length].id;
-    game.currentGuess = '';
-    game.guessedRight = false;
-    game.hints = game.players.filter(player => player.id !== game.currentGuesser).map(player => { return { hint: '', author: player.id } });
-    if (game.players.length < 4) game.hints = game.hints.concat(game.hints);
-}
-
-function addHint(game: IGame, hint: string = '', playerId: string = '') {
-    let hintObj = game.hints.find(h => h.author === playerId && !h.hint);
-    if (!hintObj) hintObj = game.hints.find(h => h.author === playerId);
-    if (!hintObj) return;
-    hintObj.hint = justOne(hint);
-
-    if (game.hints.every(h => h.hint && h.hint.length > 0)) {
-        compareHints(game);
-    }
-}
-
-function compareHints(game: IGame) {
-    const plainHints = game.hints.map(h => h.hint.toLowerCase());
-    game.hints.forEach(hint => {
-        const value = hint.hint.toLowerCase();
-        if (plainHints.indexOf(value) !== plainHints.lastIndexOf(value)) {
-            hint.isDuplicate = true;
-        }
-    });
-    game.phase = GamePhase.HintComparing;
-}
-
-function justOne(word: string = ''): string {
-    return word.split(' ')[0];
-}
+];

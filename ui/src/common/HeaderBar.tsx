@@ -16,7 +16,7 @@ import { UserConfig } from './UserConfig';
 
 const styles = (theme: Theme) => createStyles({
     root: {
-        marginBottom: theme.spacing(2),
+        marginBottom: theme.spacing(4),
         padding: theme.spacing(1)
     }, 
     title: {

@@ -1,18 +1,19 @@
 import React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Container, Box, Button, TextField } from '@material-ui/core';
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
-import { Trans } from 'react-i18next';
-import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
-import { IGame } from '../custom';
-import { GameList } from './GameList';
+import {RouteComponentProps, withRouter} from 'react-router-dom'
+import {Box, Button, Container, TextField} from '@material-ui/core';
+import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
+import {Trans} from 'react-i18next';
+import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
+import {IGame} from '../types';
+import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
-import { SETTING_ID, SETTING_NAME } from '../shared/constants';
-import {emptyGame, setDocumentTitle} from '../shared/functions';
-import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
-import { STYLES } from '../theme';
+import {SETTING_ID, SETTING_NAME} from '../shared/constants';
+import {setDocumentTitle} from '../shared/functions';
+import {createGame, deleteGame, loadGames} from '../shared/apiFunctions';
+import {STYLES} from '../theme';
 import i18n from '../i18n';
+import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
 
 const styles = (theme: Theme) => createStyles({
@@ -38,7 +39,7 @@ type JustOneHomeState = {
     gamesLoading: boolean
 };
 
-class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
+class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
@@ -181,4 +182,4 @@ function getInitialGameName(userName?: string) {
     return userName ? i18n.t('HOME.NEW_GAME_PERSONAL', 'Neues Spiel', {name: userName}) : i18n.t('HOME.NEW_GAME', 'Neues Spiel');
 }
 
-export default withRouter(withSnackbar(withStyles(styles)(JustOneHome)));
+export default withRouter(withSnackbar(withStyles(styles)(OneWordHome)));

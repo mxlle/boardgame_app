@@ -12,10 +12,10 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Trans } from 'react-i18next';
-import { IGame, GamePhase } from '../custom.d';
+import { IGame, GamePhase } from '../types';
 
 import { SETTING_ID, SETTING_NAME } from '../shared/constants';
-import { getCurrentUserInGame } from '../shared/functions';
+import {getCurrentUserInGame} from "../shared/functions";
 
 type GameListProps = {
     allGames: IGame[],
@@ -52,7 +52,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                         secondary={<Trans i18nKey="HOME.GAME_LIST.PLAYERS">Spieler: {{playersString}}</Trans>} 
                     />
                     {
-                        this.currentUserId === game.host && (
+                        this.currentUserId === game.hostId && (
                             <ListItemSecondaryAction>
                                 <IconButton onClick={() => deleteGame(game.id)}>
                                     <DeleteIcon/>

@@ -3,13 +3,14 @@ import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import { Grid, Button, Typography } from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { IGame, IHint } from '../../custom.d';
+import { IGame, IHint } from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {getUserInGame} from "../gameFunctions";
+import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 
 type HintComparingViewProps = {
@@ -52,11 +53,12 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     render() {
         const game: IGame = this.props.game;
         const { shownMessage } = this.state;
+        const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
-        const guesser = getUserInGame(game, game.currentGuesser) || { name: '?', id: '?' };
+        const guesser = getUserInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = guesser.name;
-        const isRoundHost = currentUser && currentUser.id === game.roundHost;
+        const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
 
         if (isRoundHost && !shownMessage) {
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_COMPARING' }), {
@@ -66,15 +68,15 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
             });
         }
 
-        const currentWord = isGuesser ? '?' : (game.currentWord || '');
-        const currentHints = game.hints.map((hintObj: IHint, index: number) => {
-            const hintIsMine = currentUser && currentUser.id === hintObj.author;
-            const author = getUserInGame(game, hintObj.author) || { name: '?', id: '?' };
+        const currentWord = isGuesser ? '?' : (currentRound.word || '');
+        const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
+            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
+            const author = getUserInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
                 <WordHint 
-                    key={hintObj.author+index} 
+                    key={hintObj.authorId+index}
                     hint={hintObj.hint} 
                     color={author.color}
                     showCheck={isGuesser}

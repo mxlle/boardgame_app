@@ -47,7 +47,7 @@ type WordCardProps = {
 	color?: string;
     isGuesser?: boolean;
     guess?: string;
-    guessedRight?: boolean;
+    guessedRight?: boolean|null;
     showInput?: boolean;
     small?: boolean;
     submitHint?: (hint:string)=>void

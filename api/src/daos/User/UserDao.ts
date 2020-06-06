@@ -1,4 +1,4 @@
-import { IUser } from '@entities/User';
+import { IUserDocument as IUser } from '@entities/User';
 import { UserModel } from "@daos/Mongoose/models";
 
 export interface IUserDao {

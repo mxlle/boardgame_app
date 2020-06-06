@@ -26,7 +26,6 @@
     "react-i18next": "^11.4.0",
     "react-router-dom": "^5.2.0",
     "react-scripts": "3.4.1",
-    "shortid": "^2.2.15",
     "typescript": "^3.7.5"
   },
   "scripts": {
@@ -49,5 +48,6 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
-  }
+  },
+  "proxy": "http://localhost:9000"
 }

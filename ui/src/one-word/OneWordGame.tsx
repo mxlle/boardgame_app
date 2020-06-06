@@ -8,7 +8,7 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import { IGame, GamePhase } from '../custom.d';
+import { IGame, GamePhase } from '../types';
 
 import { loadGame } from '../shared/apiFunctions';
 import { setDocumentTitle } from '../shared/functions';
@@ -24,7 +24,7 @@ type JustOneGameState = {
     currentGame?: IGame
 };
 
-export default class JustOneGame extends React.Component<JustOneGameProps,JustOneGameState> {
+export default class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = {};
     private _interval: number|undefined;
     private _isMounted: boolean = false;

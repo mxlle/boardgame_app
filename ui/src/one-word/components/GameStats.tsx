@@ -1,10 +1,10 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { IGame, GamePhase } from '../../custom.d';
-import { getUserInGame } from '../../shared/functions';
+import { IGame, GamePhase } from '../../types';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";
+import {getCorrectRounds, getUserInGame, getWrongRounds} from "../gameFunctions";
 
 type GameStatsProps = {
     game: IGame
@@ -44,16 +44,17 @@ class GameStats extends React.Component<GameStatsProps> {
 
     render() {
         const {game, classes} = this.props;
+        const currentRound = game.rounds[game.round];
 
-        const roundHost = getUserInGame(game, game.roundHost) || { name: '?' };
+        const roundHost = getUserInGame(game, currentRound.hostId) || { name: '?' };
         const roundHostName = roundHost.name;
-        const guesser = getUserInGame(game, game.currentGuesser) || { name: '?' };
+        const guesser = getUserInGame(game, currentRound.guesserId) || { name: '?' };
         const guesserName = guesser.name;
 
         let gamePhase;
         switch(game.phase) {
             case GamePhase.HintWriting: 
-                const players = game.players.filter(p => game.currentGuesser && p.id !== game.currentGuesser).map(p => p.name);
+                const players = game.players.filter(p => p.id !== currentRound.guesserId).map(p => p.name);
                 const playersString = players.slice(0, players.length-1).join(', ') + ' und ' + players[players.length-1];
                 gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING">{{playersString}} schreiben Hinweise auf...</Trans>;
                 break;
@@ -64,7 +65,7 @@ class GameStats extends React.Component<GameStatsProps> {
                 gamePhase = <Trans i18nKey="GAME.STATS.PHASE_GUESSING">{{guesserName}} versucht den Begriff zu erraten...</Trans>;
                 break;
             case GamePhase.Solution: 
-                if (game.guessedRight) {
+                if (currentRound.correct) {
                     gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION">{{guesserName}} lag genau richtig!</Trans>;
                 } else {
                     gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG">{{roundHostName}} lag daneben! {{guesserName}} entscheidet ob es trotzdem zählt...</Trans>;
@@ -74,8 +75,8 @@ class GameStats extends React.Component<GameStatsProps> {
 
         const round = game.round+1;
         const roundCount = game.words.length;
-        const rightCount = game.correctWords.length;
-        const wrongCount = game.wrongWords.length;
+        const rightCount = getCorrectRounds(game).length;
+        const wrongCount = getWrongRounds(game).length;
 
         return (
             <div className={classes.root}>

@@ -24,6 +24,12 @@
       ],
       "@server": [
         "src/Server"
+      ],
+      "@gameTypes": [
+        "../ui/src/types"
+      ],
+      "@gameFunctions": [
+        "../ui/src/one-word/gameFunctions"
       ]
     },
     "types": [

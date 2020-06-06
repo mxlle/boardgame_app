@@ -1,13 +1,13 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import { IGame, IUser } from '../custom.d';
+import { IGame, IUser, DEFAULT_NUM_WORDS } from '../types';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import WordHint from './components/WordHint';
 import WordCard from './components/WordCard';
 import { WordAdder } from './components/WordAdder';
 import { getRandomColor } from '../common/ColorPicker';
 
-import { SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../shared/constants';
+import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
 
@@ -53,7 +53,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                 allMyWordsEntered = wordsEntered;
             } 
             return (
-                <WordHint key={player.id} hint={player.name} color={player.color} showPencil={!wordsEntered}></WordHint>
+                <WordHint key={player.id} hint={player.name} color={player.color} showPencil={!wordsEntered} />
             )
         });
 
