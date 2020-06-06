@@ -8,8 +8,9 @@ import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import { getCurrentUserInGame, getUserInGame } from '../../shared/functions';
 import * as api from '../../shared/apiFunctions';
+import {getUserInGame} from "../gameFunctions";
+import {getCurrentUserInGame} from "../../shared/functions";
 
 type SolutionViewProps = {
     game: IGame
@@ -45,22 +46,23 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     render() {
         const game: IGame = this.props.game;
         const { shownMessage, shownResult } = this.state;
+        const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
-        const guesser = getUserInGame(game, game.currentGuesser) ||  { name: '?', id: '?' };
+        const guesser = getUserInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
         const guesserName = guesser.name;
         const isGuesser = currentUser && currentUser.id === guesser.id;
-        const isRoundHost = currentUser && currentUser.id === game.roundHost;
+        const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
 
-        const currentWord = game.currentWord || '';
-        const currentGuess = game.currentGuess || '';
-        const currentHints = game.hints.map((hintObj: IHint, index: number) => {
-            const hintIsMine = currentUser && currentUser.id === hintObj.author;
-            const author = getUserInGame(game, hintObj.author) || { name: '?', id: '?' };
+        const currentWord = currentRound.word;
+        const currentGuess = currentRound.guess;
+        const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
+            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
+            const author = getUserInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
                 <WordHint 
-                    key={hintObj.author+index} 
+                    key={hintObj.authorId+index}
                     hint={hintObj.hint} 
                     color={author.color}
                     author={authorName}
@@ -69,7 +71,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             );
         });
 
-        if (isRoundHost && !game.guessedRight && !shownMessage) {
+        if (isRoundHost && !currentRound.correct && !shownMessage) {
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'SOLUTION' }), {
                 variant: 'info',
                 preventDuplicate: true,
@@ -78,9 +80,9 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         }
 
         if (!shownResult) {
-            const context = game.guessedRight ? 'CORRECT' : 'WRONG';
-            const variant = game.guessedRight ? 'success' : 'warning';
-            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName, guess: game.currentGuess }), {
+            const context = currentRound.correct ? 'CORRECT' : 'WRONG';
+            const variant = currentRound.correct ? 'success' : 'warning';
+            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName, guess: currentRound.guess }), {
                 variant: variant,
                 preventDuplicate: true,
                 onClose: () =>{ if(this._isMounted) this.setState({shownResult: true}); }
@@ -96,9 +98,9 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                 isGuesser={isGuesser}
                 color={guesser.color}
                 guess={currentGuess} 
-                guessedRight={game.guessedRight} />
+                guessedRight={currentRound.correct} />
         );
-        if (game.guessedRight) {
+        if (currentRound.correct) {
             leftCol.push(
                 <Grid item xs={12} key="button1">
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>

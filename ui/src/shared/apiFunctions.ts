@@ -1,6 +1,9 @@
-import { GAME_URL } from './constants';
 import { getCurrentUserId } from './functions';
 import { IGame, IUser } from '../types';
+
+// api url
+export const API_URL = '/api';
+export const GAME_URL = API_URL + '/games';
 
 export async function loadGames(): Promise<IGame[]> {
     return (await _get('all')).games || [];

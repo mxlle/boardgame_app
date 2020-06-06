@@ -48,10 +48,10 @@ router.post('/add', async (req: Request, res: Response) => {
     }
 
     if (!game.id) game.id = generateId();
-    if (!game.host) game.host = userId;
+    if (!game.hostId) game.hostId = userId;
 
     await gameDao.add(game);
-    return res.status(CREATED).json({id: game.id, playerId: game.host});
+    return res.status(CREATED).json({id: game.id, playerId: game.hostId});
 });
 
 
@@ -83,7 +83,7 @@ router.put('/:id/startPreparation', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.host !== userId) {
+    if (game.hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -194,7 +194,7 @@ router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.roundHost !== userId) {
+    if (game.rounds[game.round].hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -218,7 +218,7 @@ router.put('/:id/showHints', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.roundHost !== userId) {
+    if (game.rounds[game.round].hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -248,7 +248,7 @@ router.put('/:id/guess', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.currentGuesser !== userId) {
+    if (game.rounds[game.round].guesserId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });
@@ -298,7 +298,7 @@ router.delete('/delete/:id', async (req: Request, res: Response) => {
             error: gameNotFoundError,
         });
     }
-    if (game.host !== userId) {
+    if (game.hostId !== userId) {
         return res.status(FORBIDDEN).json({
             error: forebiddenError,
         });

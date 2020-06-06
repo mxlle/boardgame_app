@@ -1,5 +1,5 @@
 import React from 'react';
-import { IGame, IUser } from '../types';
+import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
 import { Grid, Button, Paper, Typography } from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
 import { Trans } from 'react-i18next';
@@ -10,7 +10,7 @@ import NewPlayer from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
-import { SETTING_ID, SETTING_NAME, SETTING_COLOR, DEFAULT_NUM_WORDS } from '../shared/constants';
+import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 
 type GameLobbyProps = {
@@ -106,7 +106,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         const { game } = this.props;
         const { currentPlayer, roundDialogOpen, playerAdded } = this.state;
         const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
-        const isHost: boolean = !!currentUserId && game.host === currentUserId;
+        const isHost: boolean = !!currentUserId && game.hostId === currentUserId;
         let isInGame: boolean = false;
         const listOfPlayers = game.players.map(player => {
             if (player.id === currentUserId) {

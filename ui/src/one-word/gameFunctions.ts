@@ -1,7 +1,9 @@
-import {DEFAULT_NUM_WORDS, IGame, GamePhase, IUser, WordResult} from "../types";
+// shared between api and app, needs to be in ui/src because of cra restrictions
+
+import {DEFAULT_NUM_WORDS, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
 
 export function addPlayer(game: IGame, player: IUser) {
-    if (!game.host) game.host = player.id; // TODO still needed?
+    if (!game.hostId) game.hostId = player.id; // TODO still needed?
     if (!player.enteredWords) player.enteredWords = [];
     game.players.push(player);
 
@@ -30,23 +32,38 @@ export function updatePlayer(game: IGame, player: IUser) {
 }
 
 export function startGame(game: IGame) {
-    createWordOrder(game);
+    createRounds(game);
     newRound(game, true);
 }
 
-export function createWordOrder(game: IGame) {
-    const newWordOrder: string[] = [];
+export function createRounds(game: IGame) {
     const numPlayers = game.players.length;
+    const rounds: IGameRound[] = [];
     game.words.forEach((word: string, i: number) => {
         const guesserIndex = i % game.players.length;
+        const guesserId = game.players[guesserIndex].id;
+
+        // calculate word to guess
         const guessTime: number = Math.floor(i/game.players.length);
         const guessFromIndex: number = ((guessTime%2 === 0) ? guesserIndex+1 : guesserIndex-1+numPlayers)%numPlayers;
         const getWordsFrom: IUser = game.players[guessFromIndex];
         const wordToGuess = getWordsFrom.enteredWords ? getWordsFrom.enteredWords[guessTime] : 'Fehler'; // TODO
-        newWordOrder.push(justOne(wordToGuess));
+
+        let hints: IHint[] = game.players.filter(player => player.id !== guesserId).map(player => { return { hint: '', authorId: player.id } });
+        if (game.players.length < 4) hints = hints.concat(hints);
+        const gameRound: IGameRound = {
+            word: justOne(wordToGuess),
+            authorId: getWordsFrom.id,
+            guesserId: game.players[guesserIndex].id,
+            hostId: game.players[(guesserIndex+1) % game.players.length].id,
+            hints: hints,
+            guess: '',
+            correct: null,
+            countAnyway: null
+        };
+        rounds.push(gameRound);
     });
-    game.words = newWordOrder;
-    game.words = game.words.filter(word => word && word.length > 0);
+    game.rounds = rounds;
 }
 
 export function newRound(game: IGame, gameStart: boolean = false) {
@@ -57,29 +74,22 @@ export function newRound(game: IGame, gameStart: boolean = false) {
     }
 
     game.phase = GamePhase.HintWriting;
-    game.currentWord = game.words[game.round];
-    game.currentGuesser = game.players[game.round % game.players.length].id;
-    game.roundHost = game.players[(game.round+1) % game.players.length].id;
-    game.currentGuess = '';
-    game.guessedRight = false;
-    game.hints = game.players.filter(player => player.id !== game.currentGuesser).map(player => { return { hint: '', author: player.id } });
-    if (game.players.length < 4) game.hints = game.hints.concat(game.hints);
 }
 
 export function addHint(game: IGame, hint: string = '', playerId: string = '') {
-    let hintObj = game.hints.find(h => h.author === playerId && !h.hint);
-    if (!hintObj) hintObj = game.hints.find(h => h.author === playerId);
+    let hintObj = game.rounds[game.round].hints.find(h => h.authorId === playerId && !h.hint);
+    if (!hintObj) hintObj = game.rounds[game.round].hints.find(h => h.authorId === playerId);
     if (!hintObj) return; // TODO
     hintObj.hint = justOne(hint);
 
-    if (game.hints.every(h => h.hint && h.hint.length > 0)) {
+    if (game.rounds[game.round].hints.every(h => h.hint && h.hint.length > 0)) {
         compareHints(game);
     }
 }
 
 export function compareHints(game: IGame) {
-    const plainHints = game.hints.map(h => h.hint.toLowerCase());
-    game.hints.forEach(hint => {
+    const plainHints = game.rounds[game.round].hints.map(h => h.hint.toLowerCase());
+    game.rounds[game.round].hints.forEach(hint => {
         const value = hint.hint.toLowerCase();
         if (plainHints.indexOf(value) !== plainHints.lastIndexOf(value)) {
             hint.isDuplicate = true;
@@ -91,7 +101,7 @@ export function compareHints(game: IGame) {
 export function toggleDuplicateHint(game: IGame, hintIndex: number) {
     if (game.phase !== GamePhase.HintComparing) return;
 
-    const hintObj = game.hints[hintIndex];
+    const hintObj = game.rounds[game.round].hints[hintIndex];
     if (hintObj) {
         hintObj.isDuplicate = !hintObj.isDuplicate;
     }
@@ -105,30 +115,20 @@ export function showHints(game: IGame) {
 
 export function guess(game: IGame, guess: string) {
     if (game.phase !== GamePhase.Guessing) return;
+    const currentRound = game.rounds[game.round];
 
-    if (!game.currentWord || !guess) return;
-    const isCorrect = justOne(guess).toLowerCase() === game.currentWord.toLowerCase();
-
-    game.currentGuess = guess;
-    game.guessedRight = isCorrect;
+    currentRound.guess = guess;
+    currentRound.correct = isSameWord(currentRound.guess, currentRound.word);
     game.phase = GamePhase.Solution;
 }
 
 export function resolveRound(game: IGame, countAsCorrect: boolean) {
     if (game.phase !== GamePhase.Solution) return;
+    const currentRound = game.rounds[game.round];
 
-    const wordResult: WordResult = {
-        word: game.currentWord || '',
-        guess: game.currentGuess || ''
-    };
+    currentRound.countAnyway = countAsCorrect;
 
-    if (game.guessedRight || countAsCorrect) {
-        game.correctWords.push(wordResult);
-    } else {
-        game.wrongWords.push(wordResult);
-    }
-
-    if (game.round < game.words.length-1) {
+    if (game.round < game.rounds.length-1) {
         newRound(game);
     } else {
         endOfGame(game);
@@ -141,4 +141,51 @@ export function endOfGame(game: IGame) {
 
 function justOne(word: string = ''): string {
     return word.split(' ')[0];
+}
+
+function isSameWord(word1: string, word2: string): boolean {
+    return justOne(word1).toLowerCase() === justOne(word2).toLowerCase();
+}
+
+export function emptyGame(): IGame {
+    return {
+        "id": "",
+        "name": "",
+        "words": [],
+        "players": [],
+        "hostId": "",
+        "wordsPerPlayer": DEFAULT_NUM_WORDS,
+        "round": 0,
+        "phase": 0,
+        "rounds": []
+    };
+}
+
+export function getUserInGame(game: IGame, userId?: string): IUser | undefined {
+    return game.players.find((player: IUser) => player.id === userId);
+}
+
+export function checkPrevResult(game: IGame, showSnackbar: any, onClose: () => void, i18n: any) {
+    const roundIndex = GamePhase.End === game.phase ? game.rounds.length - 1 : game.round - 1;
+    if (roundIndex >= 0) {
+        const prevRound = game.rounds[roundIndex];
+        if (!prevRound.correct) {
+            showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', {
+                context: prevRound.correct ? 'CORRECT' : 'WRONG',
+                word: prevRound.guess
+            }), {
+                variant: prevRound.correct ? 'success' : 'error',
+                preventDuplicate: true,
+                onClose: onClose
+            });
+        }
+    }
+}
+
+export function getCorrectRounds(game: IGame): IGameRound[] {
+    return game.rounds.filter(r => r.correct !== null && (r.correct || r.countAnyway));
+}
+
+export function getWrongRounds(game: IGame): IGameRound[] {
+    return game.rounds.filter(r => r.correct !== null && !r.correct && !r.countAnyway);
 }

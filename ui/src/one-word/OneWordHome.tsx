@@ -1,18 +1,19 @@
 import React from 'react';
-import { withRouter, RouteComponentProps } from 'react-router-dom'
-import { Container, Box, Button, TextField } from '@material-ui/core';
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
-import { Trans } from 'react-i18next';
-import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
-import { IGame } from '../types';
-import { GameList } from './GameList';
+import {RouteComponentProps, withRouter} from 'react-router-dom'
+import {Box, Button, Container, TextField} from '@material-ui/core';
+import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
+import {Trans} from 'react-i18next';
+import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
+import {IGame} from '../types';
+import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
-import { SETTING_ID, SETTING_NAME, DEFAULT_NUM_WORDS } from '../shared/constants';
-import { setDocumentTitle } from '../shared/functions';
-import { loadGames, createGame, deleteGame } from '../shared/apiFunctions';
-import { STYLES } from '../theme';
+import {SETTING_ID, SETTING_NAME} from '../shared/constants';
+import {setDocumentTitle} from '../shared/functions';
+import {createGame, deleteGame, loadGames} from '../shared/apiFunctions';
+import {STYLES} from '../theme';
 import i18n from '../i18n';
+import {emptyGame} from "./gameFunctions";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -168,10 +169,6 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
 function getInitialGameName(userName?: string) {
     return userName ? i18n.t('HOME.NEW_GAME_PERSONAL', 'Neues Spiel', {name: userName}) : i18n.t('HOME.NEW_GAME', 'Neues Spiel');
-}
-
-function emptyGame(): IGame {
-    return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
 export default withRouter(withSnackbar(withStyles(styles)(OneWordHome)));
