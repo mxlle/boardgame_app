@@ -1,5 +1,4 @@
 import {SETTING_ID} from './constants';
-import shortid from 'shortid';
 import i18n from '../i18n';
 import {IGame, IUser} from "../types";
 import {getUserInGame} from "../one-word/gameFunctions";
@@ -18,8 +17,7 @@ export function getCurrentUserId() {
 }
 
 export function generateId() {
-	shortid.characters('0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZüÜ');
-	return shortid();
+	return Math.random().toString(36).replace('0.', '');
 }
 
 export function setDocumentTitle(gameName?: string) {
