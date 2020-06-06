@@ -10,10 +10,11 @@ import NewPlayer from '../common/NewPlayer';
 import { RoundSelector } from './components/RoundSelector';
 import { getRandomColor } from '../common/ColorPicker';
 
-
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
+import {StoreHelpers} from "react-joyride";
+import TutorialOverlay from "../common/TutorialOverlay";
 
 type GameLobbyProps = {
     game: IGame,
@@ -23,22 +24,23 @@ type GameLobbyProps = {
 type GameLobbyState = {
     currentPlayer: IUser,
     roundDialogOpen: boolean,
-    playerAdded?: boolean
+    playerAdded?: boolean,
+    joyrideHelpers?: StoreHelpers
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
-    public state: GameLobbyState = { 
-        currentPlayer: {
-            id: localStorage.getItem(SETTING_ID) || '',
-            name: localStorage.getItem(SETTING_NAME) || '',
-            color: getRandomColor(localStorage.getItem(SETTING_COLOR))
-        }, 
-        roundDialogOpen: false
-    };
-
     constructor(props: GameLobbyProps) {
         super(props);
+
+        this.state = {
+            currentPlayer: {
+                id: localStorage.getItem(SETTING_ID) || '',
+                name: localStorage.getItem(SETTING_NAME) || '',
+                color: getRandomColor(localStorage.getItem(SETTING_COLOR), props.game.players.map(p => p.color))
+            },
+            roundDialogOpen: false
+        }
 
         this.addPlayer = this.addPlayer.bind(this);
         this.setPlayerProps = this.setPlayerProps.bind(this);
@@ -54,7 +56,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     async addPlayer(player: IUser) {
-        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); return; }
+        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); this.state?.joyrideHelpers?.close(); return; }
         const resultPlayer = await api.addPlayer(this.props.game.id, player);
         if (!resultPlayer) return;
         this.setLocalPlayer(resultPlayer);
@@ -74,7 +76,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     selectNumRounds() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.state.joyrideHelpers?.close(); return; }
 
         this.setState({
             roundDialogOpen: true
@@ -136,12 +138,14 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                                         Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
                                     </Trans> 
                                 </Paper>
+                                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} />
                             </Grid>
                         ) : (
                             <Grid item xs={12}>
                                 <NewPlayer currentPlayer={currentPlayer}
                                     updatePlayer={this.setPlayerProps}
                                     addPlayer={this.addPlayer}/>
+                                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} />
                             </Grid>
                         )
                     }
@@ -159,7 +163,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isHost && isInGame && (
                             <Grid item xs={12}>
-                                <Button variant="contained" color="primary" 
+                                <Button variant="contained" color="primary" className="submitBtn"
                                     disabled={game.players.length < 3}
                                     onClick={this.selectNumRounds}>
                                     <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>

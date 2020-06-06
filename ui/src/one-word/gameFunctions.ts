@@ -123,7 +123,7 @@ export function guess(game: IGame, guess: string) {
 }
 
 export function resolveRound(game: IGame, countAsCorrect: boolean) {
-    if (game.phase !== GamePhase.Solution) return;
+    if (game.phase !== GamePhase.Solution) return game;
     const currentRound = game.rounds[game.round];
 
     currentRound.countAnyway = countAsCorrect;
@@ -133,6 +133,8 @@ export function resolveRound(game: IGame, countAsCorrect: boolean) {
     } else {
         endOfGame(game);
     }
+
+    return game;
 }
 
 export function endOfGame(game: IGame) {

@@ -18,7 +18,8 @@
             "ONGOING": "My ongoing games",
             "PLAYERS": "Players: {{playersString}}"
         },
-        "DELETED_GAME": "Game deleted"
+        "DELETED_GAME": "Game deleted",
+        "START_TUTORIAL": "How to play"
     },
     "GAME": {
         "COMMON": {
@@ -111,6 +112,15 @@
         "HEADING": "Language",
         "DE": "Deutsch",
         "EN": "English"
+    },
+    "TUTORIAL": {
+        "CONTROLS": {
+            "BACK": "Back",
+            "CLOSE": "Close",
+            "DONE": "Done",
+            "NEXT": "Next",
+            "SKIP": "Skip"
+        }
     },
     "ERROR": {
         "NO_CONNECTION": "No connection!",

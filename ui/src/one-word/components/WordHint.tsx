@@ -49,7 +49,8 @@ type WordHintProps = {
     showCheck?: boolean,
     showCross?: boolean,
     submitHint?: (hint:string)=>void,
-    toggleDuplicate?: ()=>void
+    toggleDuplicate?: ()=>void,
+    defaultValue?: string
 }&WithStyles<typeof styles>;
 
 class WordHint extends React.Component<WordHintProps> {
@@ -57,7 +58,7 @@ class WordHint extends React.Component<WordHintProps> {
     render() {
         const { hint, color, author, 
                 showPencil, showCheck, showCross, 
-                submitHint, toggleDuplicate, duplicate,
+                submitHint, toggleDuplicate, duplicate, defaultValue,
                 classes
         } = this.props;
 
@@ -69,10 +70,11 @@ class WordHint extends React.Component<WordHintProps> {
         const classList = [classes.root];
         if (showPencil) classList.push(classes.writing);
         if (duplicate) classList.push(classes.duplicate);
+        if (submitHint) classList.push('WordHint-withInput');
         
         let content;
         if (submitHint) {
-            content = <WordHintInput submitHint={submitHint}/>;
+            content = <WordHintInput submitHint={submitHint} defaultValue={defaultValue}/>;
         } else if (showCross) {
             content = <Box fontSize={80}>✗</Box>;
         } else if (showCheck) {
@@ -90,7 +92,7 @@ class WordHint extends React.Component<WordHintProps> {
             <Grid item xs={12}>
                 <Paper className={classList.join(' ')} style={duplicate?undefined:styleObj}>
                     {content}
-                    {showPencil && <PencilAnimation color={color}></PencilAnimation>}
+                    {showPencil && <PencilAnimation color={color} />}
                     {toggleDuplicate && (
                         <Checkbox className={classes.toggleBtn} 
                             icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 

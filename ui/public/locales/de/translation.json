@@ -18,7 +18,8 @@
             "ONGOING": "Meine laufenden Spiele",
             "PLAYERS": "Spieler: {{playersString}}"
         },
-        "DELETED_GAME": "Spiel gelöscht"
+        "DELETED_GAME": "Spiel gelöscht",
+        "START_TUTORIAL": "Wie funktioniert's?"
     },
     "GAME": {
         "COMMON": {
@@ -111,6 +112,15 @@
         "HEADING": "Sprache",
         "DE": "Deutsch",
         "EN": "English"
+    },
+    "TUTORIAL": {
+        "CONTROLS": {
+            "BACK": "Zurück",
+            "CLOSE": "Schließen",
+            "DONE": "Fertig",
+            "NEXT": "Weiter",
+            "SKIP": "Überspringen"
+        }
     },
     "ERROR": {
         "NO_CONNECTION": "Keine Verbindung!",

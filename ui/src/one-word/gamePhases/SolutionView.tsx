@@ -12,6 +12,8 @@ import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
+import {StoreHelpers} from "react-joyride";
+import TutorialOverlay from "../../common/TutorialOverlay";
 
 type SolutionViewProps = {
     game: IGame
@@ -19,7 +21,8 @@ type SolutionViewProps = {
 
 type SolutionViewState = {
     shownMessage: boolean,
-    shownResult: boolean
+    shownResult: boolean,
+    joyrideHelpers?: StoreHelpers
 };
 
 class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> {
@@ -41,7 +44,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     resolveRound(correct: boolean = true) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); this.state.joyrideHelpers?.close(); return; }
         api.resolveRound(this.props.game.id, correct);
     }
 
@@ -113,19 +116,22 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         } else if (isRoundHost) {
             leftCol.push(
                 <Grid item xs={12} key="button1">
-                    <Button variant="contained" onClick={() => this.resolveRound(true)}>
+                    <Button variant="contained" onClick={() => this.resolveRound(true)} className="submitBtn correct">
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
                     </Button>
                 </Grid>,
                 <Grid item xs={12} key="button2">
-                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
+                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)} className="submitBtn wrong">
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
                     </Button>
                 </Grid>
             );
         }
-        if (game.$isTutorial && !isRoundHost && !currentRound.correct) {
-            leftCol.push(<Button onClick={() => nextTutorialStep()} key="tutorial">Weiter</Button>);
+
+        if (game.$isTutorial) {
+            leftCol.push(
+                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
+            )
         }
 
         return (

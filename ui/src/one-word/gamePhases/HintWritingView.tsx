@@ -1,5 +1,4 @@
 import React from 'react';
-import {Button} from "@material-ui/core";
 import i18n from '../../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../types';
@@ -10,7 +9,9 @@ import GameField from './GameField';
 import * as api from '../../shared/apiFunctions';
 import {checkPrevResult, getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
-import {nextTutorialStep} from "../tutorial";
+import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
+import {StoreHelpers} from "react-joyride";
+import TutorialOverlay from "../../common/TutorialOverlay";
 
 type HintWritingViewProps = {
     game: IGame
@@ -18,7 +19,8 @@ type HintWritingViewProps = {
 
 type HintWritingViewState = {
     shownMessage: boolean,
-    shownPrevResult: boolean
+    shownPrevResult: boolean,
+    joyrideHelpers?: StoreHelpers
 };
 
 class HintWritingView extends React.Component<HintWritingViewProps, HintWritingViewState> {
@@ -40,7 +42,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     submitHint(hint: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(hint); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); this.state.joyrideHelpers?.close(); return; }
         api.submitHint(this.props.game.id, hint);
     }
 
@@ -80,11 +82,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                     submitHint={showInput ? this.submitHint : undefined}
                     showCheck={!showHint}
                     author={authorName}
+                    defaultValue={game.$isTutorial && hintIsMine ? TUTORIAL_HINTS[currentRound.word][0] : undefined}
                 />
             );
         });
-
-        const tutorialButton = game.$isTutorial && isGuesser ? <Button onClick={() => nextTutorialStep()} key="2">Weiter</Button> : <span key="2"/>;
 
         return (
             <GameField
@@ -95,7 +96,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         isGuesser={isGuesser}
                         color={guesser.color}
                         key="1" />),
-                    tutorialButton
+                    <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
                 ]}
 
                 rightCol={currentHints}

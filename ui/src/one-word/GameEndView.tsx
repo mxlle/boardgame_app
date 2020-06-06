@@ -8,13 +8,16 @@ import { IGame } from '../types';
 import {checkPrevResult, getCorrectRounds, getWrongRounds} from "./gameFunctions";
 import {removeTutorial} from "./tutorial";
 import {RouteComponentProps, withRouter} from "react-router-dom";
+import {StoreHelpers} from "react-joyride";
+import TutorialOverlay from "../common/TutorialOverlay";
 
 type GameEndViewProps = {
     game: IGame
 }&WithSnackbarProps&RouteComponentProps;
 
 type HintWritingViewState = {
-    shownPrevResult: boolean
+    shownPrevResult: boolean,
+    joyrideHelpers?: StoreHelpers
 };
 
 class GameEndView extends React.Component<GameEndViewProps> {
@@ -47,9 +50,11 @@ class GameEndView extends React.Component<GameEndViewProps> {
         }
 
         const closeTutorial = () => {
+            this.state.joyrideHelpers?.close();
             removeTutorial();
             this.props.history.push('/');
         };
+
         const returnButton = game.$isTutorial ? <Grid item xs={12}><Button onClick={closeTutorial}>Close Tutorial</Button></Grid> : null;
 
         return (
@@ -67,6 +72,7 @@ class GameEndView extends React.Component<GameEndViewProps> {
                     </Grid>
                     {wrongWords}
                 </Grid>
+                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
             </Grid>
         );
     }

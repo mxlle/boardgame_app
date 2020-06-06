@@ -76,7 +76,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
                     <Trans i18nKey="GAME.PREP.WORD_ADDER.HEADING" count={numOfWords}>Gib Begriffe für das Spiel ein</Trans>
                 </Typography>
                 {wordFields}
-                <Button variant="contained" color="primary" 
+                <Button variant="contained" color="primary" className="submitBtn"
                     disabled={enterDisabled} 
                     onClick={() => add(words)}>
                     <Trans i18nKey="GAME.PREP.WORD_ADDER.BUTTON" count={numOfWords}>Jetzt abschicken</Trans>
