@@ -1,5 +1,5 @@
 import { SETTING_ID } from './constants';
-import { IGame, IUser, WordResult, GamePhase } from '../custom.d';
+import { IGame, IUser, WordResult, GamePhase } from '../types';
 import shortid from 'shortid';
 import i18n from '../i18n'; 
 

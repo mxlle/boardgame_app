@@ -1,8 +1,4 @@
 import { Document } from 'mongoose';
+import { IUser } from '@entities/Game';
 
-export interface IUser extends Document {
-    id: string;
-    name: string;
-    color?: string;
-    enteredWords?: string[];
-}
+export type IUserDocument = IUser & Document;

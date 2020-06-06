@@ -1,8 +1,7 @@
-// custom module declarations
+// shared between api and app, needs to be in ui/src because cra restrictions
 
-import 'react';
+export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 
-// TODO 
 export interface IUser {
     id: string;
     name: string;
@@ -13,7 +12,7 @@ export interface IUser {
 export interface IHint {
     hint: string;
     author: string;
-    isDuplicate?: boolean
+    isDuplicate?: boolean;
 }
 
 export enum GamePhase {

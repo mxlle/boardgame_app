@@ -4,7 +4,7 @@ import { Container, Box, Button, TextField } from '@material-ui/core';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps, CloseReason } from 'notistack';
-import { IGame } from '../custom.d';
+import { IGame } from '../types';
 import { GameList } from './GameList';
 import ActionButton from '../common/ActionButton';
 
@@ -37,7 +37,7 @@ type JustOneHomeState = {
     gamesLoading: boolean
 };
 
-class JustOneHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
+class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
@@ -174,4 +174,4 @@ function emptyGame(): IGame {
     return {"id":"", "name": "", "words":[],"players":[],"host":"","wordsPerPlayer":DEFAULT_NUM_WORDS,"round":0,"phase":0,"hints":[],"correctWords":[],"wrongWords":[]};
 }
 
-export default withRouter(withSnackbar(withStyles(styles)(JustOneHome)));
+export default withRouter(withSnackbar(withStyles(styles)(OneWordHome)));

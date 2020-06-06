@@ -1,6 +1,6 @@
 import { GAME_URL } from './constants';
 import { getCurrentUserId } from './functions';
-import { IGame, IUser } from '../custom.d';
+import { IGame, IUser } from '../types';
 
 export async function loadGames(): Promise<IGame[]> {
     return (await _get('all')).games || [];

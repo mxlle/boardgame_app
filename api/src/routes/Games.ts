@@ -4,8 +4,7 @@ import { ParamsDictionary } from 'express-serve-static-core';
 import { generateId } from '@shared/functions';
 
 import GameDao from '@daos/Game';
-import * as GameController from '@entities/Game';
-import { IUser } from "@entities/User";
+import { GameController, IGame, IUser, GamePhase } from "@entities/Game";
 import { paramMissingError, gameNotFoundError, forebiddenError } from '@shared/constants';
 
 // Init shared
@@ -20,8 +19,8 @@ const gameDao = new GameDao();
 router.get('/all', async (req: Request, res: Response) => {
     const userId = req.headers.authorization;
     let games = await gameDao.getAll();
-    games = games.filter((game: GameController.IGame) => {
-        return game.phase === GameController.GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
+    games = games.filter((game: IGame) => {
+        return game.phase === GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
     });
     return res.status(OK).json({games});
 });

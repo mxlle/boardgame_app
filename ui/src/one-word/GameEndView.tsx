@@ -3,7 +3,7 @@ import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { Grid, Typography } from '@material-ui/core';
 import WordCard from './components/WordCard';
-import { IGame } from '../custom.d';
+import { IGame } from '../types';
 import { checkPrevResult } from '../shared/functions';
 
 type GameEndViewProps = {

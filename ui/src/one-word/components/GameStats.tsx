@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { IGame, GamePhase } from '../../custom.d';
+import { IGame, GamePhase } from '../../types';
 import { getUserInGame } from '../../shared/functions';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";

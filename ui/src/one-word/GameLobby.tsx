@@ -1,5 +1,5 @@
 import React from 'react';
-import { IGame, IUser } from '../custom.d';
+import { IGame, IUser } from '../types';
 import { Grid, Button, Paper, Typography } from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
 import { Trans } from 'react-i18next';

@@ -15,8 +15,8 @@ import { SETTING_COLOR, SETTING_THEME, ThemeMode } from './shared/constants';
 import { getTheme, STYLES } from './theme';
 import HeaderBar from './common/HeaderBar';
 import Loader from "./common/Loader";
-import JustOneHome from './just-one/JustOneHome';
-import JustOneGame from './just-one/JustOneGame';
+import JustOneHome from './one-word/OneWordHome';
+import OneWordGame from './one-word/OneWordGame';
 
 import './i18n';
 
@@ -57,7 +57,7 @@ export const App = () =>    {
                         <Paper square elevation={0} className={classes.root} style={{backgroundColor: theme.palette.background.default}}>
                             <HeaderBar userTheme={userTheme} applyUserTheme={applyUserTheme}/>
                             <Switch>
-                                <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <JustOneGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
+                                <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <OneWordGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
                                 <Route children={<JustOneHome/>} />
                             </Switch> 
                         </Paper>

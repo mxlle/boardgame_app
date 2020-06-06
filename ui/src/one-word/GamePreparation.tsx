@@ -1,6 +1,6 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import { IGame, IUser } from '../custom.d';
+import { IGame, IUser } from '../types';
 import { Grid, Paper, Typography } from '@material-ui/core';
 import WordHint from './components/WordHint';
 import WordCard from './components/WordCard';

@@ -12,7 +12,7 @@ import {
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
 import { Trans } from 'react-i18next';
-import { IGame, GamePhase } from '../custom.d';
+import { IGame, GamePhase } from '../types';
 
 import { SETTING_ID, SETTING_NAME } from '../shared/constants';
 import { getCurrentUserInGame } from '../shared/functions';
