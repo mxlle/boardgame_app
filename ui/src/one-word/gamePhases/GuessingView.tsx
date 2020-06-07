@@ -11,10 +11,11 @@ import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type GuessingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type GuessingViewState = {
     shownMessage: boolean
@@ -38,9 +39,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         this._isMounted = false;
     }
 
-    guess(guess: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(guess); return; }
-        api.guess(this.props.game.id, guess);
+    async guess(guess: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(guess); this.props.triggerReload(); return; }
+        await api.guess(this.props.game.id, guess);
+        this.props.triggerReload();
     }
 
     render() {

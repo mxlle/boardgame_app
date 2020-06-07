@@ -13,10 +13,11 @@ import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type HintComparingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintComparingViewState = {
     shownMessage: boolean
@@ -41,14 +42,16 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         this._isMounted = false;
     }
 
-    toggleDuplicate(hintIndex: number) {
-        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); return; }
-        api.toggleDuplicate(this.props.game.id, hintIndex);
+    async toggleDuplicate(hintIndex: number) {
+        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); this.props.triggerReload(); return; }
+        await api.toggleDuplicate(this.props.game.id, hintIndex);
+        this.props.triggerReload();
     }
 
-    showHints() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
-        api.showHints(this.props.game.id);
+    async showHints() {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
+        await api.showHints(this.props.game.id);
+        this.props.triggerReload();
     }
 
     render() {

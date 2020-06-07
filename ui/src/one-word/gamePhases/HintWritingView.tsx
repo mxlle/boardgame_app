@@ -11,10 +11,11 @@ import {checkPrevResult, getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type HintWritingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintWritingViewState = {
     shownMessage: boolean,
@@ -39,9 +40,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         this._isMounted = false;
     }
 
-    submitHint(hint: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(hint); return; }
-        api.submitHint(this.props.game.id, hint);
+    async submitHint(hint: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); this.props.triggerReload(); return; }
+        await api.submitHint(this.props.game.id, hint);
+        this.props.triggerReload();
     }
 
     render() {

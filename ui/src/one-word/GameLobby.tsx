@@ -14,11 +14,12 @@ import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
+import {OneWordGameChildProps} from "./OneWordGame";
 
 type GameLobbyProps = {
     game: IGame,
     setTheme?: (color: string)=>void
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type GameLobbyState = {
     currentPlayer: IUser,
@@ -54,10 +55,11 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     async addPlayer(player: IUser) {
-        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); return; }
+        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); this.props.triggerReload(); return; }
         const resultPlayer = await api.addPlayer(this.props.game.id, player);
         if (!resultPlayer) return;
         this.setLocalPlayer(resultPlayer);
+        this.props.triggerReload();
     }
 
     setLocalPlayer(player: IUser) {
@@ -74,19 +76,20 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     selectNumRounds() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
 
         this.setState({
             roundDialogOpen: true
         });
     }
 
-    startPreparation(wordsPerPlayer: number = DEFAULT_NUM_WORDS) {
+    async startPreparation(wordsPerPlayer: number = DEFAULT_NUM_WORDS) {
         this.setState({
             roundDialogOpen: false
         });
 
-        api.startPreparation(this.props.game.id, wordsPerPlayer);
+        await api.startPreparation(this.props.game.id, wordsPerPlayer);
+        this.props.triggerReload();
     }
 
     shareGame() {

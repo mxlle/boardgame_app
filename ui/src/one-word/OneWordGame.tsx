@@ -1,5 +1,5 @@
 import React from 'react';
-import {Box, Button, Container, createStyles, Grid, Theme, withStyles, WithStyles} from '@material-ui/core';
+import {Button, Container, createStyles, Grid, Theme, withStyles, WithStyles} from '@material-ui/core';
 import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
@@ -8,10 +8,10 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import { IGame, GamePhase } from '../types';
+import {GamePhase, IGame} from '../types';
 
-import { loadGame } from '../shared/apiFunctions';
-import { setDocumentTitle } from '../shared/functions';
+import {loadGame} from '../shared/apiFunctions';
+import {setDocumentTitle} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans} from "react-i18next";
 import {RouteComponentProps, withRouter} from "react-router-dom";
@@ -37,6 +37,10 @@ type JustOneGameProps = {
 type JustOneGameState = {
     currentGame?: IGame
 };
+
+export type OneWordGameChildProps = {
+    triggerReload: () => void
+}
 
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = {};
@@ -83,6 +87,8 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         let returnBtn;
         let resetTutorialBtn;
 
+        const triggerReload = () => this.loadGame();
+
         const backToList = () => {
             if (currentGame.$isTutorial) removeTutorial();
             history.push('/');
@@ -90,29 +96,29 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         switch(currentGame.phase) {
             case GamePhase.Init:
-                gameContent = <GameLobby game={currentGame} setTheme={setTheme} />;
+                gameContent = <GameLobby game={currentGame} triggerReload={triggerReload} setTheme={setTheme} />;
                 break;
             case GamePhase.Preparation:
-                gameContent = <GamePreparation game={currentGame} />;
+                gameContent = <GamePreparation game={currentGame} triggerReload={triggerReload} />;
                 break;
             case GamePhase.HintWriting:
-                gameContent = <HintWritingView game={currentGame} />;
+                gameContent = <HintWritingView game={currentGame} triggerReload={triggerReload} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.HintComparing:
-                gameContent = <HintComparingView game={currentGame} />;
+                gameContent = <HintComparingView game={currentGame} triggerReload={triggerReload} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Guessing:
-                gameContent = <GuessingView game={currentGame} />;
+                gameContent = <GuessingView game={currentGame} triggerReload={triggerReload} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Solution:
-                gameContent = <SolutionView game={currentGame} />;
+                gameContent = <SolutionView game={currentGame} triggerReload={triggerReload} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.End:
-                gameContent = <GameEndView game={currentGame} />;
+                gameContent = <GameEndView game={currentGame} triggerReload={triggerReload} />;
                 returnBtn = (
                     <Grid item xs={12}>
                         <Button className={classes.button} variant="outlined" onClick={backToList}>

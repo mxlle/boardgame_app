@@ -11,10 +11,11 @@ import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
+import {OneWordGameChildProps} from "./OneWordGame";
 
 type GamePreparationProps = {
     game: IGame
-}
+}&OneWordGameChildProps;
 
 type GamePreparationState = {}
 
@@ -33,12 +34,13 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
     }
 
     async addWords(words: string[]) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
 
         let player: IUser = this.currentPlayer;
         player.enteredWords = words;
 
-        api.updatePlayer(this.props.game.id, player);
+        await api.updatePlayer(this.props.game.id, player);
+        this.props.triggerReload();
     }
 
     render() {

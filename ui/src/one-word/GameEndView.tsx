@@ -7,10 +7,11 @@ import WordCard from './components/WordCard';
 import { IGame } from '../types';
 import {checkPrevResult, getCorrectRounds, getWrongRounds} from "./gameFunctions";
 import TutorialOverlay from "../common/TutorialOverlay";
+import {OneWordGameChildProps} from "./OneWordGame";
 
 type GameEndViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintWritingViewState = {
     shownPrevResult: boolean

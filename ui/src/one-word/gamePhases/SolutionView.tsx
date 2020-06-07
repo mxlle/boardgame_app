@@ -13,10 +13,11 @@ import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type SolutionViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type SolutionViewState = {
     shownMessage: boolean,
@@ -41,9 +42,10 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         this._isMounted = false;
     }
 
-    resolveRound(correct: boolean = true) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); return; }
-        api.resolveRound(this.props.game.id, correct);
+    async resolveRound(correct: boolean = true) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); this.props.triggerReload(); return; }
+        await api.resolveRound(this.props.game.id, correct);
+        this.props.triggerReload();
     }
 
     render() {
