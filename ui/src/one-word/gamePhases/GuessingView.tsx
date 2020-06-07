@@ -9,10 +9,13 @@ import GameField from './GameField';
 import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
+import {nextTutorialStep} from "../tutorial";
+import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type GuessingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type GuessingViewState = {
     shownMessage: boolean
@@ -36,8 +39,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         this._isMounted = false;
     }
 
-    guess(guess: string) {
-        api.guess(this.props.game.id, guess);
+    async guess(guess: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(guess); this.props.triggerReload(); return; }
+        await api.guess(this.props.game.id, guess);
+        this.props.triggerReload();
     }
 
     render() {
@@ -77,15 +82,17 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
 
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
                         color={guesser.color} 
                         showInput={isGuesser}
-                        submitHint={this.guess}/>
-                )}
+                        submitHint={this.guess}
+                        key="1" />),
+                    <TutorialOverlay game={game} key="tutorial" />
+                ]}
 
                 rightCol={currentHints}
             />

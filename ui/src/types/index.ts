@@ -14,6 +14,8 @@ export interface IGame {
     phase: GamePhase;
 
     rounds: IGameRound[];
+
+    $isTutorial?: boolean;
 }
 
 export interface IUser {

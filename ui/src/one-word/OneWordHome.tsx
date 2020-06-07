@@ -14,6 +14,7 @@ import {createGame, deleteGame, loadGames} from '../shared/apiFunctions';
 import {STYLES} from '../theme';
 import i18n from '../i18n';
 import {emptyGame} from "./gameFunctions";
+import {TUTORIAL_ID} from "./tutorial";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -49,6 +50,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         super(props);
 
         this.createGame = this.createGame.bind(this);
+        this.startTutorial = this.startTutorial.bind(this);
         this.loadGames = this.loadGames.bind(this);
         this.handleChange = this.handleChange.bind(this);
         this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
@@ -141,6 +143,10 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         }
     }
 
+    startTutorial() {
+        this.props.history.push('/' + TUTORIAL_ID);
+    }
+
     render() {
         let { classes } = this.props;
         let {newGameName, allGames, gamesLoading} = this.state;
@@ -153,6 +159,11 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     <Button variant="contained" color="primary" onClick={this.createGame}>
                         <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
                     </Button>         
+                </Box>
+                <Box mb={2}>
+                    <Button variant="contained" onClick={this.startTutorial}>
+                        <Trans i18nKey="HOME.START_TUTORIAL">Tutorial</Trans>
+                    </Button>
                 </Box>
                 <Box mb={2}>
                     <ActionButton loading={gamesLoading}>

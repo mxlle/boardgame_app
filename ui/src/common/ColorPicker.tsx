@@ -22,9 +22,11 @@ export const allColors: string[] = [
     '#f4511e'
 ];
 
-export function getRandomColor(color?: string|null): string {
+export function getRandomColor(color?: string|null, exclude: (string|undefined)[] = []): string {
     if (!color || !allColors.includes(color)) {
-        return allColors[Math.floor(Math.random()*allColors.length)];
+        let availableColors = allColors.filter(c => !exclude.includes(c));
+        if (availableColors.length === 0) availableColors = allColors;
+        return availableColors[Math.floor(Math.random()*availableColors.length)];
     } else {
         return color;
     }

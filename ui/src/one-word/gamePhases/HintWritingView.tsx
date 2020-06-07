@@ -9,10 +9,13 @@ import GameField from './GameField';
 import * as api from '../../shared/apiFunctions';
 import {checkPrevResult, getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
+import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
+import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type HintWritingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintWritingViewState = {
     shownMessage: boolean,
@@ -37,8 +40,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         this._isMounted = false;
     }
 
-    submitHint(hint: string) {
-        api.submitHint(this.props.game.id, hint);
+    async submitHint(hint: string) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); this.props.triggerReload(); return; }
+        await api.submitHint(this.props.game.id, hint);
+        this.props.triggerReload();
     }
 
     render() {
@@ -77,19 +82,22 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                     submitHint={showInput ? this.submitHint : undefined}
                     showCheck={!showHint}
                     author={authorName}
+                    defaultValue={game.$isTutorial && hintIsMine ? TUTORIAL_HINTS[currentRound.word][0] : undefined}
                 />
             );
         });
 
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
-                        color={guesser.color} />
-                )}
+                        color={guesser.color}
+                        key="1" />),
+                    <TutorialOverlay game={game} key="tutorial" />
+                ]}
 
                 rightCol={currentHints}
             />

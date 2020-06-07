@@ -9,12 +9,17 @@ import { getRandomColor } from '../common/ColorPicker';
 
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
+import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
+import TutorialOverlay from "../common/TutorialOverlay";
+import {OneWordGameChildProps} from "./OneWordGame";
 
 type GamePreparationProps = {
     game: IGame
-}
+}&OneWordGameChildProps;
 
-export class GamePreparation extends React.Component<GamePreparationProps> {
+type GamePreparationState = {}
+
+export class GamePreparation extends React.Component<GamePreparationProps,GamePreparationState> {
     // TODO central place for player
     public currentPlayer: IUser =  {
         id: localStorage.getItem(SETTING_ID) || '',
@@ -29,10 +34,13 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
     }
 
     async addWords(words: string[]) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
+
         let player: IUser = this.currentPlayer;
         player.enteredWords = words;
 
-        api.updatePlayer(this.props.game.id, player);
+        await api.updatePlayer(this.props.game.id, player);
+        this.props.triggerReload();
     }
 
     render() {
@@ -54,6 +62,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
             )
         });
 
+        const defaultValue: string|undefined = game.$isTutorial ? TUTORIAL_WORDS[0] : undefined;
         const myWordCards = myWords.map(word => <WordCard key={word} small word={word} color={this.currentPlayer.color}/>)
 
         // TODO not in game users
@@ -70,7 +79,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                             </Grid>
                         ) : (
                             <Grid item xs={12}>
-                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer}/>
+                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer} defaultValue={defaultValue}/>
                             </Grid>
                         )
                     }
@@ -87,6 +96,7 @@ export class GamePreparation extends React.Component<GamePreparationProps> {
                     </Grid>
                     {listOfPlayers}
                 </Grid>
+                <TutorialOverlay game={game} />
             </Grid>
         );
     }

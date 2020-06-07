@@ -13,18 +13,19 @@ const styles = (theme: Theme) => createStyles({
 });
 
 type WordHintInputProps = {
-    submitHint: (hint: string)=>void
-    label?: string
+    submitHint: (hint: string)=>void;
+    label?: string;
+    defaultValue?: string;
 }&WithStyles<typeof styles>;
 type WordHintInputState = {
-    value: string, 
+    value: string;
 };
 
 class WordHintInput extends React.Component<WordHintInputProps,WordHintInputState> {
 
     constructor(props: WordHintInputProps) {
     	super(props);
-        this.state = {value: ''};
+        this.state = {value: props.defaultValue || ''};
 
         this.handleChange = this.handleChange.bind(this);
         this.submitHint = this.submitHint.bind(this);
@@ -56,13 +57,13 @@ class WordHintInput extends React.Component<WordHintInputProps,WordHintInputStat
 	        <Box width={1} ml={label ? 5 : 7} mr={2} className={classes.root}>
 	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
                     fullWidth
-	        		value={value} 
+	        		value={value}
 	        		onChange={this.handleChange} 
 	        		onKeyPress={this.keyPressed} />
     			<IconButton color="primary"
     				disabled={!value} 
     				onClick={this.submitHint}>
-                    <SendIcon></SendIcon>
+                    <SendIcon />
                 </IconButton>
 	        </Box>
         );

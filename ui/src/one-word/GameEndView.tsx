@@ -2,14 +2,16 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import { Grid, Typography } from '@material-ui/core';
+import {Grid, Typography} from '@material-ui/core';
 import WordCard from './components/WordCard';
 import { IGame } from '../types';
 import {checkPrevResult, getCorrectRounds, getWrongRounds} from "./gameFunctions";
+import TutorialOverlay from "../common/TutorialOverlay";
+import {OneWordGameChildProps} from "./OneWordGame";
 
 type GameEndViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintWritingViewState = {
     shownPrevResult: boolean
@@ -58,6 +60,7 @@ class GameEndView extends React.Component<GameEndViewProps> {
                     </Grid>
                     {wrongWords}
                 </Grid>
+                <TutorialOverlay game={game} key="tutorial" />
             </Grid>
         );
     }

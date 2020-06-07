@@ -70,6 +70,7 @@ class WordCard extends React.Component<WordCardProps> {
             guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesser}} muss raten</Trans>;
         }
         if (small) classList.push(classes.small);
+        if (showInput) classList.push('WordCard-withInput');
 
         return (
             <Grid item xs={12} className={small ? classes.root : undefined}>

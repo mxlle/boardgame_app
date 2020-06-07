@@ -123,7 +123,7 @@ export function guess(game: IGame, guess: string) {
 }
 
 export function resolveRound(game: IGame, countAsCorrect: boolean) {
-    if (game.phase !== GamePhase.Solution) return;
+    if (game.phase !== GamePhase.Solution) return game;
     const currentRound = game.rounds[game.round];
 
     currentRound.countAnyway = countAsCorrect;
@@ -133,6 +133,8 @@ export function resolveRound(game: IGame, countAsCorrect: boolean) {
     } else {
         endOfGame(game);
     }
+
+    return game;
 }
 
 export function endOfGame(game: IGame) {
@@ -171,10 +173,10 @@ export function checkPrevResult(game: IGame, showSnackbar: any, onClose: () => v
         const prevRound = game.rounds[roundIndex];
         if (!prevRound.correct) {
             showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', {
-                context: prevRound.correct ? 'CORRECT' : 'WRONG',
+                context: prevRound.correct || prevRound.countAnyway ? 'CORRECT' : 'WRONG',
                 word: prevRound.guess
             }), {
-                variant: prevRound.correct ? 'success' : 'error',
+                variant: prevRound.correct || prevRound.countAnyway ? 'success' : 'error',
                 preventDuplicate: true,
                 onClose: onClose
             });

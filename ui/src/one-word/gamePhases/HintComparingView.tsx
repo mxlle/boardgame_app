@@ -11,10 +11,13 @@ import GameField from './GameField';
 import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
+import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
+import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type HintComparingViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type HintComparingViewState = {
     shownMessage: boolean
@@ -39,12 +42,16 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         this._isMounted = false;
     }
 
-    toggleDuplicate(hintIndex: number) {
-        api.toggleDuplicate(this.props.game.id, hintIndex);
+    async toggleDuplicate(hintIndex: number) {
+        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); this.props.triggerReload(); return; }
+        await api.toggleDuplicate(this.props.game.id, hintIndex);
+        this.props.triggerReload();
     }
 
-    showHints() {
-        api.showHints(this.props.game.id);
+    async showHints() {
+        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
+        await api.showHints(this.props.game.id);
+        this.props.triggerReload();
     }
 
     render() {
@@ -92,7 +99,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                 </Grid>
             ),(
                 <Grid item xs={12} key="button">
-                    <Button variant="contained" color="primary" onClick={this.showHints}>
+                    <Button variant="contained" color="primary" onClick={this.showHints} className="submitBtn">
                         <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
                     </Button>
                 </Grid>
@@ -101,13 +108,15 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
 
         return (
             <GameField
-                leftCol={(
-                    <WordCard 
+                leftCol={[
+                    (<WordCard
                         word={currentWord} 
                         guesser={guesser.name} 
                         isGuesser={isGuesser}
-                        color={guesser.color} />
-                )}
+                        color={guesser.color}
+                        key="1" />),
+                    <TutorialOverlay game={game} key="tutorial" />
+                ]}
 
                 rightCol={currentHints}
             />

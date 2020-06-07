@@ -11,10 +11,13 @@ import GameField from './GameField';
 import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
+import {nextTutorialStep} from "../tutorial";
+import TutorialOverlay from "../../common/TutorialOverlay";
+import {OneWordGameChildProps} from "../OneWordGame";
 
 type SolutionViewProps = {
     game: IGame
-}&WithSnackbarProps;
+}&WithSnackbarProps&OneWordGameChildProps;
 
 type SolutionViewState = {
     shownMessage: boolean,
@@ -39,8 +42,10 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         this._isMounted = false;
     }
 
-    resolveRound(correct: boolean = true) {
-        api.resolveRound(this.props.game.id, correct);
+    async resolveRound(correct: boolean = true) {
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); this.props.triggerReload(); return; }
+        await api.resolveRound(this.props.game.id, correct);
+        this.props.triggerReload();
     }
 
     render() {
@@ -111,16 +116,29 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         } else if (isRoundHost) {
             leftCol.push(
                 <Grid item xs={12} key="button1">
-                    <Button variant="contained" onClick={() => this.resolveRound(true)}>
+                    <Button variant="contained" onClick={() => this.resolveRound(true)} className="submitBtn correct">
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
                     </Button>
                 </Grid>,
                 <Grid item xs={12} key="button2">
-                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)}>
+                    <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)} className="submitBtn wrong">
                         <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
                     </Button>
                 </Grid>
             );
+        }
+
+        if (game.$isTutorial) {
+            if (!currentRound.correct && !isRoundHost) {
+                leftCol.push(
+                    <Button onClick={() => {nextTutorialStep();this.props.triggerReload();}} className="tutorialBtn">
+                        <Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans>
+                    </Button>
+                );
+            }
+            leftCol.push(
+                <TutorialOverlay game={game} key="tutorial" />
+            )
         }
 
         return (

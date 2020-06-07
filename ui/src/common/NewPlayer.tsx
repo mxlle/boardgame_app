@@ -52,12 +52,12 @@ class NewPlayer extends React.Component<NewPlayerProps> {
 
         return (
             <div className={classes.root}>
-                <TextField required label={<Trans i18nKey="COMMON.PLAYER_NAME">Spielername</Trans>}
+                <TextField className="name-input" required label={<Trans i18nKey="COMMON.PLAYER_NAME">Spielername</Trans>}
                     name='name'
                     value={currentPlayer.name} 
                     onChange={this.handleChange}/>
                 <ColorPicker select={this.setColor} selected={currentPlayer.color}/>
-                <Button variant="contained" color="primary" 
+                <Button variant="contained" color="primary" className="submitBtn"
                     disabled={!currentPlayer.name} 
                     onClick={this.addPlayer}><Trans i18nKey="GAME.LOBBY.JOIN">Mitspielen</Trans></Button>
             </div>

@@ -23,7 +23,9 @@ import './i18n';
 const useStyles = makeStyles({
     root: {
         ...STYLES.rootSizing,
-        textAlign: 'center'
+        textAlign: 'center',
+        display: 'flex',
+        flexDirection: 'column'
     },
     loading: {
         ...STYLES.flexCenter
