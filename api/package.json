@@ -4,15 +4,17 @@
   "scripts": {
     "build": "node ./util/build.js",
     "lint": "tslint --project \"tsconfig.json\"",
-    "start": "node -r module-alias/register ./dist",
+    "start": "node -r module-alias/register ./dist/api/src",
     "start:dev": "nodemon --config nodemon.json",
     "test": "nodemon --config nodemon.test.json"
   },
   "_moduleAliases": {
-    "@daos": "dist/daos",
-    "@entities": "dist/entities",
-    "@shared": "dist/shared",
-    "@server": "dist/Server"
+    "@daos": "dist/api/src/daos",
+    "@entities": "dist/api/src/entities",
+    "@shared": "dist/api/src/shared",
+    "@server": "dist/api/src/Server",
+    "@gameTypes": "dist/ui/src/types",
+    "@gameFunctions": "dist/ui/src/one-word/gameFunctions"
   },
   "dependencies": {
     "command-line-args": "^5.1.1",
