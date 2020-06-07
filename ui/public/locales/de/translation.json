@@ -6,7 +6,8 @@
         "ME": "Ich",
         "UNDO": "Rückgängig",
         "YOUR_TURN": "Du bist dran!",
-        "PLAYER_NAME": "Spielername"
+        "PLAYER_NAME": "Spielername",
+        "WELCOME_NAME": "Hallo {{ name }}! Viel Spaß!"
     },
     "HOME": {
         "GAME_NAME": "Spielname",
@@ -134,14 +135,15 @@
             "NAME": "Wir fangen einfach an: Gib deinen Namen ein",
             "COLOR": "Dann wähle eine Stiftfarbe",
             "JOIN": "Wenn du fertig bist, kann es losgehen",
-            "TEAMMATES": "$t(APP_TITLE) ist eine kooperatives Spiel. Hier siehst du deine $t(COMMON.TEAMMATES).",
+            "TEAMMATES": "$t(APP_TITLE) ist eine kooperatives Spiel. \n\nHier siehst du deine $t(COMMON.TEAMMATES).",
             "WELCOME_NAME": "Hallo {{name}}, schön dass du da bist!",
             "START_TITLE": "Das Spiel starten",
-            "START": "Beginne das Spiel, sobald alle Mitspieler da sind. Es werden mindestens 3 Spieler benötigt. Empfohlen sind 4 - 7 Spieler."
+            "START": "Beginne das Spiel, sobald alle Mitspieler da sind. \n\nEs werden mindestens 3 Spieler benötigt. \nEmpfohlen sind 4 - 7 Spieler."
         },
         "PREPARATION": {
             "WELCOME": "Spielvorbereitung",
-            "WORD": "In $t(APP_TITLE) dreht sich alles um Wörter. Am Anfang gibt jeder Spieler einen $t(GAME.COMMON.WORD) ein, den ein $t(COMMON.TEAMMATE) später im Spiel mit Hilfe von Hinweisen erraten muss. Nehmen wir an du entscheidest dich für {{word}}.",
+            "EXPLANATION": "In $t(APP_TITLE) dreht sich alles um Wörter. \n\nAm Anfang gibt jeder Spieler einen $t(GAME.COMMON.WORD) ein, den ein $t(COMMON.TEAMMATE) später im Spiel mit Hilfe von Hinweisen erraten muss.",
+            "WORD": "Nehmen wir an du entscheidest dich für {{word}}.",
             "SUBMIT": "Bestätige dein Wort, wenn du fertig bist"
         },
         "GAME": {
@@ -154,7 +156,7 @@
                 "3": "Gib wieder einen $t(GAME.COMMON.HINT) ein. Diesmal um {{player}} zu helfen \"{{ word }}\" zu erraten."
             },
             "DUPLICATE_INFO_TITLE": "Oh nein! Zwei $t(COMMON.TEAMMATES) haben den gleichen $t(GAME.COMMON.HINT) gegeben.",
-            "DUPLICATE_INFO": "Das bedeutet, dass beide $t(GAME.COMMON.HINTS) gestrichen werden. Ein guter $t(GAME.COMMON.HINT) ist hilfreich, aber falls du es zu einfach machst, kann es sein, dass ein anderer $t(COMMON.TEAMMATE) die gleiche Idee hat.",
+            "DUPLICATE_INFO": "Das bedeutet, dass beide $t(GAME.COMMON.HINTS) gestrichen werden. \n\nEin guter $t(GAME.COMMON.HINT) ist hilfreich, aber falls du es zu einfach machst, kann es sein, dass ein anderer $t(COMMON.TEAMMATE) die gleiche Idee hat.",
             "TOGGLE_INFO_TITLE": "In dieser Runde bist du der $t(GAME.COMMON.ROUND_HOST)",
             "TOGGLE_INFO": "In jeder Runde ist ein Spieler der $t(GAME.COMMON.ROUND_HOST), dessen Aufgabe es ist, die $t(GAME.COMMON.HINTS) zu überprüfen und ggf. ungültige $t(GAME.COMMON.HINTS), die nicht automatisch erkannt wurden, zu streichen. Zum Beispiel $t(GAME.COMMON.HINTS), die Teile des zu erratenen Begriffs enthalten",
             "TOGGLE_BTN": "Benutze diesen Knopf an jedem $t(GAME.COMMON.HINT), um zwischen Anzeigen und Streichen zu wechseln.",

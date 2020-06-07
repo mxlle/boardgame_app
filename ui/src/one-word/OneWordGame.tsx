@@ -26,7 +26,8 @@ const styles = (theme: Theme) => createStyles({
         alignItems: 'center'
     },
     button: {
-        margin: theme.spacing(2)
+        margin: theme.spacing(1),
+        marginTop: theme.spacing(8)
     }
 });
 

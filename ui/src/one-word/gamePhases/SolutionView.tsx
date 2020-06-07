@@ -130,7 +130,11 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
 
         if (game.$isTutorial) {
             if (!currentRound.correct && !isRoundHost) {
-                leftCol.push(<Button onClick={() => nextTutorialStep()} className="tutorialBtn"><Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans></Button>);
+                leftCol.push(
+                    <Button onClick={() => {nextTutorialStep();this.props.triggerReload();}} className="tutorialBtn">
+                        <Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans>
+                    </Button>
+                );
             }
             leftCol.push(
                 <TutorialOverlay game={game} key="tutorial" />

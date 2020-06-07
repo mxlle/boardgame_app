@@ -6,7 +6,8 @@
         "ME": "Me",
         "UNDO": "Undo",
         "YOUR_TURN": "Your turn!",
-        "PLAYER_NAME": "Player name"
+        "PLAYER_NAME": "Player name",
+        "WELCOME_NAME": "Hi {{ name }}! Have fun!"
     },
     "HOME": {
         "GAME_NAME": "Game name",
@@ -134,14 +135,15 @@
             "NAME": "The first step is easy: enter your name",
             "COLOR": "Then choose a pen color",
             "JOIN": "Then you are ready to join the game",
-            "TEAMMATES": "$t(APP_TITLE) is a cooperative multiplayer game. Here you can find your $t(COMMON.TEAMMATES).",
+            "TEAMMATES": "$t(APP_TITLE) is a cooperative multiplayer game. \n\nHere you can find your $t(COMMON.TEAMMATES).",
             "WELCOME_NAME": "Hello {{name}}, nice to meet you!",
             "START_TITLE": "Start the game",
-            "START": "When everyone has joined you can start the game. You need at least 3 players. 4 - 7 players are recommended."
+            "START": "When everyone has joined you can start the game. \n\nYou need at least 3 players. \n4 - 7 players are recommended."
         },
         "PREPARATION": {
             "WELCOME": "Game preparation",
-            "WORD": "$t(APP_TITLE) is all about words. In the beginning everyone enters a word, which another $t(COMMON.TEAMMATE) has to guess later in the game based on some clues. Let's assume, you chose the word {{word}}.",
+            "EXPLANATION": "$t(APP_TITLE) is all about words. \n\nIn the beginning everyone enters a word, which another $t(COMMON.TEAMMATE) has to guess later in the game based on some clues.",
+            "WORD": "Let's assume, you chose the word {{word}}.",
             "SUBMIT": "Submit your word once you are ready"
         },
         "GAME": {
@@ -154,7 +156,7 @@
                 "3": "Enter another $t(GAME.COMMON.HINT) to help {{player}} to guess \"{{ word }}\"."
             },
             "DUPLICATE_INFO_TITLE": "Oh no! Two $t(COMMON.TEAMMATES) gave the same $t(GAME.COMMON.HINT).",
-            "DUPLICATE_INFO": "This means both $t(GAME.COMMON.HINTS) will be removed. Be careful to give a $t(GAME.COMMON.HINT) that's helpful but not too obvious, another $t(COMMON.TEAMMATE) might have the same idea.",
+            "DUPLICATE_INFO": "This means both $t(GAME.COMMON.HINTS) will be removed. \n\nBe careful to give a $t(GAME.COMMON.HINT) that's helpful but not too obvious, another $t(COMMON.TEAMMATE) might have the same idea.",
             "TOGGLE_INFO_TITLE": "In this round you are the $t(GAME.COMMON.ROUND_HOST)",
             "TOGGLE_INFO": "In each round one player becomes the $t(GAME.COMMON.ROUND_HOST) who has the task to check all the given $t(GAME.COMMON.HINTS) for invalid hints that have not been recognized automatically, e.g. duplicates with typos or $t(GAME.COMMON.HINTS) including parts of the word to guess.",
             "TOGGLE_BTN": "Use this button at each $t(GAME.COMMON.HINT) to toggle them between visible and removed",

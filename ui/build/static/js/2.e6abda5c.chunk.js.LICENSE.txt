@@ -4,6 +4,12 @@ object-assign
 @license MIT
 */
 
+/*!
+  Copyright (c) 2015 Jed Watson.
+  Based on code that is Copyright 2013-2015, Facebook, Inc.
+  All rights reserved.
+*/
+
 /**
  * A better abstraction over CSS.
  *
@@ -11,6 +17,14 @@ object-assign
  * @website https://github.com/cssinjs/jss
  * @license MIT
  */
+
+/**
+* @license nested-property https://github.com/cosmosio/nested-property
+*
+* The MIT License (MIT)
+*
+* Copyright (c) 2014-2015 Olivier Scherrer <pode.fr@gmail.com>
+*/
 
 /** @license React v0.19.1
  * scheduler.production.min.js

@@ -1,7 +1,8 @@
 import React from 'react';
 import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
-import { Grid, Button, Paper, Typography } from '@material-ui/core';
+import {Grid, Button, Paper, Typography, Box} from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
+import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
 import { Trans } from 'react-i18next';
 import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
@@ -23,8 +24,7 @@ type GameLobbyProps = {
 
 type GameLobbyState = {
     currentPlayer: IUser,
-    roundDialogOpen: boolean,
-    playerAdded?: boolean
+    roundDialogOpen: boolean
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -69,9 +69,14 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         if (this.props.setTheme && player.color) {
             this.props.setTheme(player.color);
         }
+        const name = player.name;
+        this.props.enqueueSnackbar(
+            <Box display="flex" alignItems="center">
+                <Box mr={1}><SentimentSatisfiedAltIcon/></Box>
+                <Trans i18nKey="COMMON.WELCOME_NAME">Hello {{ name }}</Trans>
+            </Box>, {});
         this.setState({
-            currentPlayer: player,
-            playerAdded: true
+            currentPlayer: player
         });
     }
 
@@ -112,7 +117,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
     render() {
         const { game } = this.props;
-        const { currentPlayer, roundDialogOpen, playerAdded } = this.state;
+        const { currentPlayer, roundDialogOpen } = this.state;
         const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
         const isHost: boolean = !!currentUserId && game.hostId === currentUserId;
         let isInGame: boolean = false;
@@ -124,7 +129,6 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 <WordHint key={player.id} hint={player.name} color={player.color} />
             )
         });
-        isInGame = isInGame || !!playerAdded;
         const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
         const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
 

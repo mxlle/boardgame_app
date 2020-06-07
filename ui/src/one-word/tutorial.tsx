@@ -198,37 +198,37 @@ function createTutorialRounds(game: IGame) {
 }
 
 export const TUTORIAL_WORDS: string[] = [
-    'Smartphone',
-    'Flamingo',
+    'Internet',
+    'Astronaut',
     'Titanic',
-    'Hogwarts'
+    'Quidditch'
 ];
 
 export const TUTORIAL_GUESSES: string[] = [
-    'Smartphone',
-    'Pigeon',
+    'Internet',
+    'Apollo',
     'Tiatnic',
-    'Hogwarts'
+    'Quidditch'
 ];
 
 export const TUTORIAL_HINTS: {[key: string]:  string[]} = {
-    'Smartphone': [
-        'Cell',
-        'Touchscreen',
-        'Apps'
+    'Internet': [
+        'online',
+        'www',
+        'Browser'
     ],
-    'Flamingo': [
-        'Bird',
-        'Pink',
-        'Pink'
+    'Astronaut': [
+        'NASA',
+        'Armstrong',
+        'Armstrong'
     ],
-    'Hogwarts': [
-        'Wizards',
-        'Harry',
-        'School'
+    'Quidditch': [
+        'Sport',
+        'Potter',
+        'Harry'
     ],
     'Titanic': [
-        'Ship',
+        'Iceberg',
         '1912',
         'Leonardo'
     ]
@@ -315,10 +315,15 @@ const JOYRIDE_INIT_STEPS: Step[][] = [
 const JOYRIDE_PREPARATION_STEPS: Step[][] = [
     [
         {
-            content: <Trans i18nKey="TUTORIAL.PREPARATION.WORD" tOptions={{word: TUTORIAL_WORDS[0]}}>Enter a word</Trans>,
+            content: <Trans i18nKey="TUTORIAL.PREPARATION.EXPLANATION">Enter a word</Trans>,
             title: <Trans i18nKey="TUTORIAL.PREPARATION.WELCOME">Game preparation</Trans>,
-            target: '.MuiTextField-root',
+            target: '.New-player',
+            placement: 'center',
             disableBeacon: true
+        },
+        {
+            content: <Trans i18nKey="TUTORIAL.PREPARATION.WORD" tOptions={{word: TUTORIAL_WORDS[0]}}>Enter word</Trans>,
+            target: '.MuiTextField-root'
         },
         {
             content: <Trans i18nKey="TUTORIAL.PREPARATION.SUBMIT">Submit your word</Trans>,
@@ -362,7 +367,7 @@ const JOYRIDE_COMPARING_STEPS: Step[][] = [
             title: <Trans i18nKey="TUTORIAL.GAME.TOGGLE_INFO_TITLE">Toggle hints</Trans>,
             target: '.Current-hints',
             spotlightClicks: false,
-            placement: 'left',
+            placement: 'center',
             disableBeacon: true
         },
         {
@@ -402,6 +407,7 @@ const JOYRIDE_SOLUTION_STEPS: Step[][] = [
             content: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO">Notice that duplicate hints will be removed</Trans>,
             title: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO_TITLE">Oh no!</Trans>,
             target: '.Current-hints',
+            placement: 'center',
             disableBeacon: true
         },
         {
@@ -417,6 +423,7 @@ const JOYRIDE_SOLUTION_STEPS: Step[][] = [
         {
             content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.INFO">You can count the result anyway</Trans>,
             target: '.Current-word',
+            placement: 'center',
             disableBeacon: true
         },
         {

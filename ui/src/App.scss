@@ -25,6 +25,10 @@ $breakPoint_md: 720px; // TODO
     @include flex-center;
 }
 
+.react-joyride__tooltip {
+    white-space: pre-line;
+}
+
 // app styles - TODO move to components
 
 .New-player, .Word-adder {

@@ -41,7 +41,7 @@ class TutorialOverlay extends React.Component<TutorialOverlayProps> {
                     skip:  <Trans i18nKey="TUTORIAL.CONTROLS.SKIP" defaultValue="Skip"/>
                 }}
                 getHelpers={getHelpers}
-                continuous spotlightClicks disableScrolling disableScrollParentFix
+                continuous spotlightClicks
             />
         );
     }
