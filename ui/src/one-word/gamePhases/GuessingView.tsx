@@ -10,7 +10,6 @@ import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../../common/TutorialOverlay";
 
 type GuessingViewProps = {
@@ -18,8 +17,7 @@ type GuessingViewProps = {
 }&WithSnackbarProps;
 
 type GuessingViewState = {
-    shownMessage: boolean,
-    joyrideHelpers?: StoreHelpers
+    shownMessage: boolean
 };
 
 class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> {
@@ -41,7 +39,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 
     guess(guess: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(guess); this.state.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(guess); return; }
         api.guess(this.props.game.id, guess);
     }
 
@@ -91,7 +89,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                         showInput={isGuesser}
                         submitHint={this.guess}
                         key="1" />),
-                    <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
+                    <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
                 rightCol={currentHints}

@@ -12,7 +12,6 @@ import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../../common/TutorialOverlay";
 
 type SolutionViewProps = {
@@ -21,8 +20,7 @@ type SolutionViewProps = {
 
 type SolutionViewState = {
     shownMessage: boolean,
-    shownResult: boolean,
-    joyrideHelpers?: StoreHelpers
+    shownResult: boolean
 };
 
 class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> {
@@ -44,7 +42,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     resolveRound(correct: boolean = true) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); this.state.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); return; }
         api.resolveRound(this.props.game.id, correct);
     }
 
@@ -129,8 +127,11 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         }
 
         if (game.$isTutorial) {
+            if (!currentRound.correct && !isRoundHost) {
+                leftCol.push(<Button onClick={() => nextTutorialStep()} className="tutorialBtn"><Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans></Button>);
+            }
             leftCol.push(
-                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
+                <TutorialOverlay game={game} key="tutorial" />
             )
         }
 

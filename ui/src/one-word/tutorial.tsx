@@ -91,15 +91,6 @@ function tutorialGuess(game: IGame, word?: string) {
     guess(game, word);
 
     game.phase = GamePhase.Solution;
-
-    if (game.rounds[game.round].hostId.length === 1) {
-        if (!game.rounds[game.round].correct) {
-            setTimeout(() => {
-                resolveRound(game, false);
-                saveTutorial(game);
-            }, MAGIC_TUTORIAL_DELAY)
-        }
-    }
 }
 
 function triggerAddingPlayer(game: IGame) {
@@ -227,9 +218,9 @@ export const TUTORIAL_HINTS: {[key: string]:  string[]} = {
         'Apps'
     ],
     'Flamingo': [
+        'Bird',
         'Pink',
-        'Pink',
-        'Bird'
+        'Pink'
     ],
     'Hogwarts': [
         'Wizards',
@@ -263,6 +254,9 @@ export function getCurrentTutorialSteps(game: IGame): Step[] {
     switch (game.phase) {
         case GamePhase.Init:
             steps = JOYRIDE_INIT_STEPS[game.players.length ? 1 : 0];
+            if (game.players.length > 0) {
+                steps[0].title = <Trans i18nKey="TUTORIAL.LOBBY.WELCOME_NAME" tOptions={{name:game.players[0].name}}>Hello friend</Trans>;
+            }
             break;
         case GamePhase.Preparation:
             steps = JOYRIDE_PREPARATION_STEPS[0];
@@ -289,67 +283,70 @@ export function getCurrentTutorialSteps(game: IGame): Step[] {
 const JOYRIDE_INIT_STEPS: Step[][] = [
     [
         {
-            content: <Trans i18nKey="TUTORIAL.LOBBY.ENTER">Enter your name</Trans>,
+            content: <Trans i18nKey="TUTORIAL.LOBBY.NAME">Enter your name</Trans>,
+            title: <Trans i18nKey="TUTORIAL.LOBBY.WELCOME">Welcome</Trans>,
             target: '.name-input',
             disableBeacon: true
         },
         {
             content: <Trans i18nKey="TUTORIAL.LOBBY.COLOR">Choose a color</Trans>,
-            target: '.name-input + div',
-            disableBeacon: true
+            target: '.name-input + div'
         },
         {
             content: <Trans i18nKey="TUTORIAL.LOBBY.JOIN">Join the game</Trans>,
-            target: '.submitBtn',
-            disableBeacon: true
+            target: '.submitBtn'
         }
     ],
     [
         {
             content: <Trans i18nKey="TUTORIAL.LOBBY.TEAMMATES">Here are your teammates</Trans>,
+            title: <Trans i18nKey="TUTORIAL.LOBBY.WELCOME_NAME">Hello friend</Trans>,
             target: '.Player-list',
             placement: 'left',
             disableBeacon: true
         },
         {
             content: <Trans i18nKey="TUTORIAL.LOBBY.START">Start the game</Trans>,
-            target: '.submitBtn',
-            disableBeacon: true
+            title: <Trans i18nKey="TUTORIAL.LOBBY.START_TITLE">Let's start</Trans>,
+            target: '.submitBtn'
         }
     ]
 ];
 const JOYRIDE_PREPARATION_STEPS: Step[][] = [
     [
         {
-            content: <Trans i18nKey="TUTORIAL.PREPARATION.WORD">Enter a word</Trans>,
+            content: <Trans i18nKey="TUTORIAL.PREPARATION.WORD" tOptions={{word: TUTORIAL_WORDS[0]}}>Enter a word</Trans>,
+            title: <Trans i18nKey="TUTORIAL.PREPARATION.WELCOME">Game preparation</Trans>,
             target: '.MuiTextField-root',
             disableBeacon: true
         },
         {
             content: <Trans i18nKey="TUTORIAL.PREPARATION.SUBMIT">Submit your word</Trans>,
-            target: '.submitBtn',
-            disableBeacon: true
+            target: '.submitBtn'
         }
     ]
 ];
 const JOYRIDE_WRITING_STEPS: Step[][] = [
     [
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT">Enter a hint</Trans>,
+            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.1" tOptions={{word: TUTORIAL_WORDS[0], player: TUTORIAL_PLAYERS[0].name}}>Enter a hint</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.TITLE1">First round</Trans>,
             target: '.WordHint-withInput',
             disableBeacon: true
         }
     ],
     [
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT">Enter a hint</Trans>,
+            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.2" tOptions={{word: TUTORIAL_WORDS[1], player: TUTORIAL_PLAYERS[1].name}}>Enter a hint</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.TITLE2">Second round</Trans>,
             target: '.WordHint-withInput',
             disableBeacon: true
         }
     ],
     [
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT">Enter a hint</Trans>,
+            content: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.3" tOptions={{word: TUTORIAL_WORDS[2], player: TUTORIAL_PLAYERS[2].name}}>Enter a hint</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.ENTER_HINT.TITLE3">Third round</Trans>,
             target: '.WordHint-withInput',
             disableBeacon: true
         }
@@ -362,6 +359,7 @@ const JOYRIDE_COMPARING_STEPS: Step[][] = [
     [
         {
             content: <Trans i18nKey="TUTORIAL.GAME.TOGGLE_INFO">Toggle hints</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.TOGGLE_INFO_TITLE">Toggle hints</Trans>,
             target: '.Current-hints',
             spotlightClicks: false,
             placement: 'left',
@@ -369,13 +367,11 @@ const JOYRIDE_COMPARING_STEPS: Step[][] = [
         },
         {
             content: <Trans i18nKey="TUTORIAL.GAME.TOGGLE_BTN">Use the smiley</Trans>,
-            target: '.MuiCheckbox-root',
-            disableBeacon: true
+            target: '.MuiCheckbox-root'
         },
         {
             content: <Trans i18nKey="TUTORIAL.GAME.START_GUESSING">Continue</Trans>,
-            target: '.submitBtn',
-            disableBeacon: true
+            target: '.submitBtn'
         }
     ],
     []
@@ -387,37 +383,59 @@ const JOYRIDE_GUESSING_STEPS: Step[][] = [
     [
         {
             content: <Trans i18nKey="TUTORIAL.GAME.GUESS">Guess the word</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.GUESS_TITLE">Your turn!</Trans>,
             target: '.WordCard-withInput',
             disableBeacon: true
         }
     ]
 ];
 const JOYRIDE_SOLUTION_STEPS: Step[][] = [
-    [],
-    [],
     [
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION_INFO">You can count the result anyway</Trans>,
-            target: '.CurrentWord',
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.CONTINUE" tOptions={{player: TUTORIAL_PLAYERS[0].name}}>This was correct. Let's continue</Trans>,
+            target: '.Current-word',
+            disableBeacon: true
+        },
+    ],
+    [
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO">Notice that duplicate hints will be removed</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO_TITLE">Oh no!</Trans>,
+            target: '.Current-hints',
             disableBeacon: true
         },
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION_WRONG">If wrong</Trans>,
-            target: '.submitBtn.wrong',
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.WRONG" tOptions={{player: TUTORIAL_PLAYERS[1].name}}>The answer was wrong</Trans>,
+            target: '.Current-word'
+        },
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.WRONG_CONTINUE">Press here to continue</Trans>,
+            target: '.tutorialBtn'
+        },
+    ],
+    [
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.INFO">You can count the result anyway</Trans>,
+            target: '.Current-word',
             disableBeacon: true
         },
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION_CORRECT">If correct</Trans>,
-            target: '.submitBtn.correct',
-            disableBeacon: true
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.COUNT_WRONG">If wrong</Trans>,
+            target: '.submitBtn.wrong'
+        },
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.COUNT_CORRECT">If correct</Trans>,
+            target: '.submitBtn.correct'
         }
     ],
     []
 ];
 const JOYRIDE_END_STEPS: Step[] = [
     {
-        content: <Trans i18nKey="TUTORIAL.GAME.END_INFO">That's it! And here are the results for this game</Trans>,
+        content: <Trans i18nKey="TUTORIAL.GAME.END_INFO">And here are the results for this game</Trans>,
+        title: <Trans i18nKey="TUTORIAL.GAME.END_INFO_TITLE">That's it!</Trans>,
         target: '.Game-end-view',
+        placement: 'center',
         disableBeacon: true
     }
 ];

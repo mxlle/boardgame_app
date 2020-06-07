@@ -13,7 +13,6 @@ import { getRandomColor } from '../common/ColorPicker';
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../common/TutorialOverlay";
 
 type GameLobbyProps = {
@@ -24,8 +23,7 @@ type GameLobbyProps = {
 type GameLobbyState = {
     currentPlayer: IUser,
     roundDialogOpen: boolean,
-    playerAdded?: boolean,
-    joyrideHelpers?: StoreHelpers
+    playerAdded?: boolean
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -56,7 +54,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     async addPlayer(player: IUser) {
-        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); this.state?.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); return; }
         const resultPlayer = await api.addPlayer(this.props.game.id, player);
         if (!resultPlayer) return;
         this.setLocalPlayer(resultPlayer);
@@ -76,7 +74,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     selectNumRounds() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); this.state.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
 
         this.setState({
             roundDialogOpen: true
@@ -138,19 +136,17 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                                         Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
                                     </Trans> 
                                 </Paper>
-                                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} />
                             </Grid>
                         ) : (
                             <Grid item xs={12}>
                                 <NewPlayer currentPlayer={currentPlayer}
                                     updatePlayer={this.setPlayerProps}
                                     addPlayer={this.addPlayer}/>
-                                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} />
                             </Grid>
                         )
                     }
                     {
-                        isInGame && (
+                        isInGame && !game.$isTutorial && (
                             <Grid item xs={12}>
                                 <Button variant="contained"
                                     startIcon={<ShareIcon />}
@@ -180,6 +176,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true} />}
                 </Grid>
                 <RoundSelector numOfPlayers={game.players.length} open={roundDialogOpen} onClose={this.startPreparation}/>
+                <TutorialOverlay key={isInGame ? '1' : '2'} game={game} />
             </Grid>
         );
     }

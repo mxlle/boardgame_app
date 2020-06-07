@@ -10,16 +10,13 @@ import { getRandomColor } from '../common/ColorPicker';
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
 import * as api from '../shared/apiFunctions';
 import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../common/TutorialOverlay";
 
 type GamePreparationProps = {
     game: IGame
 }
 
-type GamePreparationState = {
-    joyrideHelpers?: StoreHelpers
-}
+type GamePreparationState = {}
 
 export class GamePreparation extends React.Component<GamePreparationProps,GamePreparationState> {
     // TODO central place for player
@@ -36,7 +33,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
     }
 
     async addWords(words: string[]) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); this.state?.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
 
         let player: IUser = this.currentPlayer;
         player.enteredWords = words;
@@ -97,7 +94,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                     </Grid>
                     {listOfPlayers}
                 </Grid>
-                <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} />
+                <TutorialOverlay game={game} />
             </Grid>
         );
     }

@@ -2,6 +2,7 @@
     "APP_TITLE": "Nur ein Wort!",
     "COMMON": {
         "TEAMMATES": "Mitspieler",
+        "TEAMMATE": "Mitspieler",
         "ME": "Ich",
         "UNDO": "Rückgängig",
         "YOUR_TURN": "Du bist dran!",
@@ -24,14 +25,17 @@
     "GAME": {
         "COMMON": {
             "WORD": "Begriff",
+            "HINT": "Hinweis",
+            "HINTS": "Hinweise",
             "PLAYER_HINTS": "Spieler-Hinweise",
-            "ENTER_HINT": "Hinweis eingeben",
+            "ENTER_HINT": "$t(GAME.COMMON.HINT) eingeben",
             "TURN_GUESSING": "{{guesser}} ist mit Raten dran",
             "TURN_GUESSING_ME": "Ich bin mit Raten dran",
             "GUESS": "Rateversuch",
             "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",
             "CURRENT_GUESS": "{{guesserName}}s Rateversuch: {{guess}}",
-            "CURRENT_GUESS_ME": "Mein Rateversuch: {{guess}}"
+            "CURRENT_GUESS_ME": "Mein Rateversuch: {{guess}}",
+            "ROUND_HOST": "Spielleiter"
         },
         "LOBBY": {
             "ROUND_SELECT": {
@@ -70,9 +74,9 @@
             "RIGHT": "Richtige: {{rightCount}}",
             "WRONG": "Falsche: {{wrongCount}}",
             "PHASE": "Phase",
-            "PHASE_WRITING": "{{ playersString }} schreiben Hinweise auf...",
-            "PHASE_COMPARING": "{{ roundHostName }} überprüft die Hinweise auf ungültige oder doppelte Wörter...",
-            "PHASE_GUESSING": "{{ guesserName }} versucht den Begriff zu erraten...",
+            "PHASE_WRITING": "{{ playersString }} schreiben $t(GAME.COMMON.HINTS) auf...",
+            "PHASE_COMPARING": "{{ roundHostName }} überprüft die $t(GAME.COMMON.HINTS) auf ungültige oder doppelte Wörter...",
+            "PHASE_GUESSING": "{{ guesserName }} versucht den $t(GAME.COMMON.WORD) zu erraten...",
             "PHASE_SOLUTION": "{{ guesserName }} lag genau richtig!",
             "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ roundHostName }} entscheidet ob es trotzdem zählt..."
         },
@@ -87,7 +91,8 @@
         },
         "END": {
             "RIGHT": "Richtig ({{count}})",
-            "WRONG": "Falsch ({{count}})"
+            "WRONG": "Falsch ({{count}})",
+            "BACK_HOME": "Zurück zur Spieleliste"
         },
         "MESSAGE": {
             "RESULT": "{{guesserName}} hat geraten",
@@ -96,9 +101,9 @@
             "PREV_RESULT_CORRECT": "\"{{word}}\" zählt trotzdem!",
             "PREV_RESULT_WRONG": "\"{{word}}\" zählt nicht!",
             "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
-            "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Gib einen Hinweis ein.",
-            "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Markiere ungültige Hinweise.",
-            "YOUR_TURN_GUESSING": "$t(COMMON.YOUR_TURN) Versuche den Begriff zu erraten.",
+            "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Gib einen $t(GAME.COMMON.HINT) ein.",
+            "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Markiere ungültige $t(GAME.COMMON.HINTS).",
+            "YOUR_TURN_GUESSING": "$t(COMMON.YOUR_TURN) Versuche den $t(GAME.COMMON.WORD) zu erraten.",
             "YOUR_TURN_SOLUTION": "$t(COMMON.YOUR_TURN) Entscheide ob es trotzdem zählt."
         }
     },
@@ -114,12 +119,58 @@
         "EN": "English"
     },
     "TUTORIAL": {
+        "CONTINUE": "Tutorial fortsetzen",
+        "RESTART": "Tutorial von vorne beginnen",
+        "CLOSE": "Tutorial beenden",
         "CONTROLS": {
             "BACK": "Zurück",
             "CLOSE": "Schließen",
             "DONE": "Fertig",
             "NEXT": "Weiter",
             "SKIP": "Überspringen"
+        },
+        "LOBBY": {
+            "WELCOME": "Willkommen bei $t(APP_TITLE)",
+            "NAME": "Wir fangen einfach an: Gib deinen Namen ein",
+            "COLOR": "Dann wähle eine Stiftfarbe",
+            "JOIN": "Wenn du fertig bist, kann es losgehen",
+            "TEAMMATES": "$t(APP_TITLE) ist eine kooperatives Spiel. Hier siehst du deine $t(COMMON.TEAMMATES).",
+            "WELCOME_NAME": "Hallo {{name}}, schön dass du da bist!",
+            "START_TITLE": "Das Spiel starten",
+            "START": "Beginne das Spiel, sobald alle Mitspieler da sind. Es werden mindestens 3 Spieler benötigt. Empfohlen sind 4 - 7 Spieler."
+        },
+        "PREPARATION": {
+            "WELCOME": "Spielvorbereitung",
+            "WORD": "In $t(APP_TITLE) dreht sich alles um Wörter. Am Anfang gibt jeder Spieler einen $t(GAME.COMMON.WORD) ein, den ein $t(COMMON.TEAMMATE) später im Spiel mit Hilfe von Hinweisen erraten muss. Nehmen wir an du entscheidest dich für {{word}}.",
+            "SUBMIT": "Bestätige dein Wort, wenn du fertig bist"
+        },
+        "GAME": {
+            "ENTER_HINT": {
+                "TITLE1": "In $t(APP_TITLE) dreht sich alles um Wörter",
+                "1": "Gib ein Wort ein, das deinem $t(COMMON.TEAMMATE) dabei helfen könnte den aktuellen $t(GAME.COMMON.WORD) \"{{ word }}\" zu erraten.",
+                "TITLE2": "Weiter geht's mit der zweiten Runde",
+                "2": "Gib einen neuen $t(GAME.COMMON.HINT) ein um {{player}} zu helfen \"{{ word }}\" zu erraten.",
+                "TITLE3": "Wir starten Runde 3",
+                "3": "Gib wieder einen $t(GAME.COMMON.HINT) ein. Diesmal um {{player}} zu helfen \"{{ word }}\" zu erraten."
+            },
+            "DUPLICATE_INFO_TITLE": "Oh nein! Zwei $t(COMMON.TEAMMATES) haben den gleichen $t(GAME.COMMON.HINT) gegeben.",
+            "DUPLICATE_INFO": "Das bedeutet, dass beide $t(GAME.COMMON.HINTS) gestrichen werden. Ein guter $t(GAME.COMMON.HINT) ist hilfreich, aber falls du es zu einfach machst, kann es sein, dass ein anderer $t(COMMON.TEAMMATE) die gleiche Idee hat.",
+            "TOGGLE_INFO_TITLE": "In dieser Runde bist du der $t(GAME.COMMON.ROUND_HOST)",
+            "TOGGLE_INFO": "In jeder Runde ist ein Spieler der $t(GAME.COMMON.ROUND_HOST), dessen Aufgabe es ist, die $t(GAME.COMMON.HINTS) zu überprüfen und ggf. ungültige $t(GAME.COMMON.HINTS), die nicht automatisch erkannt wurden, zu streichen. Zum Beispiel $t(GAME.COMMON.HINTS), die Teile des zu erratenen Begriffs enthalten",
+            "TOGGLE_BTN": "Benutze diesen Knopf an jedem $t(GAME.COMMON.HINT), um zwischen Anzeigen und Streichen zu wechseln.",
+            "START_GUESSING": "Sobald du damit fertig bist, kannst du die  $t(GAME.COMMON.HINTS) für deinen $t(COMMON.TEAMMATE) zum Raten freigeben.",
+            "SOLUTION": {
+                "CONTINUE": "Super! {{player}} hat richtig geraten. Es kann weitergehen.",
+                "WRONG": "Mist! {{player}} lag falsch.",
+                "WRONG_CONTINUE": "Klicke hier um das Tutorial fortzusetzen",
+                "INFO": "Wenn der $t(GAME.COMMON.GUESS) nicht mit dem $t(GAME.COMMON.WORD) übereinstimmt, hat der $t(GAME.COMMON.ROUND_HOST) die Möglichkeit, den Versuch trotzdem zählen zu lassen, zum Beispiel wenn es nur einen Tippfehler gab oder der Versuch wirklich nah dran war.",
+                "COUNT_WRONG": "Falls es zu weit daneben liegt, klicke hier",
+                "COUNT_CORRECT": "Wenn es trotzdem zählen soll, klicke hier"
+            },
+            "GUESS_TITLE": "$t(COMMON.YOUR_TURN)",
+            "GUESS": "Schau dir die $t(GAME.COMMON.HINTS) deiner $t(COMMON.TEAMMATES) an und versuche den $t(GAME.COMMON.WORD) zu erraten.",
+            "END_INFO_TITLE": "So, das war's. Danke für's Mitspielen!",
+            "END_INFO": "Am Ende jedes Spiels findest du eine Übersicht aller Runden."
         }
     },
     "ERROR": {

@@ -12,7 +12,6 @@ import * as api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../../common/TutorialOverlay";
 
 type HintComparingViewProps = {
@@ -20,8 +19,7 @@ type HintComparingViewProps = {
 }&WithSnackbarProps;
 
 type HintComparingViewState = {
-    shownMessage: boolean,
-    joyrideHelpers?: StoreHelpers
+    shownMessage: boolean
 };
 
 class HintComparingView extends React.Component<HintComparingViewProps,HintComparingViewState> {
@@ -49,7 +47,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 
     showHints() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); this.state.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
         api.showHints(this.props.game.id);
     }
 
@@ -114,7 +112,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                         isGuesser={isGuesser}
                         color={guesser.color}
                         key="1" />),
-                    <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
+                    <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
                 rightCol={currentHints}

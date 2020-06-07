@@ -173,10 +173,10 @@ export function checkPrevResult(game: IGame, showSnackbar: any, onClose: () => v
         const prevRound = game.rounds[roundIndex];
         if (!prevRound.correct) {
             showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', {
-                context: prevRound.correct ? 'CORRECT' : 'WRONG',
+                context: prevRound.correct || prevRound.countAnyway ? 'CORRECT' : 'WRONG',
                 word: prevRound.guess
             }), {
-                variant: prevRound.correct ? 'success' : 'error',
+                variant: prevRound.correct || prevRound.countAnyway ? 'success' : 'error',
                 preventDuplicate: true,
                 onClose: onClose
             });

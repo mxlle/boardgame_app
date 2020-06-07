@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container } from '@material-ui/core';
+import {Box, Button, Container, createStyles, Grid, Theme, withStyles, WithStyles} from '@material-ui/core';
 import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
@@ -12,19 +12,33 @@ import { IGame, GamePhase } from '../types';
 
 import { loadGame } from '../shared/apiFunctions';
 import { setDocumentTitle } from '../shared/functions';
-import {loadTutorial, TUTORIAL_ID} from "./tutorial";
+import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
+import {Trans} from "react-i18next";
+import {RouteComponentProps, withRouter} from "react-router-dom";
 
 const POLLING_INTERVAL = 1000;
+
+const styles = (theme: Theme) => createStyles({
+    root: {
+        flex: '1 0 auto',
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center'
+    },
+    button: {
+        margin: theme.spacing(2)
+    }
+});
 
 type JustOneGameProps = {
     gameId: string,
     setTheme?: (color: string)=>void
-};
+}&RouteComponentProps&WithStyles<typeof styles>;
 type JustOneGameState = {
     currentGame?: IGame
 };
 
-export default class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
+class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = {};
     private _interval: number|undefined;
     private _isMounted: boolean = false;
@@ -59,13 +73,20 @@ export default class OneWordGame extends React.Component<JustOneGameProps,JustOn
     }
 
     render() {
-        const {setTheme} = this.props;
+        const {setTheme, history, classes} = this.props;
         const {currentGame} = this.state;
 
         if (!currentGame) return null;
 
         let gameContent;
         let gameStats;
+        let returnBtn;
+        let resetTutorialBtn;
+
+        const backToList = () => {
+            if (currentGame.$isTutorial) removeTutorial();
+            history.push('/');
+        };
 
         switch(currentGame.phase) {
             case GamePhase.Init:
@@ -92,14 +113,34 @@ export default class OneWordGame extends React.Component<JustOneGameProps,JustOn
                 break;
             case GamePhase.End:
                 gameContent = <GameEndView game={currentGame} />;
+                returnBtn = (
+                    <Grid item xs={12}>
+                        <Button className={classes.button} variant="outlined" onClick={backToList}>
+                            <Trans i18nKey={currentGame.$isTutorial ? 'TUTORIAL.CLOSE' : 'GAME.BACK_HOME'}>Back</Trans>
+                        </Button>
+                    </Grid>
+                );
                 break;
         }
 
+        if (currentGame.$isTutorial) {
+            const resetTutorial = () => { removeTutorial(); this.loadGame(); };
+            resetTutorialBtn = (
+                <Grid item xs={12}>
+                    <Button className={classes.button} variant="outlined" onClick={resetTutorial}><Trans i18nKey="TUTORIAL.RESTART">Restart tutorial</Trans></Button>
+                </Grid>
+            );
+        }
+
         return (
-            <Container maxWidth="lg" className="Game-content">
+            <Container maxWidth="lg" className={classes.root}>
                 {gameContent}
+                {returnBtn}
+                {resetTutorialBtn}
                 {gameStats}
             </Container>
         );
     }
 }
+
+export default withRouter(withStyles(styles)(OneWordGame));

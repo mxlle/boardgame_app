@@ -10,7 +10,6 @@ import * as api from '../../shared/apiFunctions';
 import {checkPrevResult, getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
-import {StoreHelpers} from "react-joyride";
 import TutorialOverlay from "../../common/TutorialOverlay";
 
 type HintWritingViewProps = {
@@ -19,8 +18,7 @@ type HintWritingViewProps = {
 
 type HintWritingViewState = {
     shownMessage: boolean,
-    shownPrevResult: boolean,
-    joyrideHelpers?: StoreHelpers
+    shownPrevResult: boolean
 };
 
 class HintWritingView extends React.Component<HintWritingViewProps, HintWritingViewState> {
@@ -42,7 +40,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     submitHint(hint: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(hint); this.state.joyrideHelpers?.close(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); return; }
         api.submitHint(this.props.game.id, hint);
     }
 
@@ -96,7 +94,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         isGuesser={isGuesser}
                         color={guesser.color}
                         key="1" />),
-                    <TutorialOverlay game={game} getHelpers={(helpers) => { this.setState({joyrideHelpers: helpers}); }} key="tutorial" />
+                    <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
                 rightCol={currentHints}

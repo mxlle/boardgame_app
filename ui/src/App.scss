@@ -15,9 +15,6 @@ $breakPoint_md: 720px; // TODO
 
 .MuiContainer-root {
     padding-bottom: 4*$gridSize; // TODO - because negative margin
-    &.Game-content { // TODO
-        min-height: 50vh;
-    }
 }
 
 .MuiAlert-filledInfo {
@@ -40,6 +37,8 @@ $breakPoint_md: 720px; // TODO
 }
 
 .Game-lobby, .Game-field, .Game-end-view {
+    flex: 1 0 auto;
+    align-items: flex-start;
     justify-content: center;
     @media(min-width: $breakPoint_md) {
         justify-content: space-between;

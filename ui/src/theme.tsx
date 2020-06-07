@@ -39,6 +39,13 @@ export function getTheme(primaryColor: string|null, prefersDarkMode: boolean): T
                 textTransform: 'capitalize',
             }
         },
+        overrides: {
+            MuiButton: {
+                outlined: {
+                    textTransform: 'none'
+                }
+            }
+        }
     };
 }
 
