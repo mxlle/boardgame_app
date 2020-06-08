@@ -7,7 +7,8 @@
         "UNDO": "Rückgängig",
         "YOUR_TURN": "Du bist dran!",
         "PLAYER_NAME": "Spielername",
-        "WELCOME_NAME": "Hallo {{ name }}! Viel Spaß!"
+        "WELCOME_NAME": "Hallo {{ name }}! Viel Spaß!",
+        "CONFETTI": "Konfetti!"
     },
     "HOME": {
         "GAME_NAME": "Spielname",
