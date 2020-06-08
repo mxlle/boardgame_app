@@ -15,6 +15,8 @@ class TutorialOverlay extends React.Component<TutorialOverlayProps> {
     render() {
         const { game, getHelpers, theme } = this.props;
 
+        //return null;
+
         if (!game.$isTutorial) return null;
 
         const joyrideSteps = getCurrentTutorialSteps(game);

@@ -54,7 +54,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         const guesser = getUserInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
 
-        if (!shownPrevResult) checkPrevResult(game, this.props.enqueueSnackbar, ()=>{ if(this._isMounted) this.setState({shownPrevResult: true}); }, i18n);
+        if (!shownPrevResult) {
+            checkPrevResult(game, this.props.enqueueSnackbar, i18n, this.props.triggerConfetti);
+            setTimeout(() => this.setState({shownPrevResult: true}), 0);
+        }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
@@ -68,9 +71,9 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
             if (hintIsMine && !hint && !shownMessage) {
                 this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_WRITING' }), {
                     variant: 'info',
-                    preventDuplicate: true,
-                    onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
+                    preventDuplicate: true
                 });
+                setTimeout(() => this.setState({shownMessage: true}), 0);
             }
 
             return (

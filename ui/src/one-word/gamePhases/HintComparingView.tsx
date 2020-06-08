@@ -67,9 +67,9 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         if (isRoundHost && !shownMessage) {
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_COMPARING' }), {
                 variant: 'info',
-                preventDuplicate: true,
-                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
+                preventDuplicate: true
             });
+            setTimeout(() => this.setState({shownMessage: true}), 0);
         }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');

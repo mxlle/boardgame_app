@@ -79,9 +79,9 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         if (isRoundHost && !currentRound.correct && !shownMessage) {
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'SOLUTION' }), {
                 variant: 'info',
-                preventDuplicate: true,
-                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
+                preventDuplicate: true
             });
+            setTimeout(() => this.setState({shownMessage: true}), 0);
         }
 
         if (!shownResult) {
@@ -89,9 +89,12 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             const variant = currentRound.correct ? 'success' : 'warning';
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.RESULT', `${guesserName} hat geraten`, { context: context, guesserName: guesserName, guess: currentRound.guess }), {
                 variant: variant,
-                preventDuplicate: true,
-                onClose: () =>{ if(this._isMounted) this.setState({shownResult: true}); }
+                preventDuplicate: true
             });
+            if (currentRound.correct && this.props.triggerConfetti) {
+                this.props.triggerConfetti();
+            }
+            setTimeout(() => this.setState({shownResult: true}), 0);
         }
 
         const leftCol = [];
@@ -131,7 +134,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         if (game.$isTutorial) {
             if (!currentRound.correct && !isRoundHost) {
                 leftCol.push(
-                    <Button onClick={() => {nextTutorialStep();this.props.triggerReload();}} className="tutorialBtn">
+                    <Button onClick={() => {nextTutorialStep();this.props.triggerReload();}} className="tutorialBtn" key="tutorialBtn">
                         <Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans>
                     </Button>
                 );

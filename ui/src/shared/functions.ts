@@ -20,6 +20,10 @@ export function generateId() {
 	return Math.random().toString(36).replace('0.', '');
 }
 
+export function randomInt(max: number) {
+	return Math.floor(Math.random()*max);
+}
+
 export function setDocumentTitle(gameName?: string) {
 	const appTitleFallback = 'Nur ein Wort!';
     if (gameName) {

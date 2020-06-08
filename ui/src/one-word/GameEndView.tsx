@@ -41,9 +41,8 @@ class GameEndView extends React.Component<GameEndViewProps> {
         });
 
         if (!shownPrevResult) {
-            checkPrevResult(game, this.props.enqueueSnackbar, ()=>{ 
-                if(this._isMounted) this.setState({shownPrevResult: true}); 
-            }, i18n);
+            checkPrevResult(game, this.props.enqueueSnackbar, i18n, this.props.triggerConfetti);
+            setTimeout(() => this.setState({shownPrevResult: true}), 0);
         }
 
         return (

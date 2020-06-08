@@ -56,9 +56,9 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         if (isGuesser && !shownMessage) {
             this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'GUESSING' }), {
                 variant: 'info',
-                preventDuplicate: true,
-                onClose: ()=>{ if(this._isMounted) this.setState({shownMessage: true}); }
+                preventDuplicate: true
             });
+            setTimeout(() => this.setState({shownMessage: true}), 0);
         }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
