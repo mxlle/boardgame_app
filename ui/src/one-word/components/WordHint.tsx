@@ -15,6 +15,7 @@ const styles = (theme: Theme) => createStyles({
         border: '2px solid black',
         whiteSpace: 'nowrap',
         position: 'relative',
+        padding: theme.spacing(0, 5)
     },
     writing: {
         borderStyle: 'dotted',

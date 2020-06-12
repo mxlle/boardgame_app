@@ -35,7 +35,7 @@ const styles = (theme: Theme) => createStyles({
 
 class CardIcon extends React.Component<CardIconProps> {
     render() {
-        const { type, classes } = this.props;
+        const { type, title, children, classes } = this.props;
 
         const rootClasses = [classes.root];
 
@@ -46,12 +46,12 @@ class CardIcon extends React.Component<CardIconProps> {
             <div className={rootClasses.join(' ')}>
                 {type === CardTypes.CORRECT && <CheckIcon fontSize="inherit"/>}
                 {type === CardTypes.WRONG && <ClearIcon fontSize="inherit"/>}
-                <div>{this.props.children}</div>
+                <div>{children}</div>
             </div>
         );
 
-        if (this.props.title) {
-            result = <Tooltip title={this.props.title} aria-label={this.props.title}>{result}</Tooltip>;
+        if (title) {
+            result = <Tooltip title={title} aria-label={title}>{result}</Tooltip>;
         }
 
         return result;

@@ -43,15 +43,15 @@ const HeaderBar = (props: HeaderBarProps) => {
     const [themeConfigOpen, setThemeConfigOpen] = React.useState(false);
     const [languageConfigOpen, setLanguageConfigOpen] = React.useState(false);
     const [language, setLanguage] = React.useState(i18n.language);
-    const [anchorEl, setAnchorEl] = React.useState(null);
+    const [anchorEl, setAnchorEl]: [HTMLButtonElement|undefined, (e: HTMLButtonElement|undefined)=>void] = React.useState();
 
     const openMenu = (event: React.MouseEvent<HTMLButtonElement>) => {
-        const target: any = event.currentTarget; // TODO 
+        const target = event.currentTarget;
         setAnchorEl(target);
     };
 
     const handleMenuClose = () => {
-        setAnchorEl(null);
+        setAnchorEl(undefined);
     };
 
     const changeLanguage = (lng: string) => {
@@ -93,7 +93,7 @@ const HeaderBar = (props: HeaderBarProps) => {
                     </IconButton>
                 }
                 <Menu
-                    anchorEl={anchorEl}
+                    anchorEl={anchorEl as HTMLButtonElement}
                     keepMounted
                     open={Boolean(anchorEl)}
                     onClose={handleMenuClose}
