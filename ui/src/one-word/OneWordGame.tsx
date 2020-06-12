@@ -11,7 +11,7 @@ import SolutionView from './gamePhases/SolutionView';
 import {GameEvent, GamePhase, IGame, ROOM_GAME} from '../types';
 
 import api from '../shared/apiFunctions';
-import {setDocumentTitle} from '../shared/functions';
+import {getCurrentUserInGame, setDocumentTitle} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans} from "react-i18next";
 import {RouteComponentProps, withRouter} from "react-router-dom";
@@ -41,7 +41,7 @@ type JustOneGameProps = {
 }&RouteComponentProps&WithStyles<typeof styles>;
 type JustOneGameState = {
     currentGame?: IGame,
-    triggerConfetti: ()=>void
+    triggerConfetti: (colors?: string[])=>void
 };
 
 export type OneWordGameChildProps = {
@@ -57,6 +57,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         this._isMounted = true;
 
         this.updateGame = this.updateGame.bind(this);
+        this.triggerConfetti = this.triggerConfetti.bind(this);
 
         this.loadGame();
         this.subscribeToGame();
@@ -87,12 +88,14 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 if (err) console.error('failed to subscribe to game', gameId);
             });
             socket.on(GameEvent.Update, this.updateGame);
+            socket.on(GameEvent.Confetti, this.triggerConfetti);
         }
     }
 
     unsubscribeFromGame() {
         socket.emit(GameEvent.Unsubscribe, ROOM_GAME(this.props.gameId))
         socket.off(GameEvent.Update, this.updateGame);
+        socket.off(GameEvent.Confetti, this.triggerConfetti);
         tutorialEmitter.off(GameEvent.Update, this.updateGame);
     }
 
@@ -106,9 +109,13 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         });
     }
 
+    triggerConfetti(colors?: string[]) {
+        this.state.triggerConfetti(colors);
+    }
+
     render() {
         const {setTheme, history, classes} = this.props;
-        const {currentGame, triggerConfetti} = this.state;
+        const {currentGame} = this.state;
 
         if (!currentGame) return null;
 
@@ -122,10 +129,21 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         const triggerConfettiSave = async () => {
             if (!this._confettiTriggered) {
                 this._confettiTriggered = true;
-                await triggerConfetti();
+                await this.triggerConfetti();
                 this._confettiTriggered = false;
             }
         };
+
+        const sendConfetti = () => {
+            if (this.state.currentGame?.id === TUTORIAL_ID) {
+                this.triggerConfetti();
+            } else {
+                const color = getCurrentUserInGame(currentGame)?.color;
+                const colors = color ? [color] : undefined;
+                socket.emit(GameEvent.Confetti, currentGame.id, colors);
+                this.triggerConfetti(colors);
+            }
+        }
 
         switch(currentGame.phase) {
             case GamePhase.Init:
@@ -161,7 +179,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 );
                 confettiBtn = (
                     <Grid item xs={12} className={classes.button}>
-                        <Button variant="outlined" onClick={triggerConfetti}>
+                        <Button variant="outlined" onClick={sendConfetti}>
                             <Trans i18nKey="COMMON.CONFETTI">Confetti!</Trans>
                         </Button>
                     </Grid>

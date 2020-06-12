@@ -5,7 +5,7 @@ import { withSnackbar, WithSnackbarProps } from 'notistack';
 import {Grid, Typography} from '@material-ui/core';
 import WordCard from './components/WordCard';
 import { IGame } from '../types';
-import {checkPrevResult, getCorrectRounds, getWrongRounds} from "./gameFunctions";
+import {checkPrevResult, getCorrectRounds, getPlayerInGame, getWrongRounds} from "./gameFunctions";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
 
@@ -34,10 +34,10 @@ class GameEndView extends React.Component<GameEndViewProps> {
         const game: IGame = this.props.game;
         const { shownPrevResult } = this.state;
         const correctWords = getCorrectRounds(game).map(round => {
-            return <WordCard key={round.word} small word={round.word} guess={round.guess} guessedRight={true}/>
+            return <WordCard key={round.word} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={true}/>
         });
         const wrongWords = getWrongRounds(game).map(round => {
-            return <WordCard key={round.word} small word={round.word} guess={round.guess} guessedRight={false}/>
+            return <WordCard key={round.word} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={false}/>
         });
 
         if (!shownPrevResult) {

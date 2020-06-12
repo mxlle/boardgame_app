@@ -1,7 +1,7 @@
 import http from 'http';
 import SocketIO from "socket.io";
 import GameApi from './routes/Games';
-import {GameEvent, IGameApi} from "@gameTypes";
+import {GameEvent, IGameApi, ROOM_GAME} from "@gameTypes";
 
 
 export const httpServer = http.createServer();
@@ -36,6 +36,9 @@ io.on('connection', (socket) => {
     });
     socket.on(GameEvent.Unsubscribe, (room: string, ack: ErrorFirstCallback) => {
         socket.leave(room, ack);
+    });
+    socket.on(GameEvent.Confetti, (gameId: string, colors: string[]) => {
+        socket.in(ROOM_GAME(gameId)).emit(GameEvent.Confetti, colors);
     });
 });
 

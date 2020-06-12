@@ -1,10 +1,10 @@
 import {SETTING_ID} from './constants';
 import i18n from '../i18n';
 import {IGame, IUser} from "../types";
-import {getUserInGame} from "../one-word/gameFunctions";
+import {getPlayerInGame} from "../one-word/gameFunctions";
 
 export function getCurrentUserInGame(game: IGame): IUser | undefined {
-	return getUserInGame(game, getCurrentUserId());
+	return getPlayerInGame(game, getCurrentUserId());
 }
 
 export function getCurrentUserId() {

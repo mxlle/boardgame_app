@@ -7,6 +7,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 import { STYLES } from '../../theme';
 import WordHintInput from './WordHintInput';
 import CornerInfo from '../../common/CornerInfo';
+import {IUser} from "../../types";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -19,7 +20,7 @@ const styles = (theme: Theme) => createStyles({
         maxHeight: '30vh',
         minHeight: 150,
         fontSize: 32,
-        border: '2px solid black',
+        border: `2px solid ${theme.palette.text.primary}`,
         whiteSpace: 'nowrap',
         position: 'relative',
         padding: theme.spacing(0, 5)
@@ -27,11 +28,10 @@ const styles = (theme: Theme) => createStyles({
     guess: {
         ...STYLES.handwriting
     },
-    correct: {
-        borderColor: theme.palette.success.main
-    },
     wrong: {
-        borderColor: theme.palette.error.main
+        '& $guess': {
+            textDecoration: 'line-through'
+        }
     }, 
     small: {
         maxWidth: 250,
@@ -44,44 +44,42 @@ const styles = (theme: Theme) => createStyles({
 
 type WordCardProps = {
 	word: string;
-	guesser?: string;
-	color?: string;
+	guesser?: IUser;
     isGuesser?: boolean;
     guess?: string;
     guessedRight?: boolean|null;
-    showInput?: boolean;
     small?: boolean;
-    submitHint?: (hint:string)=>void
+    submitGuess?: (hint:string)=>void
 }&WithStyles<typeof styles>;
 
 class WordCard extends React.Component<WordCardProps> {
 
     render() {
-        const { word, guesser, color, isGuesser, guess, guessedRight, showInput, submitHint, small, classes} = this.props;
+        const { word, guesser, isGuesser, guess, guessedRight, submitGuess, small, classes} = this.props;
 
         const classList = [classes.wordCard];
-        const cardStyle = {borderColor: color};
+        const cardStyle = {borderColor: guesser?.color};
         let guesserText, originalWord;
+        guesserText = guesser?.name;
         
         if (guess) {
             originalWord = i18n.t('GAME.COMMON.WORD', 'Begriff') + ': ' + word;
-            classList.push(guessedRight ? classes.correct : classes.wrong);
-            delete cardStyle.borderColor;
-        } else if (guesser) {
-            guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesser}} muss raten</Trans>;
+            if (!guessedRight) classList.push(classes.wrong);
+        } else if (guesser && guesser.name) {
+            guesserText = <Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}}>{{guesser: guesser.name}} muss raten</Trans>;
         }
         if (small) classList.push(classes.small);
-        if (showInput) classList.push('WordCard-withInput');
+        if (submitGuess) classList.push('WordCard-withInput');
 
         return (
             <Grid item xs={12} className={small ? classes.root : undefined}>
     	        <Paper className={classList.join(' ')} style={cardStyle}>
     	        	{
-                        (showInput && submitHint) ? 
-                        <WordHintInput submitHint={submitHint} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> : 
-                        <span className={guess && classes.guess} style={{color: guess && color}}>{guess || word}</span>
+                        (submitGuess) ?
+                        <WordHintInput submitHint={submitGuess} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> :
+                        <span className={guess && classes.guess} style={{color: (guess) ? guesser?.color : undefined}}>{guess || word}</span>
                     }
-                    <CornerInfo bottom left handwriting color={color} m={2}>{guesserText}</CornerInfo>
+                    <CornerInfo bottom left handwriting color={guesser?.color} m={2}>{guesserText}</CornerInfo>
                     <CornerInfo bottom right m={2}>{originalWord}</CornerInfo>
     	        </Paper>
             </Grid>

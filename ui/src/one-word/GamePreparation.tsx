@@ -62,7 +62,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         });
 
         const defaultValue: string|undefined = game.$isTutorial ? TUTORIAL_WORDS[0] : undefined;
-        const myWordCards = myWords.map(word => <WordCard key={word} small word={word} color={this.currentPlayer.color}/>)
+        const myWordCards = myWords.map(word => <WordCard key={word} small word={word} />)
 
         // TODO not in game users
         // TODO css classes

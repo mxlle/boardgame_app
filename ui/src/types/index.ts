@@ -72,7 +72,8 @@ export enum GameEvent {
     Unsubscribe = 'unsubscribe',
     UpdateList = 'updateGameList',
     Update = 'updateGame',
-    ApiCall = 'apiCall.Games'
+    ApiCall = 'apiCall.Games',
+    Confetti = 'confetti'
 }
 
 export const ROOM_GAME_LIST = 'gameList';

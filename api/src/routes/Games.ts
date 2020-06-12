@@ -75,6 +75,7 @@ class GameApi implements IGameApi {
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
 
         return true;
     };

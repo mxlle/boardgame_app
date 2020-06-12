@@ -9,7 +9,7 @@ import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {getUserInGame} from "../gameFunctions";
+import {getPlayerInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
@@ -57,7 +57,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const { shownMessage } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
-        const guesser = getUserInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
+        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = guesser.name;
         const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
@@ -73,7 +73,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getUserInGame(game, hintObj.authorId) || { name: '?', id: '?' };
+            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
@@ -109,9 +109,8 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                 leftCol={[
                     (<WordCard
                         word={currentWord} 
-                        guesser={guesser.name} 
+                        guesser={guesser}
                         isGuesser={isGuesser}
-                        color={guesser.color}
                         key="1" />),
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}

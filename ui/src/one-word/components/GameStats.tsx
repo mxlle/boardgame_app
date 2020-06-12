@@ -4,7 +4,7 @@ import i18n from '../../i18n';
 import { IGame, GamePhase } from '../../types';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";
-import {getCorrectRounds, getUserInGame, getWrongRounds} from "../gameFunctions";
+import {getCorrectRounds, getPlayerInGame, getWrongRounds} from "../gameFunctions";
 
 type GameStatsProps = {
     game: IGame
@@ -46,9 +46,9 @@ class GameStats extends React.Component<GameStatsProps> {
         const {game, classes} = this.props;
         const currentRound = game.rounds[game.round];
 
-        const roundHost = getUserInGame(game, currentRound.hostId) || { name: '?' };
+        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?' };
         const roundHostName = roundHost.name;
-        const guesser = getUserInGame(game, currentRound.guesserId) || { name: '?' };
+        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?' };
         const guesserName = guesser.name;
 
         let gamePhase;

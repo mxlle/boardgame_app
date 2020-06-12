@@ -9,7 +9,7 @@ import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {getUserInGame} from "../gameFunctions";
+import {getPlayerInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
@@ -52,7 +52,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         const { shownMessage, shownResult } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
-        const guesser = getUserInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
+        const guesser = getPlayerInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
         const guesserName = guesser.name;
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
@@ -61,7 +61,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         const currentGuess = currentRound.guess;
         const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getUserInGame(game, hintObj.authorId) || { name: '?', id: '?' };
+            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
@@ -101,9 +101,8 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             <WordCard 
                 key="wordCard"
                 word={currentWord} 
-                guesser={guesser.name} 
+                guesser={guesser}
                 isGuesser={isGuesser}
-                color={guesser.color}
                 guess={currentGuess} 
                 guessedRight={currentRound.correct} />
         );

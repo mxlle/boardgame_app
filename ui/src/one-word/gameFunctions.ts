@@ -163,7 +163,7 @@ export function emptyGame(): IGame {
     };
 }
 
-export function getUserInGame(game: IGame, userId?: string): IUser | undefined {
+export function getPlayerInGame(game: IGame, userId?: string): IUser | undefined {
     return game.players.find((player: IUser) => player.id === userId);
 }
 

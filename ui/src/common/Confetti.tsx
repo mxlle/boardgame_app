@@ -1,6 +1,6 @@
 import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
-import { create } from 'canvas-confetti';
+import { create, CreateTypes } from 'canvas-confetti';
 import {allColors} from "./ColorPicker";
 
 const styles = (theme: Theme) => createStyles({
@@ -26,6 +26,7 @@ type ConfettiProps = {
 
 class Confetti extends React.Component<ConfettiProps> {
     private canvasRef: React.RefObject<HTMLCanvasElement>;
+    private confettiCannon: CreateTypes|undefined;
 
     constructor(props: ConfettiProps) {
         super(props);
@@ -36,29 +37,34 @@ class Confetti extends React.Component<ConfettiProps> {
 
     }
 
-    async triggerConfetti () {
-        if (this.canvasRef.current) {
-            const confettiCannon = create(this.canvasRef.current, {
+    getConfettiCannon() {
+        if (!this.confettiCannon && this.canvasRef.current) {
+            this.confettiCannon = create(this.canvasRef.current, {
                 resize: true
             });
-
-            const CONFETTI_BASE_OPTIONS = {
-                colors: allColors,
-                startVelocity: 70,
-                particleCount: 70,
-                spread: 60
-            }
-            confettiCannon({
-                ...CONFETTI_BASE_OPTIONS,
-                angle: 125,
-                origin: { x: 1, y: 1 },
-            });
-            await confettiCannon({
-                ...CONFETTI_BASE_OPTIONS,
-                angle: 55,
-                origin: { x: 0, y: 1 }
-            });
         }
+        return this.confettiCannon;
+    }
+
+    triggerConfetti (colors?: string[]) {
+        const confettiCannon = this.getConfettiCannon();
+        if (!confettiCannon) return;
+        const CONFETTI_BASE_OPTIONS = {
+            colors: colors || allColors,
+            startVelocity: 70,
+            particleCount: 70,
+            spread: 60
+        }
+        confettiCannon({
+            ...CONFETTI_BASE_OPTIONS,
+            angle: 125,
+            origin: { x: 1, y: 1 },
+        });
+        confettiCannon({
+            ...CONFETTI_BASE_OPTIONS,
+            angle: 55,
+            origin: { x: 0, y: 1 }
+        });
     }
 
     render() {
