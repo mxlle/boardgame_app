@@ -8,7 +8,11 @@ import { STYLES } from '../../theme';
 
 const styles = (theme: Theme) => createStyles({
     root: {
-        ...STYLES.flexCenter
+        ...STYLES.flexCenter,
+        width: '100%',
+        '& button': {
+            marginRight: theme.spacing(-1.5)
+        }
     }
 });
 
@@ -51,10 +55,8 @@ class WordHintInput extends React.Component<WordHintInputProps,WordHintInputStat
         const { label, classes } = this.props;
         const { value } = this.state;
 
-        // TODO ml calc based on label
-
         return (
-	        <Box width={1} ml={label ? 5 : 7} mr={2} className={classes.root}>
+	        <Box className={classes.root}>
 	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
                     fullWidth
 	        		value={value}

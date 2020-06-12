@@ -88,8 +88,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                 gamesLoading: false
             });
         } catch(e) {
-            console.log(e);
-            this.props.enqueueSnackbar(i18n.t('ERROR.LOAD_GAMES', 'Fehler'), { variant: 'error' });
+            this.props.enqueueSnackbar(<Trans i18nKey="ERROR.LOAD_GAMES">Fehler</Trans>, { variant: 'error' });
             this.setState({
                 gamesLoading: false
             });
@@ -109,7 +108,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                 </Button>
             </React.Fragment>
         );
-        this.props.enqueueSnackbar(i18n.t('HOME.DELETED_GAME', 'Spiel gelöscht'), {
+        this.props.enqueueSnackbar(<Trans i18nKey="HOME.DELETED_GAME">Deleted Game</Trans>, {
             action: action,
             onClose: (_: any, reason: CloseReason) => {
                 if (reason !== 'instructed') {
@@ -140,7 +139,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
             this.props.history.push('/'+gameId);
 
         } catch(e) {
-            this.props.enqueueSnackbar(i18n.t('ERROR.CREATE_GAME', 'Fehler'), { variant: 'error' });
+            this.props.enqueueSnackbar(<Trans i18nKey="ERROR.CREATE_GAME">Error</Trans>, { variant: 'error' });
         }
     }
 

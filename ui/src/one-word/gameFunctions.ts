@@ -3,7 +3,7 @@
 import {DEFAULT_NUM_WORDS, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
 
 export function addPlayer(game: IGame, player: IUser) {
-    if (!game.hostId) game.hostId = player.id; // TODO still needed?
+    if (!game.hostId) game.hostId = player.id; // backup plan
     if (!player.enteredWords) player.enteredWords = [];
     game.players.push(player);
 
