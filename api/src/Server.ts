@@ -1,79 +1,44 @@
-import cookieParser from 'cookie-parser';
-import morgan from 'morgan';
-import path from 'path';
-import helmet from 'helmet';
-const cors = require('cors');
-
-import express, { Request, Response, NextFunction } from 'express';
-import { BAD_REQUEST } from 'http-status-codes';
-import 'express-async-errors';
-
-import BaseRouter from './routes';
-import logger from '@shared/Logger';
+import http from 'http';
+import SocketIO from "socket.io";
+import GameApi from './routes/Games';
 
 
-// Init express
-const app = express();
+export const httpServer = http.createServer();
+const io = SocketIO(httpServer, {
+    path: '/api',
+    serveClient: false,
+});
 
-
-
-/************************************************************************************
- *                              Set basic express settings
- ***********************************************************************************/
-
-app.use(express.json());
-app.use(express.urlencoded({extended: true}));
-app.use(cookieParser());
-
-// Show routes called in console during development
-if (process.env.NODE_ENV === 'development') {
-    app.use(morgan('dev'));
+interface GamesApiCall {
+    action: keyof typeof GameApi,
+    auth: string,
+    params?: any
 }
+type ErrorFirstCallback = (error?: any, data?: any) => void;
 
-// Security
-if (process.env.NODE_ENV === 'production') {
-    app.use(helmet());
-}
+io.on('connection', (socket) => {
+    // GameController
+    socket.on('apiCall.Games', ({ action, auth, params }: GamesApiCall, ack: ErrorFirstCallback) => {
+        if (!GameApi.hasOwnProperty(action)) {
+            ack('Invalid action');
+        }
 
-var whitelist = process.env.UI_URL ? process.env.UI_URL.split(',') : [];
-var corsOptions = {
-  origin: function (origin: string, callback: any) {
-    if (undefined === origin || whitelist.indexOf(origin) !== -1) {
-      callback(null, true)
-    } else {
-      callback(new Error('Not allowed by CORS'))
-    }
-  }
-}
+        let handler = GameApi[action];
 
-app.use(cors(corsOptions));
+        handler(io.sockets, auth, params||{})
+            .then((responseData: any) => ack(null, responseData))
+            .catch((error: any) => ack(error));
+    });
 
-app.set('trust proxy', process.env.TRUST_PROXY || false);
-
-// Add APIs
-app.use('/api', BaseRouter);
-
-// Print API errors
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-    logger.error(err.message, err);
-    return res.status(BAD_REQUEST).json({
-        error: err.message,
+    socket.on('subscribe', (room: string, ack: ErrorFirstCallback) => {
+        // TODO authentication
+        socket.join(room, ack);
+        console.log('joined room ', room);
+    });
+    socket.on('unsubscribe', (room: string, ack: ErrorFirstCallback) => {
+        socket.leave(room, ack);
+        console.log('left room ', room);
     });
 });
 
-
-
-/************************************************************************************
- *                              Serve front-end content
- ***********************************************************************************/
-
-const viewsDir = path.join(__dirname, 'views');
-app.set('views', viewsDir);
-const staticDir = path.join(__dirname, 'public');
-app.use(express.static(staticDir));
-app.get('*', (req: Request, res: Response) => {
-    res.sendFile('index.html', {root: viewsDir});
-});
-
-// Export express instance
-export default app;
+export default io;

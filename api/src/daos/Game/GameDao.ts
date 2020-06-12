@@ -4,8 +4,8 @@ import { GameModel } from "@daos/Mongoose/models";
 export interface IGameDao {
     getOne: (id: string) => Promise<IGame | null>;
     getAll: () => Promise<IGame[]>;
-    add: (game: IGame) => Promise<void>;
-    update: (game: IGame) => Promise<void>;
+    add: (game: IGame) => Promise<IGame>;
+    update: (game: IGame) => Promise<IGame>;
     delete: (id: string) => Promise<void>;
 }
 
@@ -28,8 +28,8 @@ class GameDao implements IGameDao {
      *
      * @param game
      */
-    public async add(game: IGame): Promise<void> {
-        await new GameModel(game).save();
+    public async add(game: IGame): Promise<IGame> {
+        return await new GameModel(game).save();
     }
 
 
@@ -37,8 +37,8 @@ class GameDao implements IGameDao {
      *
      * @param game
      */
-    public async update(game: IGame): Promise<void> {
-        await game.save();
+    public async update(game: IGame): Promise<IGame> {
+        return await game.save();
     }
 
 

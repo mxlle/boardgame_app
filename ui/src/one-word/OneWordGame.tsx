@@ -17,6 +17,7 @@ import {Trans} from "react-i18next";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
+import socket, {tutorialEmitter} from "../shared/socket";
 
 const POLLING_INTERVAL = 1000;
 
@@ -52,21 +53,21 @@ export type OneWordGameChildProps = {
 
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = { triggerConfetti: ()=>{} };
-    private _interval: number|undefined;
     private _isMounted: boolean = false;
     private _confettiTriggered: boolean = false;
 
     componentDidMount() {
         this._isMounted = true;
 
-        this.loadGame();
+        this.updateGame = this.updateGame.bind(this);
 
-        this._interval = window.setInterval(this.loadGame.bind(this), POLLING_INTERVAL);
+        this.loadGame();
+        this.subscribeToGame();
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        clearInterval(this._interval);
+        this.unsubscribeFromGame();
     }
 
     async loadGame() {
@@ -77,8 +78,31 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         } else {
             game = await loadGame(id);
         }
+        if (game) this.updateGame(game);
+    }
+
+    subscribeToGame() {
+        const { gameId } = this.props;
+        if (gameId === TUTORIAL_ID) {
+            tutorialEmitter.on('updateGame', this.updateGame);
+        } else {
+            socket.emit('subscribe', `game.${this.props.gameId}`, (err: any) => {
+                if (!err) console.debug('subscribed to game', this.props.gameId);
+                if (err) console.error('failed to subscribe to game', this.props.gameId);
+            });
+            socket.on('updateGame', this.updateGame);
+        }
+    }
+
+    unsubscribeFromGame() {
+        socket.off('updateGame', this.updateGame);
+        tutorialEmitter.off('updateGame', this.updateGame);
+    }
+
+    updateGame(game: IGame) {
         if (!this._isMounted) return;
-        if (!game) return;
+        if (this.props.gameId != game.id) return;
+
         setDocumentTitle(game.name);
         this.setState({
             currentGame: game
@@ -86,14 +110,19 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     }
 
     render() {
-        const {setTheme, history, classes} = this.props;
+        const {setTheme, history, classes, gameId} = this.props;
         const {currentGame, triggerConfetti} = this.state;
 
         if (!currentGame) return null;
 
         let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn;
 
-        const triggerReload = () => this.loadGame();
+        const triggerReload = () => {
+            if (gameId === TUTORIAL_ID) {
+                const game = loadTutorial();
+                this.updateGame(game)
+            }
+        };
 
         const backToList = () => {
             if (currentGame.$isTutorial) removeTutorial();

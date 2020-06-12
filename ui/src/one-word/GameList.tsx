@@ -16,6 +16,7 @@ import { IGame, GamePhase } from '../types';
 
 import { SETTING_ID, SETTING_NAME } from '../shared/constants';
 import {getCurrentUserInGame} from "../shared/functions";
+import socket from "../shared/socket";
 
 type GameListProps = {
     allGames: IGame[],
@@ -28,6 +29,17 @@ type GameListState = {
 export class GameList extends React.Component<GameListProps,GameListState> {
     public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
+
+    componentDidMount() {
+        socket.emit('subscribe', 'lobby', (err: any) => console.error('subscribe lobby', err));
+        socket.on('updateGameList', () => {
+            console.log('updateGameList');
+        })
+    }
+
+    componentWillUnmount() {
+        socket.emit('unsubscribe', 'lobby', (err: any) => console.error('unsubscribe lobby', err));
+    }
 
     render() {
         const {allGames,deleteGame} = this.props;

@@ -1,141 +1,68 @@
 import { getCurrentUserId } from './functions';
 import { IGame, IUser } from '../types';
-
-// api url
-export const API_URL = '/api';
-export const GAME_URL = API_URL + '/games';
+import socket from './socket';
 
 export async function loadGames(): Promise<IGame[]> {
-    return (await _get('all')).games || [];
+    return (await _apiCall('allGames')).games || [];
 }
 
-export async function loadGame(id: string): Promise<IGame> {
-    return (await _get(id)).game;
+export async function loadGame(gameId: string): Promise<IGame> {
+    return (await _apiCall('loadGame', {gameId})).game;
 }
 
 export async function createGame(game: IGame): Promise<{id:string,playerId:string}> {
-    return _post('add', {game});
+    return _apiCall('addGame', {game});
 }
 
-export function deleteGame(id: string) {
-    return _delete(`delete/${id}`);
+export function deleteGame(gameId: string) {
+    return _apiCall('delete', {gameId});
 }
 
-export async function addPlayer(id: string, player: IUser): Promise<IUser> {
-    return (await _put(`${id}/addPlayer`, {player})).player;
+export async function addPlayer(gameId: string, player: IUser): Promise<IUser> {
+    return (await _apiCall('addPlayer', {gameId, player})).player;
 }
 
-export async function updatePlayer(id: string, player: IUser): Promise<IUser> {
-    return (await _put(`${id}/updatePlayer`, {player})).player;
+export async function updatePlayer(gameId: string, player: IUser): Promise<IUser> {
+    return (await _apiCall('updatePlayer', {gameId, player})).player;
 }
 
-export function startPreparation(id: string, wordsPerPlayer: number) {
-    return _put(`${id}/startPreparation`, {wordsPerPlayer});
+export function startPreparation(gameId: string, wordsPerPlayer: number) {
+    return _apiCall('startPreparation', {gameId, wordsPerPlayer});
 }
 
-export function submitHint(id: string, hint: string) {
-    return _put(`${id}/hint`, {hint});
+export function submitHint(gameId: string, hint: string) {
+    return _apiCall('hint', {gameId, hint});
 }
 
-export function toggleDuplicate(id: string, hintIndex: number) {
-    return _put(`${id}/toggleDuplicateHint`, {hintIndex});
+export function toggleDuplicate(gameId: string, hintIndex: number) {
+    return _apiCall('toggleDuplicateHint', {gameId, hintIndex});
 }
 
-export function showHints(id: string) {
-    return _put(`${id}/showHints`);
+export function showHints(gameId: string) {
+    return _apiCall('showHints', {gameId});
 }
 
-export function guess(id: string, guess: string) {
-    return _put(`${id}/guess`, {guess});
+export function guess(gameId: string, guess: string) {
+    return _apiCall('guess', {gameId, guess});
 }
 
-export function resolveRound(id: string, correct: boolean) {
-    return _put(`${id}/resolve`, {correct});
+export function resolveRound(gameId: string, correct: boolean) {
+    return _apiCall('resolveRound', {gameId, correct});
 }
 
-
-function _get(endpoint: string): Promise<any> {
+function _apiCall(action: string, params?: object): Promise<any> {
+    params = params || {};
     return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'GET',
-            headers: {
-                ..._getAuthHeader()
-            }
-        })
-            .then(res => res.json())
-            .then((data) => {
+        socket.emit('apiCall.Games', {
+            action,
+            auth: getCurrentUserId(),
+            params
+        }, (error: any, data: any) => {
+            if (error) {
+                reject(error)
+            } else {
                 resolve(data);
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            });
-    });
-}
-
-function _post(endpoint: string, data: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'POST',
-            headers: {
-                ..._getAuthHeader(),
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then((data) => {
-                resolve(data);
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });
-}
-
-function _put(endpoint: string, data?: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'PUT',
-            headers: {
-                ..._getAuthHeader(),
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => {
-                res.json().then(data => {
-                    resolve(data);
-                }, error => {
-                    resolve();
-                });
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });
-}
-
-function _delete(endpoint: string) {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, { 
-            method: 'DELETE',
-            headers: {
-                ..._getAuthHeader()
             }
-        })
-            .then((data) => {
-                resolve();
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });   
-}
-
-function _getAuthHeader() {
-    return {
-        'Authorization': getCurrentUserId()
-    }
+        });
+    });
 }
