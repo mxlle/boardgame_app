@@ -1,4 +1,4 @@
-import { IGame } from '@entities/Game';
+import { IGame, IGameBase } from '@entities/Game';
 import { GameModel } from "@daos/Mongoose/models";
 
 export interface IGameDao {
@@ -28,7 +28,7 @@ class GameDao implements IGameDao {
      *
      * @param game
      */
-    public async add(game: IGame): Promise<IGame> {
+    public async add(game: IGameBase): Promise<IGame> {
         return await new GameModel(game).save();
     }
 

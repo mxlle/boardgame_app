@@ -8,7 +8,7 @@ import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import * as api from '../../shared/apiFunctions';
+import api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
@@ -43,9 +43,8 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     async resolveRound(correct: boolean = true) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); this.props.triggerReload(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(correct ? 'true' : undefined); return; }
         await api.resolveRound(this.props.game.id, correct);
-        this.props.triggerReload();
     }
 
     render() {
@@ -134,7 +133,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         if (game.$isTutorial) {
             if (!currentRound.correct && !isRoundHost) {
                 leftCol.push(
-                    <Button onClick={() => {nextTutorialStep();this.props.triggerReload();}} className="tutorialBtn" key="tutorialBtn">
+                    <Button onClick={() => {nextTutorialStep();}} className="tutorialBtn" key="tutorialBtn">
                         <Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans>
                     </Button>
                 );

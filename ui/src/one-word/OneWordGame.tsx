@@ -8,9 +8,9 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import {GamePhase, IGame} from '../types';
+import {GameEvent, GamePhase, IGame, ROOM_GAME} from '../types';
 
-import {loadGame} from '../shared/apiFunctions';
+import api from '../shared/apiFunctions';
 import {setDocumentTitle} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans} from "react-i18next";
@@ -18,8 +18,6 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
-
-const POLLING_INTERVAL = 1000;
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -47,7 +45,6 @@ type JustOneGameState = {
 };
 
 export type OneWordGameChildProps = {
-    triggerReload: () => void,
     triggerConfetti?: () => void
 }
 
@@ -76,7 +73,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         if (id === TUTORIAL_ID) {
             game = loadTutorial();
         } else {
-            game = await loadGame(id);
+            game = await api.loadGame(id);
         }
         if (game) this.updateGame(game);
     }
@@ -84,24 +81,24 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     subscribeToGame() {
         const { gameId } = this.props;
         if (gameId === TUTORIAL_ID) {
-            tutorialEmitter.on('updateGame', this.updateGame);
+            tutorialEmitter.on(GameEvent.Update, this.updateGame);
         } else {
-            socket.emit('subscribe', `game.${this.props.gameId}`, (err: any) => {
-                if (!err) console.debug('subscribed to game', this.props.gameId);
-                if (err) console.error('failed to subscribe to game', this.props.gameId);
+            socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId), (err: any) => {
+                if (err) console.error('failed to subscribe to game', gameId);
             });
-            socket.on('updateGame', this.updateGame);
+            socket.on(GameEvent.Update, this.updateGame);
         }
     }
 
     unsubscribeFromGame() {
-        socket.off('updateGame', this.updateGame);
-        tutorialEmitter.off('updateGame', this.updateGame);
+        socket.emit(GameEvent.Unsubscribe, ROOM_GAME(this.props.gameId))
+        socket.off(GameEvent.Update, this.updateGame);
+        tutorialEmitter.off(GameEvent.Update, this.updateGame);
     }
 
     updateGame(game: IGame) {
         if (!this._isMounted) return;
-        if (this.props.gameId != game.id) return;
+        if (this.props.gameId !== game.id) return;
 
         setDocumentTitle(game.name);
         this.setState({
@@ -110,19 +107,12 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     }
 
     render() {
-        const {setTheme, history, classes, gameId} = this.props;
+        const {setTheme, history, classes} = this.props;
         const {currentGame, triggerConfetti} = this.state;
 
         if (!currentGame) return null;
 
         let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn;
-
-        const triggerReload = () => {
-            if (gameId === TUTORIAL_ID) {
-                const game = loadTutorial();
-                this.updateGame(game)
-            }
-        };
 
         const backToList = () => {
             if (currentGame.$isTutorial) removeTutorial();
@@ -139,29 +129,29 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         switch(currentGame.phase) {
             case GamePhase.Init:
-                gameContent = <GameLobby game={currentGame} triggerReload={triggerReload} setTheme={setTheme} />;
+                gameContent = <GameLobby game={currentGame} setTheme={setTheme} />;
                 break;
             case GamePhase.Preparation:
-                gameContent = <GamePreparation game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <GamePreparation game={currentGame} />;
                 break;
             case GamePhase.HintWriting:
-                gameContent = <HintWritingView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <HintWritingView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.HintComparing:
-                gameContent = <HintComparingView game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <HintComparingView game={currentGame} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Guessing:
-                gameContent = <GuessingView game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <GuessingView game={currentGame} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Solution:
-                gameContent = <SolutionView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <SolutionView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.End:
-                gameContent = <GameEndView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <GameEndView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 returnBtn = (
                     <Grid item xs={12} className={classes.button}>
                         <Button variant="outlined" onClick={backToList}>

@@ -8,7 +8,7 @@ import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import * as api from '../../shared/apiFunctions';
+import api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
@@ -43,15 +43,13 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 
     async toggleDuplicate(hintIndex: number) {
-        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); this.props.triggerReload(); return; }
-        await api.toggleDuplicate(this.props.game.id, hintIndex);
-        this.props.triggerReload();
+        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); return; }
+        await api.toggleDuplicateHint(this.props.game.id, hintIndex);
     }
 
     async showHints() {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
         await api.showHints(this.props.game.id);
-        this.props.triggerReload();
     }
 
     render() {

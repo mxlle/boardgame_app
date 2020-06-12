@@ -4,17 +4,18 @@ import {Box, Button, Container, TextField} from '@material-ui/core';
 import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
 import {Trans} from 'react-i18next';
 import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
-import {IGame} from '../types';
+import {GameEvent, IGame, ROOM_GAME_LIST} from '../types';
 import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
 import {SETTING_ID, SETTING_NAME} from '../shared/constants';
 import {setDocumentTitle} from '../shared/functions';
-import {createGame, deleteGame, loadGames} from '../shared/apiFunctions';
+import api from '../shared/apiFunctions';
 import {STYLES} from '../theme';
 import i18n from '../i18n';
 import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
+import socket from "../shared/socket";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -43,7 +44,6 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     public currentUserId: string = localStorage.getItem(SETTING_ID) || '';
     public currentUserName: string = localStorage.getItem(SETTING_NAME) || '';
 
-    private _interval: number|undefined;
     private _isMounted: boolean = false;
 
     constructor(props: JustOneHomeProps) {
@@ -65,11 +65,15 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         setDocumentTitle();
 
         this.loadGames();
+
+        socket.emit(GameEvent.Subscribe, ROOM_GAME_LIST, (err: any) => err && console.error('subscribe game list', err));
+        socket.on(GameEvent.UpdateList, this.loadGames)
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        clearInterval(this._interval);
+        socket.emit(GameEvent.Unsubscribe, ROOM_GAME_LIST, (err: any) => err && console.error('unsubscribe game list', err));
+        socket.off(GameEvent.UpdateList, this.loadGames);
     }
 
     async loadGames() {
@@ -77,13 +81,14 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
             gamesLoading: true
         });
         try {
-            let games = await loadGames();
+            let games = await api.loadGames();
             if (!this._isMounted) return;     
             this.setState({
                 allGames: games,
                 gamesLoading: false
             });
         } catch(e) {
+            console.log(e);
             this.props.enqueueSnackbar(i18n.t('ERROR.LOAD_GAMES', 'Fehler'), { variant: 'error' });
             this.setState({
                 gamesLoading: false
@@ -115,7 +120,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     }
 
     async deleteGame(gameId: string) {
-        await deleteGame(gameId);
+        await api.deleteGame(gameId);
         this.loadGames();
     }
 
@@ -130,13 +135,9 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         game.name = gameName;
 
         try {
-            const {id, playerId} = await createGame(game);
+            const gameId = await api.addGame(game);
 
-            if(this.currentUserId !== playerId) {
-                localStorage.setItem(SETTING_ID, playerId);
-            }
-
-            this.props.history.push('/'+id);
+            this.props.history.push('/'+gameId);
 
         } catch(e) {
             this.props.enqueueSnackbar(i18n.t('ERROR.CREATE_GAME', 'Fehler'), { variant: 'error' });

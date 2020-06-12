@@ -1,6 +1,7 @@
 import http from 'http';
 import SocketIO from "socket.io";
 import GameApi from './routes/Games';
+import {GameEvent, IGameApi} from "@gameTypes";
 
 
 export const httpServer = http.createServer();
@@ -10,34 +11,31 @@ const io = SocketIO(httpServer, {
 });
 
 interface GamesApiCall {
-    action: keyof typeof GameApi,
+    action: keyof IGameApi,
     auth: string,
-    params?: any
+    params: any[]
 }
 type ErrorFirstCallback = (error?: any, data?: any) => void;
 
 io.on('connection', (socket) => {
     // GameController
-    socket.on('apiCall.Games', ({ action, auth, params }: GamesApiCall, ack: ErrorFirstCallback) => {
-        if (!GameApi.hasOwnProperty(action)) {
+    socket.on(GameEvent.ApiCall, ({ action, auth, params }: GamesApiCall, ack: ErrorFirstCallback) => {
+        const gameApi = new GameApi(io.sockets, auth);
+
+        if (!gameApi[action]) {
             ack('Invalid action');
         }
 
-        let handler = GameApi[action];
-
-        handler(io.sockets, auth, params||{})
+        (<any>gameApi[action])(...params)
             .then((responseData: any) => ack(null, responseData))
             .catch((error: any) => ack(error));
     });
 
-    socket.on('subscribe', (room: string, ack: ErrorFirstCallback) => {
-        // TODO authentication
+    socket.on(GameEvent.Subscribe, (room: string, ack: ErrorFirstCallback) => {
         socket.join(room, ack);
-        console.log('joined room ', room);
     });
-    socket.on('unsubscribe', (room: string, ack: ErrorFirstCallback) => {
+    socket.on(GameEvent.Unsubscribe, (room: string, ack: ErrorFirstCallback) => {
         socket.leave(room, ack);
-        console.log('left room ', room);
     });
 });
 

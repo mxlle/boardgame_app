@@ -6,7 +6,7 @@ import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import * as api from '../../shared/apiFunctions';
+import api from '../../shared/apiFunctions';
 import {checkPrevResult, getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
@@ -41,9 +41,8 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     async submitHint(hint: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(hint); this.props.triggerReload(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(hint); return; }
         await api.submitHint(this.props.game.id, hint);
-        this.props.triggerReload();
     }
 
     render() {

@@ -51,3 +51,29 @@ export enum GamePhase {
     Solution,
     End
 }
+
+export interface IGameApi {
+    loadGames: () => Promise<IGame[]>;
+    loadGame: (gameId: string) => Promise<IGame|null>;
+    addGame: (game: IGame) => Promise<string>;
+    startPreparation: (gameId: string, wordsPerPlayer: number) => Promise<boolean>;
+    addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
+    updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;
+    submitHint: (gameId: string, hint: string) => Promise<boolean>;
+    toggleDuplicateHint: (gameId: string, hintIndex: number) => Promise<boolean>;
+    showHints: (gameId: string) => Promise<boolean>;
+    guess: (gameId: string, guess: string) => Promise<boolean>;
+    resolveRound: (gameId: string, correct: boolean|undefined) => Promise<boolean>;
+    deleteGame: (gameId: string) => Promise<boolean>;
+}
+
+export enum GameEvent {
+    Subscribe = 'subscribe',
+    Unsubscribe = 'unsubscribe',
+    UpdateList = 'updateGameList',
+    Update = 'updateGame',
+    ApiCall = 'apiCall.Games'
+}
+
+export const ROOM_GAME_LIST = 'gameList';
+export const ROOM_GAME = (id: string) => `game.${id}`;

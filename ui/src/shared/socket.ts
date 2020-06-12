@@ -2,8 +2,7 @@ import io from 'socket.io-client';
 import EventEmitter from 'events';
 
 const socket = io({
-    path: '/api',
-    transports: ['websocket']
+    path: '/api'
 });
 
 socket.on('connect', () => {
