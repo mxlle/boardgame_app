@@ -41,7 +41,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
             const playersString = game.players.map(p => p.name).join(', ') || '-';
 
             return (
-                <ListItem key={game.id} className="GameListItem"
+                <ListItem key={game.id}
                     {...{ to: `/${game.id}` }}
                     component={Link}
                     button
@@ -74,7 +74,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
             { key: 'done', elementList: doneGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.DONE">Meine beendeten Spiele</Trans> },
         ];
 
-        const content = categories.filter(category => category.elementList.length > 0).map((category, index) => (
+        const content = categories.filter(category => category.elementList.length > 0).map((category) => (
             <Grid item xs={12} key={category.key}>
                 <Paper>
                     <Typography variant="h5">{category.heading}</Typography>

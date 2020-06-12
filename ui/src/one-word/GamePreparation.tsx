@@ -8,7 +8,7 @@ import { WordAdder } from './components/WordAdder';
 import { getRandomColor } from '../common/ColorPicker';
 
 import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
-import * as api from '../shared/apiFunctions';
+import api from '../shared/apiFunctions';
 import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
@@ -34,13 +34,12 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
     }
 
     async addWords(words: string[]) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(); this.props.triggerReload(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
 
         let player: IUser = this.currentPlayer;
         player.enteredWords = words;
 
         await api.updatePlayer(this.props.game.id, player);
-        this.props.triggerReload();
     }
 
     render() {

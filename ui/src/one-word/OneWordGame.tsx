@@ -8,17 +8,16 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import {GamePhase, IGame} from '../types';
+import {GameEvent, GamePhase, IGame, ROOM_GAME} from '../types';
 
-import {loadGame} from '../shared/apiFunctions';
+import api from '../shared/apiFunctions';
 import {setDocumentTitle} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans} from "react-i18next";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
-
-const POLLING_INTERVAL = 1000;
+import socket, {tutorialEmitter} from "../shared/socket";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -46,27 +45,26 @@ type JustOneGameState = {
 };
 
 export type OneWordGameChildProps = {
-    triggerReload: () => void,
     triggerConfetti?: () => void
 }
 
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = { triggerConfetti: ()=>{} };
-    private _interval: number|undefined;
     private _isMounted: boolean = false;
     private _confettiTriggered: boolean = false;
 
     componentDidMount() {
         this._isMounted = true;
 
-        this.loadGame();
+        this.updateGame = this.updateGame.bind(this);
 
-        this._interval = window.setInterval(this.loadGame.bind(this), POLLING_INTERVAL);
+        this.loadGame();
+        this.subscribeToGame();
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        clearInterval(this._interval);
+        this.unsubscribeFromGame();
     }
 
     async loadGame() {
@@ -75,10 +73,33 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         if (id === TUTORIAL_ID) {
             game = loadTutorial();
         } else {
-            game = await loadGame(id);
+            game = await api.loadGame(id);
         }
+        if (game) this.updateGame(game);
+    }
+
+    subscribeToGame() {
+        const { gameId } = this.props;
+        if (gameId === TUTORIAL_ID) {
+            tutorialEmitter.on(GameEvent.Update, this.updateGame);
+        } else {
+            socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId), (err: any) => {
+                if (err) console.error('failed to subscribe to game', gameId);
+            });
+            socket.on(GameEvent.Update, this.updateGame);
+        }
+    }
+
+    unsubscribeFromGame() {
+        socket.emit(GameEvent.Unsubscribe, ROOM_GAME(this.props.gameId))
+        socket.off(GameEvent.Update, this.updateGame);
+        tutorialEmitter.off(GameEvent.Update, this.updateGame);
+    }
+
+    updateGame(game: IGame) {
         if (!this._isMounted) return;
-        if (!game) return;
+        if (this.props.gameId !== game.id) return;
+
         setDocumentTitle(game.name);
         this.setState({
             currentGame: game
@@ -92,8 +113,6 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         if (!currentGame) return null;
 
         let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn;
-
-        const triggerReload = () => this.loadGame();
 
         const backToList = () => {
             if (currentGame.$isTutorial) removeTutorial();
@@ -110,29 +129,29 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         switch(currentGame.phase) {
             case GamePhase.Init:
-                gameContent = <GameLobby game={currentGame} triggerReload={triggerReload} setTheme={setTheme} />;
+                gameContent = <GameLobby game={currentGame} setTheme={setTheme} />;
                 break;
             case GamePhase.Preparation:
-                gameContent = <GamePreparation game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <GamePreparation game={currentGame} />;
                 break;
             case GamePhase.HintWriting:
-                gameContent = <HintWritingView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <HintWritingView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.HintComparing:
-                gameContent = <HintComparingView game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <HintComparingView game={currentGame} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Guessing:
-                gameContent = <GuessingView game={currentGame} triggerReload={triggerReload} />;
+                gameContent = <GuessingView game={currentGame} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.Solution:
-                gameContent = <SolutionView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <SolutionView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 gameStats   = <GameStats game={currentGame} />;
                 break;
             case GamePhase.End:
-                gameContent = <GameEndView game={currentGame} triggerReload={triggerReload} triggerConfetti={triggerConfettiSave} />;
+                gameContent = <GameEndView game={currentGame} triggerConfetti={triggerConfettiSave} />;
                 returnBtn = (
                     <Grid item xs={12} className={classes.button}>
                         <Button variant="outlined" onClick={backToList}>

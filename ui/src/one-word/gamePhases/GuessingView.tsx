@@ -6,7 +6,7 @@ import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
-import * as api from '../../shared/apiFunctions';
+import api from '../../shared/apiFunctions';
 import {getUserInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
@@ -40,9 +40,8 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 
     async guess(guess: string) {
-        if (this.props.game.$isTutorial) { nextTutorialStep(guess); this.props.triggerReload(); return; }
+        if (this.props.game.$isTutorial) { nextTutorialStep(guess); return; }
         await api.guess(this.props.game.id, guess);
-        this.props.triggerReload();
     }
 
     render() {

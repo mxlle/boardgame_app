@@ -4,6 +4,6 @@ import {
 } from '@gameTypes';
 
 type IGame = IGameBase & Document;
-export { IGame, GamePhase, IUser };
+export { IGameBase, IGame, GamePhase, IUser };
 
 export * as GameController from '@gameFunctions';

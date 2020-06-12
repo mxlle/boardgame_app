@@ -1,141 +1,24 @@
 import { getCurrentUserId } from './functions';
-import { IGame, IUser } from '../types';
+import {GameEvent, IGameApi} from '../types';
+import socket from './socket';
 
-// api url
-export const API_URL = '/api';
-export const GAME_URL = API_URL + '/games';
-
-export async function loadGames(): Promise<IGame[]> {
-    return (await _get('all')).games || [];
-}
-
-export async function loadGame(id: string): Promise<IGame> {
-    return (await _get(id)).game;
-}
-
-export async function createGame(game: IGame): Promise<{id:string,playerId:string}> {
-    return _post('add', {game});
-}
-
-export function deleteGame(id: string) {
-    return _delete(`delete/${id}`);
-}
-
-export async function addPlayer(id: string, player: IUser): Promise<IUser> {
-    return (await _put(`${id}/addPlayer`, {player})).player;
-}
-
-export async function updatePlayer(id: string, player: IUser): Promise<IUser> {
-    return (await _put(`${id}/updatePlayer`, {player})).player;
-}
-
-export function startPreparation(id: string, wordsPerPlayer: number) {
-    return _put(`${id}/startPreparation`, {wordsPerPlayer});
-}
-
-export function submitHint(id: string, hint: string) {
-    return _put(`${id}/hint`, {hint});
-}
-
-export function toggleDuplicate(id: string, hintIndex: number) {
-    return _put(`${id}/toggleDuplicateHint`, {hintIndex});
-}
-
-export function showHints(id: string) {
-    return _put(`${id}/showHints`);
-}
-
-export function guess(id: string, guess: string) {
-    return _put(`${id}/guess`, {guess});
-}
-
-export function resolveRound(id: string, correct: boolean) {
-    return _put(`${id}/resolve`, {correct});
-}
-
-
-function _get(endpoint: string): Promise<any> {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'GET',
-            headers: {
-                ..._getAuthHeader()
-            }
-        })
-            .then(res => res.json())
-            .then((data) => {
-                resolve(data);
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            });
-    });
-}
-
-function _post(endpoint: string, data: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'POST',
-            headers: {
-                ..._getAuthHeader(),
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => res.json())
-            .then((data) => {
-                resolve(data);
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });
-}
-
-function _put(endpoint: string, data?: any): Promise<any> {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, {
-            method: 'PUT',
-            headers: {
-                ..._getAuthHeader(),
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data)
-        })
-            .then(res => {
-                res.json().then(data => {
+const GameApi: IGameApi = new Proxy({} as IGameApi, {
+    get: (that, action) => function (...params: any[]) {
+        return new Promise((resolve, reject) => {
+            socket.emit(GameEvent.ApiCall, {
+                action,
+                auth: getCurrentUserId(),
+                params
+            }, (error: any, data: any) => {
+                if (error) {
+                    reject(error)
+                } else {
                     resolve(data);
-                }, error => {
-                    resolve();
-                });
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });
-}
-
-function _delete(endpoint: string) {
-    return new Promise((resolve, reject) => {
-        fetch(`${GAME_URL}/${endpoint}`, { 
-            method: 'DELETE',
-            headers: {
-                ..._getAuthHeader()
-            }
-        })
-            .then((data) => {
-                resolve();
-            }, (error) => {
-                console.error(error);
-                reject(error);
-            })
-    });   
-}
-
-function _getAuthHeader() {
-    return {
-        'Authorization': getCurrentUserId()
+                }
+            });
+        });
     }
-}
+})
+
+export default GameApi;
+

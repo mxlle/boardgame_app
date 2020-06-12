@@ -1,315 +1,196 @@
-import { Request, Response, Router } from 'express';
-import { BAD_REQUEST, CREATED, OK, NOT_FOUND, FORBIDDEN } from 'http-status-codes';
-import { ParamsDictionary } from 'express-serve-static-core';
 import { generateId } from '@shared/functions';
 
 import GameDao from '@daos/Game';
-import { GameController, IGame, IUser, GamePhase } from "@entities/Game";
-import { paramMissingError, gameNotFoundError, forebiddenError } from '@shared/constants';
+import { GameController, IUser, GamePhase } from "@entities/Game";
+import { paramMissingError, gameNotFoundError, forbiddenError } from '@shared/constants';
+import {Namespace} from "socket.io";
+import {IGame, GameEvent, IGameApi, ROOM_GAME, ROOM_GAME_LIST} from "@gameTypes";
 
 // Init shared
-const router = Router();
 const gameDao = new GameDao();
 
+class GameApi implements IGameApi {
+    private socket: Namespace;
+    private readonly userId: string;
 
-/******************************************************************************
- *                      Get All Games - "GET /api/games/all"
- ******************************************************************************/
-
-router.get('/all', async (req: Request, res: Response) => {
-    const userId = req.headers.authorization;
-    let games = await gameDao.getAll();
-    games = games.filter((game: IGame) => {
-        return game.phase === GamePhase.Init || (userId && game.players.findIndex(p => p.id === userId) > -1);
-    });
-    return res.status(OK).json({games});
-});
-
-/******************************************************************************
- *                      Get One - "GET /api/games/:id"
- ******************************************************************************/
-
-router.get('/:id', async (req: Request, res: Response) => {
-    const game = await gameDao.getOne(req.params.id);
-    return res.status(OK).json({game});
-});
-
-/******************************************************************************
- *                       Add One - "POST /api/games/add"
- ******************************************************************************/
-
-router.post('/add', async (req: Request, res: Response) => {
-    const { game } = req.body;
-    const userId = req.headers.authorization;
-    if (!game) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
+    constructor(socket: Namespace, userId: string) {
+        this.socket = socket;
+        this.userId = userId;
     }
 
-    if (!game.id) game.id = generateId();
-    if (!game.hostId) game.hostId = userId;
-
-    await gameDao.add(game);
-    return res.status(CREATED).json({id: game.id, playerId: game.hostId});
-});
-
-
-/******************************************************************************
- *                       Update - "PUT /api/games/update"
- ******************************************************************************/
-
-router.put('/update', async (req: Request, res: Response) => {
-    const { game } = req.body;
-    if (!game) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
+    async loadGames() {
+        let games = await gameDao.getAll();
+        games = games.filter((game: IGame) => {
+            return game.phase === GamePhase.Init || (this.userId && game.players.findIndex(p => p.id === this.userId) > -1);
         });
-    }
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
-
-/******************************************************************************
- *              Start preparation - "PUT /api/games/:id/startPreparation"
- ******************************************************************************/
-
-router.put('/:id/startPreparation', async (req: Request, res: Response) => {
-    const { wordsPerPlayer } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.hostId !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
+        return games;
     }
 
-    GameController.goToPreparation(game, wordsPerPlayer);
-
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
-
-/******************************************************************************
- *          Add player to game - "PUT /api/games/:id/addPlayer"
- ******************************************************************************/
-
-router.put('/:id/addPlayer', async (req: Request, res: Response) => {
-    const { player } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!player) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
-    }
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
+    loadGame(gameId: string) {
+        return gameDao.getOne(gameId);
     }
 
-    if (!player.id) player.id = userId;
-    GameController.addPlayer(game, player);
+    async addGame(game: IGame) {
+        if (!game) {
+            throw new Error(paramMissingError);
+        }
 
-    await gameDao.update(game);
-    return res.status(OK).json({player: player});
-});
+        if (!game.id) game.id = generateId();
+        if (!game.hostId) game.hostId = this.userId;
 
-/******************************************************************************
- *          Update player in game - "PUT /api/games/:id/updatePlayer"
- ******************************************************************************/
+        const createdGame = await gameDao.add(game);
 
-router.put('/:id/updatePlayer', async (req: Request, res: Response) => {
-    const { player } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!player) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
-    }
-    if (player.id !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
+        this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
+
+        return createdGame.id as string;
     }
 
-    GameController.updatePlayer(game, player);
+    async startPreparation(gameId: string, wordsPerPlayer: number) {
+        const game = await gameDao.getOne(gameId);
+        if (!game) {
+            throw new Error(gameNotFoundError);
+        }
+        if (game.hostId !== this.userId) {
+            throw new Error(forbiddenError);
+        }
 
-    await gameDao.update(game);
-    return res.status(OK).json({player: player});
-});
+        GameController.goToPreparation(game, wordsPerPlayer);
 
-/******************************************************************************
- *                      Send hint - "PUT /api/games/:id/hint"
- ******************************************************************************/
+        await gameDao.update(game);
 
-router.put('/:id/hint', async (req: Request, res: Response) => {
-    const { hint } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!hint) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
-    }
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.players.findIndex((p: IUser) => p.id === userId) === -1) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
 
-    GameController.addHint(game, hint, userId);
+        return true;
+    };
 
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
+    async addPlayer(gameId: string, player: IUser) {
+        const game = await gameDao.getOne(gameId);
 
-/******************************************************************************
- *                      Send hint - "PUT /api/games/:id/toggleDuplicateHint"
- ******************************************************************************/
+        if (!player) throw new Error(paramMissingError);
+        if (!game) throw new Error(gameNotFoundError);
 
-router.put('/:id/toggleDuplicateHint', async (req: Request, res: Response) => {
-    const { hintIndex } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.rounds[game.round].hostId !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
+        if (!player.id) player.id = this.userId;
+        GameController.addPlayer(game, player);
 
-    GameController.toggleDuplicateHint(game, hintIndex);
+        await gameDao.update(game);
 
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
 
-/******************************************************************************
- *                      Send hint - "PUT /api/games/:id/showHints"
- ******************************************************************************/
+        return true;
+    };
 
-router.put('/:id/showHints', async (req: Request, res: Response) => {
-    const game = await gameDao.getOne(req.params.id);
-    const userId = req.headers.authorization;
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.rounds[game.round].hostId !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
+    async updatePlayer(gameId: string, player: IUser) {
+        const game = await gameDao.getOne(gameId);
 
-    GameController.showHints(game);
+        if (!player) throw new Error(paramMissingError);
+        if (player.id !== this.userId) throw new Error(forbiddenError);
+        if (!game) throw new Error(gameNotFoundError);
 
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
+        GameController.updatePlayer(game, player);
 
-/******************************************************************************
- *                      Send hint - "PUT /api/games/:id/guess"
- ******************************************************************************/
+        await gameDao.update(game);
 
-router.put('/:id/guess', async (req: Request, res: Response) => {
-    const { guess } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!guess) {
-        return res.status(BAD_REQUEST).json({
-            error: paramMissingError,
-        });
-    }
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.rounds[game.round].guesserId !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
 
-    GameController.guess(game, guess);
+        return true;
+    };
 
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
+    async submitHint(gameId: string, hint: string) {
+        const game = await gameDao.getOne(gameId);
 
-/******************************************************************************
- *                      Send hint - "PUT /api/games/:id/resolve"
- ******************************************************************************/
+        if (!hint) throw new Error(paramMissingError);
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.players.findIndex((p: IUser) => p.id === this.userId) === -1) {
+            throw new Error(forbiddenError);
+        }
 
-router.put('/:id/resolve', async (req: Request, res: Response) => {
-    const { correct } = req.body;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.players.findIndex((p: IUser) => p.id === userId) === -1) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
+        GameController.addHint(game, hint, this.userId);
 
-    GameController.resolveRound(game, !!correct);
+        await gameDao.update(game);
 
-    await gameDao.update(game);
-    return res.status(OK).end();
-});
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
 
-/******************************************************************************
- *                    Delete - "DELETE /api/games/delete/:id"
- ******************************************************************************/
+        return true;
+    };
 
-router.delete('/delete/:id', async (req: Request, res: Response) => {
-    const { id } = req.params as ParamsDictionary;
-    const userId = req.headers.authorization;
-    const game = await gameDao.getOne(req.params.id);
-    if (!game) {
-        return res.status(NOT_FOUND).json({
-            error: gameNotFoundError,
-        });
-    }
-    if (game.hostId !== userId) {
-        return res.status(FORBIDDEN).json({
-            error: forebiddenError,
-        });
-    }
-    await gameDao.delete(id);
-    return res.status(OK).end();
-});
+    async toggleDuplicateHint(gameId: string, hintIndex: number) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.rounds[game.round].hostId !== this.userId) throw new Error(forbiddenError);
+
+        GameController.toggleDuplicateHint(game, hintIndex);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
+    async showHints(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.rounds[game.round].hostId !== this.userId) throw new Error(forbiddenError);
+
+        GameController.showHints(game);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
+    async guess(gameId: string, guess: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!guess) throw new Error(paramMissingError);
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.rounds[game.round].guesserId !== this.userId) throw new Error(forbiddenError);
+
+        GameController.guess(game, guess);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
+    async resolveRound(gameId: string, correct: boolean|undefined) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.players.findIndex((p: IUser) => p.id === this.userId) === -1) throw new Error(forbiddenError);
+
+        GameController.resolveRound(game, !!correct);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
+    async deleteGame(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.hostId !== this.userId) throw new Error(forbiddenError);
+
+        await gameDao.delete(gameId);
+
+        this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
+
+        return true;
+    };
+}
 
 
 /******************************************************************************
  *                                     Export
  ******************************************************************************/
 
-export default router;
+export default GameApi;
