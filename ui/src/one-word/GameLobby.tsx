@@ -2,6 +2,7 @@ import React from 'react';
 import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
 import {Grid, Button, Paper, Typography, Box} from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
+import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
 import { Trans } from 'react-i18next';
 import i18n from '../i18n';
@@ -16,11 +17,27 @@ import api from '../shared/apiFunctions';
 import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
+import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
+
+
+const styles = (theme: Theme) => createStyles({
+    fakeDisabled: {
+        color: theme.palette.action.disabled,
+        backgroundColor: theme.palette.action.disabledBackground,
+        boxShadow: 'none',
+        '&:hover': {
+            color: theme.palette.action.disabled,
+            backgroundColor: theme.palette.action.disabledBackground,
+            boxShadow: 'none',
+            cursor: 'default'
+        }
+    }
+});
 
 type GameLobbyProps = {
     game: IGame,
     setTheme?: (color: string)=>void
-}&WithSnackbarProps&OneWordGameChildProps;
+}&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
 
 type GameLobbyState = {
     currentPlayer: IUser,
@@ -42,6 +59,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         }
 
         this.addPlayer = this.addPlayer.bind(this);
+        this.leaveGame = this.leaveGame.bind(this);
         this.setPlayerProps = this.setPlayerProps.bind(this);
         this.selectNumRounds = this.selectNumRounds.bind(this);
         this.startPreparation = this.startPreparation.bind(this);
@@ -76,6 +94,10 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         this.setState({
             currentPlayer: player
         });
+    }
+
+    leaveGame() {
+        api.removePlayerFromGame(this.props.game.id, this.state.currentPlayer.id);
     }
 
     selectNumRounds() {
@@ -113,7 +135,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     render() {
-        const { game } = this.props;
+        const { game, classes } = this.props;
         const { currentPlayer, roundDialogOpen } = this.state;
         const currentUserId: string = localStorage.getItem(SETTING_ID) || '';
         const isHost: boolean = !!currentUserId && game.hostId === currentUserId;
@@ -152,10 +174,16 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isInGame && !game.$isTutorial && (
                             <Grid item xs={12}>
-                                <Button variant="contained"
+                                <Button variant="outlined"
                                     startIcon={<ShareIcon />}
                                     onClick={this.shareGame}>
                                     <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Personen einladen</Trans>
+                                </Button>
+                                <br/>
+                                <Button variant="outlined"
+                                        startIcon={<ArrowBackIcon />}
+                                        onClick={this.leaveGame}>
+                                    <Trans i18nKey="COMMON.BACK">Back</Trans>
                                 </Button>
                             </Grid>
                         )
@@ -163,8 +191,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isHost && isInGame && (
                             <Grid item xs={12}>
-                                <Button variant="contained" color="primary" className="submitBtn"
-                                    disabled={game.players.length < 3}
+                                <Button variant="contained" color="primary" className={game.players.length === 2 ? `submitBtn ${classes.fakeDisabled}` : 'submitBtn'}
+                                    disabled={game.players.length < 2}
                                     onClick={this.selectNumRounds}>
                                     <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>
                                 </Button>
@@ -187,4 +215,4 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
 }
 
-export default withSnackbar(GameLobby);
+export default withStyles(styles)(withSnackbar(GameLobby));

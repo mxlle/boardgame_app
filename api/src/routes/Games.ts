@@ -96,6 +96,22 @@ class GameApi implements IGameApi {
         return true;
     };
 
+    async removePlayerFromGame(gameId: string, playerId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (!playerId) throw new Error(paramMissingError);
+        if (playerId !== this.userId && this.userId !== game.hostId) throw new Error(forbiddenError);
+
+        GameController.removePlayerFromGame(game, playerId);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    }
+
     async submitHint(gameId: string, hint: string) {
         const game = await gameDao.getOne(gameId);
 

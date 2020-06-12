@@ -8,7 +8,8 @@
         "YOUR_TURN": "Your turn!",
         "PLAYER_NAME": "Player name",
         "WELCOME_NAME": "Hi {{ name }}! Have fun!",
-        "CONFETTI": "Confetti!"
+        "CONFETTI": "Confetti!",
+        "BACK": "Back"
     },
     "HOME": {
         "GAME_NAME": "Game name",
@@ -126,7 +127,7 @@
         "RESTART": "Restart tutorial",
         "CLOSE": "Finish tutorial",
         "CONTROLS": {
-            "BACK": "Back",
+            "BACK": "$t(COMMON.BACK)",
             "CLOSE": "Close",
             "DONE": "Done",
             "NEXT": "Next",

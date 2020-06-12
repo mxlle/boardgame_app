@@ -31,6 +31,13 @@ export function updatePlayer(game: IGame, player: IUser) {
     if (allWordsEntered) startGame(game);
 }
 
+export function removePlayerFromGame(game: IGame, playerId: string) {
+    const index = game.players.findIndex(p => p.id === playerId);
+    if (index > -1) {
+        game.players.splice(index, 1);
+    }
+}
+
 export function startGame(game: IGame) {
     createRounds(game);
     newRound(game, true);

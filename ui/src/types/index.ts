@@ -59,6 +59,7 @@ export interface IGameApi {
     startPreparation: (gameId: string, wordsPerPlayer: number) => Promise<boolean>;
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
     updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;
+    removePlayerFromGame: (gameId: string, playerId: string) => Promise<boolean>;
     submitHint: (gameId: string, hint: string) => Promise<boolean>;
     toggleDuplicateHint: (gameId: string, hintIndex: number) => Promise<boolean>;
     showHints: (gameId: string) => Promise<boolean>;
