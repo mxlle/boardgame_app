@@ -17,6 +17,7 @@
     "@gameFunctions": "dist/ui/src/one-word/gameFunctions"
   },
   "dependencies": {
+    "@types/fast-levenshtein": "0.0.1",
     "@types/socket.io": "^2.1.8",
     "command-line-args": "^5.1.1",
     "cookie-parser": "^1.4.5",
@@ -24,6 +25,7 @@
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-async-errors": "^3.1.1",
+    "fast-levenshtein": "^2.0.6",
     "helmet": "^3.22.0",
     "http-status-codes": "^1.4.0",
     "module-alias": "^2.2.2",

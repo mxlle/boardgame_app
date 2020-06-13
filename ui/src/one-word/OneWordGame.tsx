@@ -19,6 +19,7 @@ import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {withSnackbar, WithSnackbarProps} from "notistack";
+import i18n from '../i18n';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -112,7 +113,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         if (!this._isMounted) return;
         if (this.props.gameId !== game.id) return;
 
-        setDocumentTitle(game.name);
+        setDocumentTitle(i18n, game.name);
         this.setState({
             currentGame: game
         });

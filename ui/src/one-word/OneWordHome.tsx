@@ -63,7 +63,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     componentDidMount() {
         this._isMounted = true;
 
-        setDocumentTitle();
+        setDocumentTitle(i18n);
 
         this._setupConnection();
         socket.on(GameEvent.UpdateList, this.loadGames);

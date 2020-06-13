@@ -1,5 +1,4 @@
 import {SETTING_ID} from './constants';
-import i18n from '../i18n';
 import {IGame, IUser} from "../types";
 import {getPlayerInGame} from "../one-word/gameFunctions";
 
@@ -24,7 +23,7 @@ export function randomInt(max: number) {
 	return Math.floor(Math.random()*max);
 }
 
-export function setDocumentTitle(gameName?: string) {
+export function setDocumentTitle(i18n: any, gameName?: string) {
 	const appTitleFallback = 'Nur ein Wort!';
     if (gameName) {
         document.title = `${i18n.t('APP_TITLE', appTitleFallback)} - ${gameName}`;
