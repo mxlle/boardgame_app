@@ -1,6 +1,5 @@
 import React from 'react';
 import i18n from '../../i18n';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
@@ -15,14 +14,11 @@ import {OneWordGameChildProps} from "../OneWordGame";
 
 type GuessingViewProps = {
     game: IGame
-}&WithSnackbarProps&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
-type GuessingViewState = {
-    shownMessage: boolean
-};
+type GuessingViewState = {};
 
 class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> {
-    public state: GuessingViewState = { shownMessage: false };
     private _isMounted: boolean = false;
 
     constructor(props: GuessingViewProps) {
@@ -46,19 +42,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
 
     render() {
         const game: IGame = this.props.game;
-        const { shownMessage } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
-
-        if (isGuesser && !shownMessage) {
-            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'GUESSING' }), {
-                variant: 'info',
-                preventDuplicate: true
-            });
-            setTimeout(() => this.setState({shownMessage: true}), 0);
-        }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -97,4 +84,4 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 }
 
-export default withSnackbar(GuessingView);
+export default GuessingView;

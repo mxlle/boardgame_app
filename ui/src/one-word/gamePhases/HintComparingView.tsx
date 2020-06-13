@@ -2,7 +2,6 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import {Grid, Button, Typography, Checkbox} from '@material-ui/core';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
@@ -18,14 +17,11 @@ import {Mood as MoodIcon, MoodBad as MoodBadIcon} from "@material-ui/icons";
 
 type HintComparingViewProps = {
     game: IGame
-}&WithSnackbarProps&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
-type HintComparingViewState = {
-    shownMessage: boolean
-};
+type HintComparingViewState = {};
 
 class HintComparingView extends React.Component<HintComparingViewProps,HintComparingViewState> {
-    public state: HintComparingViewState = { shownMessage: false };
     private _isMounted: boolean = false;
 
     constructor(props: HintComparingViewProps) {
@@ -55,21 +51,12 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
 
     render() {
         const game: IGame = this.props.game;
-        const { shownMessage } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = guesser.name;
         const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
-
-        if (isRoundHost && !shownMessage) {
-            this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_COMPARING' }), {
-                variant: 'info',
-                preventDuplicate: true
-            });
-            setTimeout(() => this.setState({shownMessage: true}), 0);
-        }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -128,4 +115,4 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 }
 
-export default withSnackbar(HintComparingView);
+export default HintComparingView;

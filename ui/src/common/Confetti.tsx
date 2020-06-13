@@ -46,13 +46,14 @@ class Confetti extends React.Component<ConfettiProps> {
         return this.confettiCannon;
     }
 
-    triggerConfetti (colors?: string[]) {
+    triggerConfetti (colors: string[] = allColors, amount: number = 1) {
         const confettiCannon = this.getConfettiCannon();
         if (!confettiCannon) return;
+        let particleCount = Math.floor(amount*60)+10; // 70 when 100%
         const CONFETTI_BASE_OPTIONS = {
-            colors: colors || allColors,
+            colors: colors,
             startVelocity: 70,
-            particleCount: 70,
+            particleCount,
             spread: 60
         }
         confettiCannon({

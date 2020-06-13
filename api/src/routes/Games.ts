@@ -1,10 +1,10 @@
-import { generateId } from '@shared/functions';
+import {generateId} from '@shared/functions';
 
 import GameDao from '@daos/Game';
-import { GameController, IUser, GamePhase } from "@entities/Game";
-import { paramMissingError, gameNotFoundError, forbiddenError } from '@shared/constants';
+import {GameController, GamePhase, IUser} from "@entities/Game";
+import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/constants';
 import {Namespace} from "socket.io";
-import {IGame, GameEvent, IGameApi, ROOM_GAME, ROOM_GAME_LIST} from "@gameTypes";
+import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from "@gameTypes";
 
 // Init shared
 const gameDao = new GameDao();
@@ -106,6 +106,14 @@ class GameApi implements IGameApi {
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        if (game.phase === GamePhase.HintWriting) {
+            // send notification for next phase
+            const options: NotificationEventOptions = {
+                transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
+                audience: game.players.filter(p => p.id !== game.rounds[game.round].guesserId).map(p => p.id)
+            };
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
+        }
 
         return true;
     };
@@ -140,6 +148,15 @@ class GameApi implements IGameApi {
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        if (game.phase === GamePhase.HintComparing) {
+            // send notification for next phase
+            const options: NotificationEventOptions = {
+                transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_COMPARING',
+                audience: [game.rounds[game.round].hostId]
+            };
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
+        }
 
         return true;
     };
@@ -189,6 +206,13 @@ class GameApi implements IGameApi {
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
 
+        // send notification for next phase
+        const options: NotificationEventOptions = {
+            transKey: 'GAME.MESSAGE.YOUR_TURN_GUESSING',
+            audience: [game.rounds[game.round].guesserId]
+        };
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
+
         return true;
     };
 
@@ -197,13 +221,31 @@ class GameApi implements IGameApi {
 
         if (!guess) throw new Error(paramMissingError);
         if (!game) throw new Error(gameNotFoundError);
-        if (game.rounds[game.round].guesserId !== this.userId) throw new Error(forbiddenError);
+        const currentRound = game.rounds[game.round];
+        if (currentRound.guesserId !== this.userId) throw new Error(forbiddenError);
 
         GameController.guess(game, guess);
 
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        // send notification
+        const guesserName = game.players.find(p => p.id === currentRound.guesserId)?.name;
+        const options: NotificationEventOptions = {
+            transKey: currentRound.correct ? 'GAME.MESSAGE.RESULT_CORRECT' : 'GAME.MESSAGE.RESULT_WRONG',
+            tOptions: { guesserName, guess },
+            variant: currentRound.correct ? 'success' : 'warning'
+        };
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
+        if (currentRound.correct) {
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Confetti);
+        } else {
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
+                transKey: 'GAME.MESSAGE.YOUR_TURN_SOLUTION',
+                audience: [currentRound.hostId]
+            });
+        }
 
         return true;
     };
@@ -214,11 +256,33 @@ class GameApi implements IGameApi {
         if (!game) throw new Error(gameNotFoundError);
         if (game.players.findIndex((p: IUser) => p.id === this.userId) === -1) throw new Error(forbiddenError);
 
+        // send resolve notification
+        if (false === game.rounds[game.round].correct) {
+            const word = game.rounds[game.round].guess;
+            const options: NotificationEventOptions = {
+                transKey: correct ? 'GAME.MESSAGE.PREV_RESULT_CORRECT' : 'GAME.MESSAGE.PREV_RESULT_WRONG',
+                tOptions: { word },
+                variant: correct ? 'success' : 'error'
+            };
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
+            if (correct) {
+                this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Confetti);
+            }
+        }
+
         GameController.resolveRound(game, !!correct);
 
         await gameDao.update(game);
 
+        // send notification for next phase
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        if (game.phase === GamePhase.HintWriting) {
+            const audience: string[] = game.players.filter(p => p.id !== game.rounds[game.round].guesserId).map(p => p.id);
+            this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
+                transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
+                audience
+            });
+        }
 
         return true;
     };

@@ -75,8 +75,16 @@ export enum GameEvent {
     Unsubscribe = 'unsubscribe',
     UpdateList = 'updateGameList',
     Update = 'updateGame',
-    ApiCall = 'apiCall.Games',
+    ApiCall = 'apiCall.games',
+    Notification = 'notification',
     Confetti = 'confetti'
+}
+
+export interface NotificationEventOptions {
+    transKey: string;
+    audience?: string[];
+    tOptions?: any;
+    variant?: 'success'|'info'|'warning'|'error';
 }
 
 // Event values from socket-io

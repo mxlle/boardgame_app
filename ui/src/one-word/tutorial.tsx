@@ -73,6 +73,7 @@ export function nextTutorialStep(word?: string) {
             tutorialGuess(game, word);
             break;
         case GamePhase.Solution:
+            if (word && !game.rounds[game.round].correct) tutorialEmitter.emit(GameEvent.Confetti);
             game = resolveRound(game, !!word);
             if (game.phase === GamePhase.HintWriting && game.rounds[game.round].guesserId.length > 1) {
                 triggerAddingHint(game, 0);
@@ -93,6 +94,10 @@ function tutorialGuess(game: IGame, word?: string) {
     guess(game, word);
 
     game.phase = GamePhase.Solution;
+
+    if (game.rounds[game.round].correct) {
+        tutorialEmitter.emit(GameEvent.Confetti);
+    }
 }
 
 function triggerAddingPlayer(game: IGame) {

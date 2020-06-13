@@ -188,25 +188,6 @@ export function getPlayerInGame(game: IGame, userId?: string): IUser | undefined
     return game.players.find((player: IUser) => player.id === userId);
 }
 
-export function checkPrevResult(game: IGame, showSnackbar: any, i18n: any, triggerConfetti: (()=>void)|undefined) {
-    const roundIndex = GamePhase.End === game.phase ? game.rounds.length - 1 : game.round - 1;
-    if (roundIndex >= 0) {
-        const prevRound = game.rounds[roundIndex];
-        if (!prevRound.correct) {
-            showSnackbar(i18n.t('GAME.MESSAGE.PREV_RESULT', 'Runde abgeschlossen', {
-                context: prevRound.correct || prevRound.countAnyway ? 'CORRECT' : 'WRONG',
-                word: prevRound.guess
-            }), {
-                variant: prevRound.correct || prevRound.countAnyway ? 'success' : 'error',
-                preventDuplicate: true
-            });
-            if (prevRound.countAnyway && triggerConfetti) triggerConfetti();
-            return true;
-        }
-    }
-    return false;
-}
-
 export function getCorrectRounds(game: IGame): IGameRound[] {
     return game.rounds.filter(r => r.correct !== null && (r.correct || r.countAnyway));
 }

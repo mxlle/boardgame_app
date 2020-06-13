@@ -1,11 +1,10 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import {Grid, Typography} from '@material-ui/core';
 import WordCard from './components/WordCard';
-import { IGame } from '../types';
-import {checkPrevResult, getCorrectRounds, getPlayerInGame, getWrongRounds} from "./gameFunctions";
+import {IGame, IGameRound} from '../types';
+import { getCorrectRounds, getPlayerInGame, getWrongRounds} from "./gameFunctions";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
 
@@ -13,12 +12,7 @@ type GameEndViewProps = {
     game: IGame
 }&WithSnackbarProps&OneWordGameChildProps;
 
-type HintWritingViewState = {
-    shownPrevResult: boolean
-};
-
 class GameEndView extends React.Component<GameEndViewProps> {
-    public state: HintWritingViewState = { shownPrevResult: false };
     private _isMounted: boolean = false;
 
     componentDidMount() {
@@ -32,18 +26,12 @@ class GameEndView extends React.Component<GameEndViewProps> {
 
     render() {
         const game: IGame = this.props.game;
-        const { shownPrevResult } = this.state;
-        const correctWords = getCorrectRounds(game).map(round => {
-            return <WordCard key={round.word} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={true}/>
+        const correctWords = getCorrectRounds(game).map((round: IGameRound, index: number) => {
+            return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={true}/>
         });
-        const wrongWords = getWrongRounds(game).map(round => {
-            return <WordCard key={round.word} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={false}/>
+        const wrongWords = getWrongRounds(game).map((round: IGameRound, index: number) => {
+            return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={false}/>
         });
-
-        if (!shownPrevResult) {
-            checkPrevResult(game, this.props.enqueueSnackbar, i18n, this.props.triggerConfetti);
-            setTimeout(() => this.setState({shownPrevResult: true}), 0);
-        }
 
         return (
             <Grid container spacing={4} className="Game-end-view">

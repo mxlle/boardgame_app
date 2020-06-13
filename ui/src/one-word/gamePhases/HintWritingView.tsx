@@ -1,13 +1,12 @@
 import React from 'react';
 import i18n from '../../i18n';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {checkPrevResult, getPlayerInGame} from "../gameFunctions";
+import {getPlayerInGame} from "../gameFunctions";
 import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
@@ -17,16 +16,14 @@ import EditIcon from '@material-ui/icons/Edit';
 
 type HintWritingViewProps = {
     game: IGame
-}&WithSnackbarProps&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
 type HintWritingViewState = {
     submittedHints: {[key: string]: { hint: string, reset?: boolean }},
-    shownMessage: boolean,
-    shownPrevResult: boolean
 };
 
 class HintWritingView extends React.Component<HintWritingViewProps, HintWritingViewState> {
-    public state: HintWritingViewState = { submittedHints: {}, shownMessage: false, shownPrevResult: false };
+    public state: HintWritingViewState = { submittedHints: {} };
     private _isMounted: boolean = false;
 
     constructor(props: HintWritingViewProps) {
@@ -63,16 +60,11 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
 
     render() {
         const game: IGame = this.props.game;
-        const { submittedHints, shownMessage, shownPrevResult } = this.state;
+        const { submittedHints } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
-
-        if (!shownPrevResult) {
-            checkPrevResult(game, this.props.enqueueSnackbar, i18n, this.props.triggerConfetti);
-            setTimeout(() => this.setState({shownPrevResult: true}), 0);
-        }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -92,14 +84,6 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
             const showInput = !hint && hintIsMine;
 
             if (game.$isTutorial && hintIsMine) defaultValue = TUTORIAL_HINTS[currentRound.word][0];
-
-            if (hintIsMine && !hint && !shownMessage) {
-                this.props.enqueueSnackbar(i18n.t('GAME.MESSAGE.YOUR_TURN', 'Du bist dran!', { context: 'HINT_WRITING' }), {
-                    variant: 'info',
-                    preventDuplicate: true
-                });
-                setTimeout(() => this.setState({shownMessage: true}), 0);
-            }
 
             return (
                 <WordHint 
@@ -138,4 +122,4 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 }
 
-export default withSnackbar(HintWritingView);
+export default HintWritingView;
