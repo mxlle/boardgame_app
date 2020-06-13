@@ -63,6 +63,20 @@ class GameApi implements IGameApi {
         return true;
     };
 
+    async backToLobby(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.hostId !== this.userId) throw new Error(forbiddenError);
+
+        GameController.backToLobby(game);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
     async addPlayer(gameId: string, player: IUser) {
         const game = await gameDao.getOne(gameId);
 
@@ -112,16 +126,16 @@ class GameApi implements IGameApi {
         return true;
     }
 
-    async submitHint(gameId: string, hint: string) {
+    async submitHint(gameId: string, hintId: string, hint: string) {
         const game = await gameDao.getOne(gameId);
 
-        if (!hint) throw new Error(paramMissingError);
+        if (!hint || !hintId) throw new Error(paramMissingError);
         if (!game) throw new Error(gameNotFoundError);
         if (game.players.findIndex((p: IUser) => p.id === this.userId) === -1) {
             throw new Error(forbiddenError);
         }
 
-        GameController.addHint(game, hint, this.userId);
+        GameController.addHint(game, hintId, hint, this.userId);
 
         await gameDao.update(game);
 
@@ -130,13 +144,31 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    async toggleDuplicateHint(gameId: string, hintIndex: number) {
+    async resetHint(gameId: string, hintId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!hintId) throw new Error(paramMissingError);
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.players.findIndex((p: IUser) => p.id === this.userId) === -1) {
+            throw new Error(forbiddenError);
+        }
+
+        GameController.resetHint(game, hintId, this.userId);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
+    async toggleDuplicateHint(gameId: string, hintId: string) {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
         if (game.rounds[game.round].hostId !== this.userId) throw new Error(forbiddenError);
 
-        GameController.toggleDuplicateHint(game, hintIndex);
+        GameController.toggleDuplicateHint(game, hintId);
 
         await gameDao.update(game);
 

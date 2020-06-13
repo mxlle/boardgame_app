@@ -8,7 +8,7 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import {GameEvent, GamePhase, IGame, ROOM_GAME} from '../types';
+import {GameEvent, GamePhase, IGame, ROOM_GAME, SocketEvent} from '../types';
 
 import api from '../shared/apiFunctions';
 import {getCurrentUserInGame, setDocumentTitle} from '../shared/functions';
@@ -58,41 +58,47 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         this.updateGame = this.updateGame.bind(this);
         this.triggerConfetti = this.triggerConfetti.bind(this);
+        this._setupConnection = this._setupConnection.bind(this);
 
-        this.loadGame();
-        this.subscribeToGame();
+        this._setupConnection();
+        this._subscribeToGame();
+        socket.on(SocketEvent.Reconnect, this._setupConnection);
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        this.unsubscribeFromGame();
+        this._unsubscribeFromGame();
+        socket.off(SocketEvent.Reconnect, this._setupConnection);
+    }
+
+    private _setupConnection() {
+        const gameId = this.props.gameId;
+        socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId));
+        this.loadGame();
     }
 
     async loadGame() {
-        const id = this.props.gameId;
+        const gameId = this.props.gameId;
         let game;
-        if (id === TUTORIAL_ID) {
+        if (gameId === TUTORIAL_ID) {
             game = loadTutorial();
         } else {
-            game = await api.loadGame(id);
+            game = await api.loadGame(gameId);
         }
         if (game) this.updateGame(game);
     }
 
-    subscribeToGame() {
+    private _subscribeToGame() {
         const { gameId } = this.props;
         if (gameId === TUTORIAL_ID) {
             tutorialEmitter.on(GameEvent.Update, this.updateGame);
         } else {
-            socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId), (err: any) => {
-                if (err) console.error('failed to subscribe to game', gameId);
-            });
             socket.on(GameEvent.Update, this.updateGame);
             socket.on(GameEvent.Confetti, this.triggerConfetti);
         }
     }
 
-    unsubscribeFromGame() {
+    private _unsubscribeFromGame() {
         socket.emit(GameEvent.Unsubscribe, ROOM_GAME(this.props.gameId))
         socket.off(GameEvent.Update, this.updateGame);
         socket.off(GameEvent.Confetti, this.triggerConfetti);

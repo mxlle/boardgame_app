@@ -8,6 +8,7 @@ export const UserSchema: Schema = new Schema({
 });
 
 export const HintSchema: Schema = new Schema({
+    id: String,
     hint: String,
     authorId: String,
     isDuplicate: {type: Boolean, required: false}
@@ -27,7 +28,6 @@ export const RoundSchema: Schema = new Schema({
 export const GameSchema: Schema = new Schema({
     id: String,
     name: String,
-    words: [String],
     players: [UserSchema],
     hostId: String,
     wordsPerPlayer: Number,

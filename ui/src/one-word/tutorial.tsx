@@ -55,12 +55,12 @@ export function nextTutorialStep(word?: string) {
             break;
         case GamePhase.Preparation:
             addWordToGame(game, 0);
-            triggerAddingWord(game);
+            triggerAddingWord(game, 1);
             break;
         case GamePhase.HintWriting:
             let index = 0;
             if (word) {
-                addHint(game, word, getCurrentUserId());
+                addHint(game, getCurrentUserId(), word, getCurrentUserId());
                 index++;
             }
             triggerAddingHint(game, index);
@@ -82,8 +82,8 @@ export function nextTutorialStep(word?: string) {
     saveTutorial(game);
 }
 
-export function toggleDuplicateInTutorial(game: IGame, hintIndex: number) {
-    toggleDuplicateHint(game, hintIndex);
+export function toggleDuplicateInTutorial(game: IGame, hintId: string) {
+    toggleDuplicateHint(game, hintId);
     saveTutorial(game);
 }
 
@@ -107,12 +107,12 @@ function triggerAddingPlayer(game: IGame) {
     }, MAGIC_TUTORIAL_DELAY);
 }
 
-function triggerAddingWord(game: IGame) {
+function triggerAddingWord(game: IGame, index: number) {
     setTimeout(() => {
-        if (game.words.length < TUTORIAL_WORDS.length) {
-            addWordToGame(game, game.words.length)
+        if (index < TUTORIAL_WORDS.length) {
+            addWordToGame(game, index)
             saveTutorial(game);
-            triggerAddingWord(game);
+            triggerAddingWord(game, index+1);
         } else {
             startGame(game);
         }
@@ -122,7 +122,8 @@ function triggerAddingWord(game: IGame) {
 function triggerAddingHint(game: IGame, index: number) {
     setTimeout(() => {
         if (index < TUTORIAL_PLAYERS.length) {
-            addHint(game, TUTORIAL_HINTS[game.rounds[game.round].word][index], game.rounds[game.round].hints[index].authorId);
+            const currentRound = game.rounds[game.round];
+            addHint(game, currentRound.hints[index].id, TUTORIAL_HINTS[currentRound.word][index], currentRound.hints[index].authorId);
             saveTutorial(game);
             triggerAddingHint(game, index+1);
         }
@@ -140,7 +141,6 @@ function triggerAddingHint(game: IGame, index: number) {
 function addWordToGame(game: IGame, index: number) {
     const word: string = TUTORIAL_WORDS[index];
     const player: IUser = game.players[index];
-    game.words.push(word);
     if (!player.enteredWords) {
         game.players[index].enteredWords = [word];
     } else {
@@ -161,7 +161,7 @@ function createTutorialRounds(game: IGame) {
             authorId: game.players[0].id,
             guesserId: game.players[1].id,
             hostId: game.players[2].id,
-            hints: game.players.filter(p => p.id !== game.players[1].id).map(p => { return { hint: '', authorId: p.id }; }),
+            hints: game.players.filter(p => p.id !== game.players[1].id).map(p => { return { hint: '', authorId: p.id, id: p.id }; }),
             guess: '',
             correct: null,
             countAnyway: null
@@ -171,7 +171,7 @@ function createTutorialRounds(game: IGame) {
             authorId: game.players[1].id,
             guesserId: game.players[2].id,
             hostId: game.players[3].id,
-            hints: game.players.filter(p => p.id !== game.players[2].id).map(p => { return { hint: '', authorId: p.id }; }),
+            hints: game.players.filter(p => p.id !== game.players[2].id).map(p => { return { hint: '', authorId: p.id, id: p.id }; }),
             guess: '',
             correct: null,
             countAnyway: null
@@ -181,7 +181,7 @@ function createTutorialRounds(game: IGame) {
             authorId: game.players[2].id,
             guesserId: game.players[3].id,
             hostId: game.players[0].id,
-            hints: game.players.filter(p => p.id !== game.players[3].id).map(p => { return { hint: '', authorId: p.id }; }),
+            hints: game.players.filter(p => p.id !== game.players[3].id).map(p => { return { hint: '', authorId: p.id, id: p.id }; }),
             guess: '',
             correct: null,
             countAnyway: null
@@ -191,7 +191,7 @@ function createTutorialRounds(game: IGame) {
             authorId: game.players[3].id,
             guesserId: game.players[0].id,
             hostId: game.players[1].id,
-            hints: game.players.filter(p => p.id !== game.players[0].id).map(p => { return { hint: '', authorId: p.id }; }),
+            hints: game.players.filter(p => p.id !== game.players[0].id).map(p => { return { hint: '', authorId: p.id, id: p.id }; }),
             guess: '',
             correct: null,
             countAnyway: null

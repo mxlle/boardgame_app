@@ -59,14 +59,14 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
 
         const currentWord = currentRound.word;
         const currentGuess = currentRound.guess;
-        const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
+        const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
                 <WordHint 
-                    key={hintObj.authorId+index}
+                    key={hintObj.id}
                     hint={hintObj.hint} 
                     color={author.color}
                     author={authorName}

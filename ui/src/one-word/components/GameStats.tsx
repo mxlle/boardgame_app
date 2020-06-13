@@ -14,6 +14,7 @@ const styles = (theme: Theme) => createStyles({
     root: {
         width: '100%',
         height: 50,
+        marginTop: 100
     },
     appbar: {
         top: 'auto',
@@ -74,7 +75,7 @@ class GameStats extends React.Component<GameStatsProps> {
         }
 
         const round = game.round+1;
-        const roundCount = game.words.length;
+        const roundCount = game.rounds.length;
         const rightCount = getCorrectRounds(game).length;
         const wrongCount = getWrongRounds(game).length;
 

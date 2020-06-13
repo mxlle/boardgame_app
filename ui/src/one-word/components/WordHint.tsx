@@ -4,8 +4,7 @@ import { STYLES } from '../../theme';
 import WordHintInput from './WordHintInput';
 import CornerInfo from '../../common/CornerInfo';
 import PencilAnimation from '../../common/PencilAnimation';
-import { Grid, Checkbox, Paper, Typography, Box } from '@material-ui/core';
-import { Mood as MoodIcon, MoodBad as MoodBadIcon } from '@material-ui/icons';
+import { Grid, Paper, Typography, Box } from '@material-ui/core';
 
 const styles = (theme: Theme) => createStyles({
     root: { 
@@ -15,7 +14,7 @@ const styles = (theme: Theme) => createStyles({
         border: '2px solid black',
         whiteSpace: 'nowrap',
         position: 'relative',
-        padding: theme.spacing(0, 5)
+        padding: theme.spacing(0, 3.5, 0, 5)
     },
     writing: {
         borderStyle: 'dotted',
@@ -34,9 +33,9 @@ const styles = (theme: Theme) => createStyles({
     lineThrough: {
         textDecoration: 'line-through',
     },
-    toggleBtn: {
+    addon: {
         position: 'absolute',
-        right: theme.spacing(1), 
+        right: theme.spacing(2),
         zIndex: 1,
     },
 });
@@ -50,7 +49,6 @@ type WordHintProps = {
     showCheck?: boolean,
     showCross?: boolean,
     submitHint?: (hint:string)=>void,
-    toggleDuplicate?: ()=>void,
     defaultValue?: string
 }&WithStyles<typeof styles>;
 
@@ -59,8 +57,8 @@ class WordHint extends React.Component<WordHintProps> {
     render() {
         const { hint, color, author, 
                 showPencil, showCheck, showCross, 
-                submitHint, toggleDuplicate, duplicate, defaultValue,
-                classes
+                submitHint, duplicate, defaultValue,
+                classes, children
         } = this.props;
 
         const styleObj = {
@@ -94,12 +92,7 @@ class WordHint extends React.Component<WordHintProps> {
                 <Paper className={classList.join(' ')} style={duplicate?undefined:styleObj}>
                     {content}
                     {showPencil && <PencilAnimation color={color} />}
-                    {toggleDuplicate && (
-                        <Checkbox className={classes.toggleBtn} 
-                            icon={<MoodIcon />} checkedIcon={<MoodBadIcon />} 
-                            checked={duplicate || false}
-                            onChange={()=>toggleDuplicate()}/>
-                    )}
+                    {children && <Box className={classes.addon}>{children}</Box>}
                     <CornerInfo bottom left handwriting color={color}>{author}</CornerInfo>
                 </Paper>
             </Grid>

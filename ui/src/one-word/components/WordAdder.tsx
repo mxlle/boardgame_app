@@ -7,7 +7,7 @@ import i18n from '../../i18n';
 type WordAdderProps = {
     add: (words: string[])=>void,
     numOfWords: number,
-    defaultValue?: string // for tutorial
+    defaultValues?: string[]
 }
 
 type WordAdderState = {
@@ -19,12 +19,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     constructor(props: WordAdderProps) {
         super(props);
 
-        const words: string[] = [];
-        if (props.defaultValue) {
-            for (let i = 0; i < props.numOfWords; i++) {
-                words.push(props.defaultValue);
-            }
-        }
+        const words: string[] = props.defaultValues || [];
         this.state = {words};
 
         this.handleChange = this.handleChange.bind(this);

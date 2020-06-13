@@ -1,7 +1,7 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { Grid, Button, Typography } from '@material-ui/core';
+import {Grid, Button, Typography, Checkbox} from '@material-ui/core';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import { IGame, IHint } from '../../types';
 import WordCard from '../components/WordCard';
@@ -14,6 +14,7 @@ import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
+import {Mood as MoodIcon, MoodBad as MoodBadIcon} from "@material-ui/icons";
 
 type HintComparingViewProps = {
     game: IGame
@@ -42,9 +43,9 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         this._isMounted = false;
     }
 
-    async toggleDuplicate(hintIndex: number) {
-        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintIndex); return; }
-        await api.toggleDuplicateHint(this.props.game.id, hintIndex);
+    async toggleDuplicate(hintId: string) {
+        if (this.props.game.$isTutorial) { toggleDuplicateInTutorial(this.props.game, hintId); return; }
+        await api.toggleDuplicateHint(this.props.game.id, hintId);
     }
 
     async showHints() {
@@ -71,22 +72,28 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         }
 
         const currentWord = isGuesser ? '?' : (currentRound.word || '');
-        const currentHints = currentRound.hints.map((hintObj: IHint, index: number) => {
+        const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
             const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
 
             return (
                 <WordHint 
-                    key={hintObj.authorId+index}
+                    key={hintObj.id}
                     hint={hintObj.hint} 
                     color={author.color}
                     showCheck={isGuesser}
                     showCross={isGuesser&&hintObj.isDuplicate}
                     duplicate={hintObj.isDuplicate}
-                    toggleDuplicate={isRoundHost ? ()=>this.toggleDuplicate(index) : undefined}
                     author={authorName}
-                />
+                >
+                    {isRoundHost && (
+                        <Checkbox
+                            icon={<MoodIcon />} checkedIcon={<MoodBadIcon />}
+                            checked={hintObj.isDuplicate || false}
+                            onChange={ ()=>this.toggleDuplicate(hintObj.id) }/>
+                    )}
+                </WordHint>
             );
         });
 

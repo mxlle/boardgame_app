@@ -5,7 +5,6 @@ export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 export interface IGame {
     id: string;
     name: string;
-    words: string[];
     players: IUser[];
     hostId: string;
     wordsPerPlayer: number;
@@ -37,6 +36,7 @@ export interface IGameRound {
 }
 
 export interface IHint {
+    id: string;
     hint: string;
     authorId: string;
     isDuplicate?: boolean;
@@ -57,11 +57,13 @@ export interface IGameApi {
     loadGame: (gameId: string) => Promise<IGame|null>;
     addGame: (game: IGame) => Promise<string>;
     startPreparation: (gameId: string, wordsPerPlayer: number) => Promise<boolean>;
+    backToLobby: (gameId: string) => Promise<boolean>;
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
     updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;
     removePlayerFromGame: (gameId: string, playerId: string) => Promise<boolean>;
-    submitHint: (gameId: string, hint: string) => Promise<boolean>;
-    toggleDuplicateHint: (gameId: string, hintIndex: number) => Promise<boolean>;
+    submitHint: (gameId: string, hintId: string, hint: string) => Promise<boolean>;
+    resetHint: (gameId: string, hintId: string) => Promise<boolean>;
+    toggleDuplicateHint: (gameId: string, hintId: string) => Promise<boolean>;
     showHints: (gameId: string) => Promise<boolean>;
     guess: (gameId: string, guess: string) => Promise<boolean>;
     resolveRound: (gameId: string, correct: boolean|undefined) => Promise<boolean>;
@@ -75,6 +77,23 @@ export enum GameEvent {
     Update = 'updateGame',
     ApiCall = 'apiCall.Games',
     Confetti = 'confetti'
+}
+
+// Event values from socket-io
+export enum SocketEvent {
+    Connect = 'connect',
+    ConnectError = 'connect_error',
+    ConnectTimeout = 'connect_timeout',
+    Connecting = 'connecting',
+    Disconnect = 'disconnect',
+    Error = 'error',
+    Reconnect = 'reconnect',
+    ReconnectAttempt = 'reconnect_attempt',
+    ReconnectFailed = 'reconnect_failed',
+    ReconnectError = 'reconnect_error',
+    Reconnecting = 'reconnecting',
+    Ping = 'ping',
+    Pong = 'pong',
 }
 
 export const ROOM_GAME_LIST = 'gameList';

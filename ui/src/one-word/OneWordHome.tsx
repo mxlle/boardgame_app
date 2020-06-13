@@ -4,7 +4,7 @@ import {Box, Button, Container, TextField} from '@material-ui/core';
 import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
 import {Trans} from 'react-i18next';
 import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
-import {GameEvent, IGame, ROOM_GAME_LIST} from '../types';
+import {GameEvent, IGame, ROOM_GAME_LIST, SocketEvent} from '../types';
 import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
@@ -55,6 +55,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.handleChange = this.handleChange.bind(this);
         this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
         this.deleteGame = this.deleteGame.bind(this);
+        this._setupConnection = this._setupConnection.bind(this);
 
         this.state = { allGames: [], newGameName: null, gamesLoading: true };
     }
@@ -64,16 +65,21 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
         setDocumentTitle();
 
-        this.loadGames();
-
-        socket.emit(GameEvent.Subscribe, ROOM_GAME_LIST, (err: any) => err && console.error('subscribe game list', err));
-        socket.on(GameEvent.UpdateList, this.loadGames)
+        this._setupConnection();
+        socket.on(GameEvent.UpdateList, this.loadGames);
+        socket.on(SocketEvent.Reconnect, this._setupConnection);
     }
 
     componentWillUnmount() {
         this._isMounted = false;
-        socket.emit(GameEvent.Unsubscribe, ROOM_GAME_LIST, (err: any) => err && console.error('unsubscribe game list', err));
+        socket.emit(GameEvent.Unsubscribe, ROOM_GAME_LIST);
         socket.off(GameEvent.UpdateList, this.loadGames);
+        socket.off(SocketEvent.Reconnect, this._setupConnection);
+    }
+
+    private _setupConnection() {
+        socket.emit(GameEvent.Subscribe, ROOM_GAME_LIST);
+        this.loadGames();
     }
 
     async loadGames() {
