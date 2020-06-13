@@ -1,7 +1,8 @@
 // shared between api and app, needs to be in ui/src because of cra restrictions
 
 import {DEFAULT_NUM_WORDS, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
-import {generateId} from "../shared/functions";
+import {generateId, randomInt} from "../shared/functions";
+import levenshtein from "fast-levenshtein";
 
 export function addPlayer(game: IGame, player: IUser) {
     if (!game.hostId) game.hostId = player.id; // backup plan
@@ -47,39 +48,69 @@ export function startGame(game: IGame) {
 
 export function createRounds(game: IGame) {
     const numPlayers = game.players.length;
-    const rounds: IGameRound[] = [];
-    const words: string[] = game.players.flatMap((p: IUser) => p.enteredWords||[]);
-    words.forEach((word: string, i: number) => {
-        const guesserIndex = i % game.players.length;
-        const guesserId = game.players[guesserIndex].id;
+    const roundCount = numPlayers*game.wordsPerPlayer;
 
-        // calculate word to guess
-        const guessTime: number = Math.floor(i/game.players.length);
-        const guessFromIndex: number = ((guessTime%2 === 0) ? guesserIndex+1 : guesserIndex-1+numPlayers)%numPlayers;
-        const getWordsFrom: IUser = game.players[guessFromIndex];
-        const wordToGuess = getWordsFrom.enteredWords ? getWordsFrom.enteredWords[guessTime] : 'Fehler'; // TODO
+    for (let i = 0; i < roundCount; i++) {
+        const guesserIndex = i % game.players.length;
+        const hostIndex = (i+1) % game.players.length;
+        const guesserId = game.players[guesserIndex].id;
+        const hostId = game.players[hostIndex].id;
 
         let hints: IHint[] = _initHints(game.players, guesserId);
         if (game.players.length < 4) hints = hints.concat(_initHints(game.players, guesserId));
+
         const gameRound: IGameRound = {
-            word: justOne(wordToGuess),
-            authorId: getWordsFrom.id,
-            guesserId: game.players[guesserIndex].id,
-            hostId: game.players[(guesserIndex+1) % game.players.length].id,
+            word: '',
+            authorId: '',
+            guesserId,
+            hostId,
             hints: hints,
             guess: '',
             correct: null,
             countAnyway: null
         };
-        rounds.push(gameRound);
-    });
-    game.rounds = rounds;
+        game.rounds.push(gameRound);
+    }
+
+    assignWordsToRounds(game);
 }
 
 function _initHints(players: IUser[], guesserId: string): IHint[] {
     return players.filter(player => player.id !== guesserId).map(player => {
         return { id: generateId(), hint: '', authorId: player.id }
     });
+}
+
+function assignWordsToRounds(game: IGame) {
+    let words: {word: string, authorId: string}[] = game.players.flatMap((p: IUser) => (p.enteredWords||[]).map(w => ({word: w, authorId: p.id})));
+    const findRound = (r: IGameRound, round: IGameRound) => r.authorId !== round.guesserId && words.some(wo => wo.authorId !== r.guesserId);
+
+    for (let i = 0; i < game.rounds.length; i++) {
+        const round = game.rounds[i];
+        let wordOptions = words.filter(wo => wo.authorId !== round.guesserId);
+        let wordToGuess: {word: string, authorId: string};
+
+        if (wordOptions.length) {
+            wordToGuess = wordOptions[randomInt(wordOptions.length)];
+            words = words.filter(wo => wo !== wordToGuess);
+        } else {
+            const swapRound = game.rounds.find(r => findRound(r, round));
+            if (!swapRound) throw new Error('assignWordsToRounds: no solution found');
+
+            const swapWord = { word: swapRound.word, authorId: swapRound.authorId};
+
+            wordOptions = words.filter(wo => wo.authorId !== swapRound.guesserId);
+            wordToGuess = wordOptions[randomInt(wordOptions.length)];
+            words = words.filter(wo => wo !== wordToGuess);
+            swapRound.word = wordToGuess.word;
+            swapRound.authorId = wordToGuess.authorId;
+
+            wordToGuess = swapWord;
+        }
+
+        round.word = wordToGuess.word;
+        round.authorId = wordToGuess.authorId;
+    }
 }
 
 export function newRound(game: IGame, gameStart: boolean = false) {
@@ -110,13 +141,21 @@ export function resetHint(game: IGame, hintId: string, playerId: string) {
 }
 
 export function compareHints(game: IGame) {
-    const plainHints = game.rounds[game.round].hints.map(h => h.hint.toLowerCase());
-    game.rounds[game.round].hints.forEach(hint => {
-        const value = hint.hint.toLowerCase();
-        if (plainHints.indexOf(value) !== plainHints.lastIndexOf(value)) {
-            hint.isDuplicate = true;
+    const currentRound = game.rounds[game.round];
+    const currentRoundHints = currentRound.hints;
+    for (let i = 0; i < currentRoundHints.length; i++) {
+        const hint1 = currentRoundHints[i];
+        for (let j = i+1; j < currentRoundHints.length; j++) {
+            const hint2 = currentRoundHints[j];
+            if (areDuplicates(hint1.hint, hint2.hint)) {
+                hint1.isDuplicate = true;
+                hint2.isDuplicate = true;
+            }
         }
-    });
+        if (!hint1.isDuplicate && areDuplicates(hint1.hint, currentRound.word)) {
+            hint1.isDuplicate = true;
+        }
+    }
     game.phase = GamePhase.HintComparing;
 }
 
@@ -169,6 +208,41 @@ function justOne(word: string = ''): string {
 
 function isSameWord(word1: string, word2: string): boolean {
     return justOne(word1).toLowerCase() === justOne(word2).toLowerCase();
+}
+
+function getSimilarity(word1: string, word2: string) {
+    const levDistance = levenshtein.get(word1, word2);
+    const combinedLength = word1.length + word2.length;
+    return (combinedLength-levDistance)/combinedLength;
+}
+
+function getBiggestSubstring(word1: string, word2: string) {
+    for (let substrLength = Math.min(word1.length, word2.length); substrLength > 0; substrLength--) {
+        for (let i = 0; i <= word1.length-substrLength; i++) {
+            const wordPart = word1.substr(i, substrLength);
+            if (word2.includes(wordPart)) return wordPart;
+        }
+    }
+    return '';
+}
+
+function areDuplicates(word1: string, word2: string): boolean {
+    let result = false;
+    word1 = word1.toLowerCase();
+    word2 = word2.toLowerCase();
+    // let the magic begin
+    const similarity = getSimilarity(word1, word2);
+    if (similarity >= 0.8) {
+        result = true;
+    } else {
+        const biggestSubstring = getBiggestSubstring(word1, word2);
+        let score = biggestSubstring.length;
+        if (word1.startsWith(biggestSubstring)) score++;
+        if (word2.startsWith(biggestSubstring)) score++;
+        const relativeScore = score / Math.min(word1.length, word2.length);
+        if (score >= 5 && relativeScore > 0.5) result = true;
+    }
+    return result;
 }
 
 export function emptyGame(): IGame {
