@@ -1,7 +1,8 @@
 import http from 'http';
 import SocketIO from "socket.io";
 import GameApi from './routes/Games';
-import {GameEvent, IGameApi, ROOM_GAME} from "@gameTypes";
+import {GameEvent, IGameApi, ROOM_GAME, WordEvent} from "@gameTypes";
+import words from "@shared/Words";
 
 
 export const httpServer = http.createServer();
@@ -39,6 +40,10 @@ io.on('connection', (socket) => {
     });
     socket.on(GameEvent.Confetti, (gameId: string, colors: string[]) => {
         socket.in(ROOM_GAME(gameId)).emit(GameEvent.Confetti, colors);
+    });
+    socket.on(WordEvent.GetRandom, async (language: 'de'|'en', callback: (word: string)=>void) => {
+        const word = await words.getRandom(language);
+        callback(word);
     });
 });
 

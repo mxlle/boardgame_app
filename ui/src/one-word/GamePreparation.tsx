@@ -110,7 +110,12 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                             </Grid>
                         ) : (
                             <Grid item xs={12}>
-                                <WordAdder add={this.addWords} numOfWords={numWordsPerPlayer} defaultValues={defaultValues}/>
+                                <WordAdder
+                                    add={this.addWords}
+                                    numOfWords={numWordsPerPlayer}
+                                    allowRandom={!game.$isTutorial}
+                                    defaultValues={defaultValues}
+                                />
                             </Grid>
                         )
                     }

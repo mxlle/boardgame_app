@@ -9,3 +9,7 @@ export const pErr = (err: Error) => {
         logger.error(err);
     }
 };
+
+export function randomInt(max: number) {
+    return Math.floor(Math.random()*max);
+}

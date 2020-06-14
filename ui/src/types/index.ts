@@ -80,6 +80,10 @@ export enum GameEvent {
     Confetti = 'confetti'
 }
 
+export enum WordEvent {
+    GetRandom = 'getRandomWord'
+}
+
 export interface NotificationEventOptions {
     transKey: string;
     audience?: string[];

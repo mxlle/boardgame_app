@@ -29,3 +29,7 @@ i18n
 
 
 export default i18n;
+
+export function getCurrentLanguage(): string {
+    return i18n.language || window.localStorage.i18nextLng || 'de';
+}
