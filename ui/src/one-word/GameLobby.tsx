@@ -1,11 +1,13 @@
 import React from 'react';
 import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
-import {Grid, Button, Paper, Typography, Box} from '@material-ui/core';
+import {Grid, Button, Paper, Typography, Box, Tooltip} from '@material-ui/core';
 import ShareIcon from '@material-ui/icons/Share';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
+import LooksTwoIcon from '@material-ui/icons/LooksTwo';
+import HelpIcon from '@material-ui/icons/HelpOutline';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
 import { Trans } from 'react-i18next';
-import i18n from '../i18n';
+import i18n, {getCurrentLanguage} from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import WordHint from './components/WordHint';
 import NewPlayer from '../common/NewPlayer';
@@ -31,6 +33,9 @@ const styles = (theme: Theme) => createStyles({
             boxShadow: 'none',
             cursor: 'default'
         }
+    },
+    marginLeft: {
+        marginLeft: theme.spacing(1)
     }
 });
 
@@ -41,7 +46,8 @@ type GameLobbyProps = {
 
 type GameLobbyState = {
     currentPlayer: IUser,
-    roundDialogOpen: boolean
+    roundDialogOpen: boolean,
+    isTwoPlayerVariant?: boolean
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -100,11 +106,12 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         api.removePlayerFromGame(this.props.game.id, this.state.currentPlayer.id);
     }
 
-    selectNumRounds() {
+    selectNumRounds(isTwoPlayerVariant: boolean = false) {
         if (this.props.game.$isTutorial) { nextTutorialStep(); return; }
 
         this.setState({
-            roundDialogOpen: true
+            roundDialogOpen: true,
+            isTwoPlayerVariant: isTwoPlayerVariant
         });
     }
 
@@ -113,7 +120,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             roundDialogOpen: false
         });
 
-        await api.startPreparation(this.props.game.id, wordsPerPlayer);
+        await api.startPreparation(this.props.game.id, wordsPerPlayer, this.state.isTwoPlayerVariant, getCurrentLanguage());
     }
 
     shareGame() {
@@ -193,8 +200,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                             <Grid item xs={12}>
                                 <Button variant="contained" color="primary" className={game.players.length === 2 ? `submitBtn ${classes.fakeDisabled}` : 'submitBtn'}
                                     disabled={game.players.length < 2}
-                                    onClick={this.selectNumRounds}>
-                                    <Trans i18nKey="GAME.LOBBY.START_BUTTON">Alle Spieler sind da</Trans>
+                                    onClick={() => this.selectNumRounds(false)}>
+                                    <Trans i18nKey="GAME.LOBBY.START_BUTTON">Start</Trans>
                                 </Button>
                             </Grid>
                         )
@@ -206,6 +213,20 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     </Grid>
                     {listOfPlayers}
                     {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true} />}
+                    {
+                        isHost && isInGame && !game.$isTutorial && game.players.length === 2 && (
+                            <Grid item xs={12} container>
+                                <Button variant="outlined"
+                                        startIcon={<LooksTwoIcon />}
+                                        onClick={() => this.selectNumRounds(true)}>
+                                    <Trans i18nKey="GAME.LOBBY.START_TWO_PLAYERS">Two player variant</Trans>
+                                </Button>
+                                <Tooltip title={<div style={{whiteSpace: 'pre'}}><Trans i18nKey="GAME.LOBBY.START_TWO_PLAYERS_DESCRIPTION"/></div>}>
+                                    <HelpIcon className={classes.marginLeft}/>
+                                </Tooltip>
+                            </Grid>
+                        )
+                    }
                 </Grid>
                 <RoundSelector numOfPlayers={game.players.length} open={roundDialogOpen} onClose={this.startPreparation}/>
                 <TutorialOverlay key={isInGame ? '1' : '2'} game={game} />

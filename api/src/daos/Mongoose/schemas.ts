@@ -35,5 +35,7 @@ export const GameSchema: Schema = new Schema({
     round: Number,
     phase: Number,
 
-    rounds: [RoundSchema]
+    rounds: [RoundSchema],
+
+    isTwoPlayerVariant: {type: Boolean, required: false}
 });

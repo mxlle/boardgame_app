@@ -14,6 +14,7 @@ export interface IGame {
 
     rounds: IGameRound[];
 
+    isTwoPlayerVariant?: boolean;
     $isTutorial?: boolean;
 }
 
@@ -56,7 +57,7 @@ export interface IGameApi {
     loadGames: () => Promise<IGame[]>;
     loadGame: (gameId: string) => Promise<IGame|null>;
     addGame: (game: IGame) => Promise<string>;
-    startPreparation: (gameId: string, wordsPerPlayer: number) => Promise<boolean>;
+    startPreparation: (gameId: string, wordsPerPlayer: number, isTwoPlayerVariant?: boolean, language?: 'de'|'en') => Promise<boolean>;
     backToLobby: (gameId: string) => Promise<boolean>;
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
     updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;

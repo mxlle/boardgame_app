@@ -80,8 +80,8 @@ class WordHint extends React.Component<WordHintProps> {
             content = <Box fontSize={80}>✓</Box>;
         } else {
             const hintClasses = [];
-            if (hint && hint.length > 18) hintClasses.push(classes.hugeWord);
-            else if (hint && hint.length > 12) hintClasses.push(classes.longWord);
+            if (hint && hint.length > 16) hintClasses.push(classes.hugeWord);
+            else if (hint && hint.length > 10) hintClasses.push(classes.longWord);
             if (duplicate) hintClasses.push(classes.lineThrough);
 
             content = <Typography variant="h2" className={hintClasses.join(' ')}>{hint}</Typography>;

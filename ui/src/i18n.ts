@@ -30,6 +30,6 @@ i18n
 
 export default i18n;
 
-export function getCurrentLanguage(): string {
+export function getCurrentLanguage(): 'de'|'en' {
     return i18n.language || window.localStorage.i18nextLng || 'de';
 }

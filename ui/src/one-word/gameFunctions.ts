@@ -10,11 +10,16 @@ export function addPlayer(game: IGame, player: IUser) {
     game.players.push(player);
 }
 
-export function goToPreparation(game: IGame, wordsPerPlayer: number) {
+export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false) {
     if (game.phase !== GamePhase.Init) return;
 
     game.wordsPerPlayer = wordsPerPlayer || game.wordsPerPlayer || DEFAULT_NUM_WORDS;
-    game.phase = GamePhase.Preparation;
+    game.isTwoPlayerVariant = isTwoPlayerVariant;
+    if (game.isTwoPlayerVariant) {
+        startGame(game);
+    } else {
+        game.phase = GamePhase.Preparation;
+    }
 }
 
 export function backToLobby(game: IGame) {
@@ -58,6 +63,7 @@ export function createRounds(game: IGame) {
 
         let hints: IHint[] = _initHints(game.players, guesserId);
         if (game.players.length < 4) hints = hints.concat(_initHints(game.players, guesserId));
+        if (game.isTwoPlayerVariant) hints = hints.concat(_initHints(game.players, guesserId));
 
         const gameRound: IGameRound = {
             word: '',
@@ -129,7 +135,11 @@ export function addHint(game: IGame, hintId: string, hint: string, playerId: str
     hintObj.hint = justOne(hint);
 
     if (game.rounds[game.round].hints.every(h => h.hint && h.hint.length > 0)) {
-        compareHints(game);
+        if (game.isTwoPlayerVariant) {
+            removeTwoPlayerHint(game);
+        } else {
+            compareHints(game);
+        }
     }
 }
 
@@ -157,6 +167,14 @@ export function compareHints(game: IGame) {
         }
     }
     game.phase = GamePhase.HintComparing;
+}
+
+export function removeTwoPlayerHint(game: IGame) {
+    const currentRoundHints = game.rounds[game.round].hints;
+    const randomIndex = randomInt(currentRoundHints.length);
+    currentRoundHints[randomIndex].isDuplicate = true;
+
+    game.phase = GamePhase.Guessing;
 }
 
 export function toggleDuplicateHint(game: IGame, hintId: string) {

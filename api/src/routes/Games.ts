@@ -5,6 +5,7 @@ import {GameController, GamePhase, IUser} from "@entities/Game";
 import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/constants';
 import {Namespace} from "socket.io";
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from "@gameTypes";
+import words from "@shared/Words";
 
 // Init shared
 const gameDao = new GameDao();
@@ -45,7 +46,7 @@ class GameApi implements IGameApi {
         return createdGame.id as string;
     }
 
-    async startPreparation(gameId: string, wordsPerPlayer: number) {
+    async startPreparation(gameId: string, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false, language: 'de'|'en' = 'en') {
         const game = await gameDao.getOne(gameId);
         if (!game) {
             throw new Error(gameNotFoundError);
@@ -54,7 +55,16 @@ class GameApi implements IGameApi {
             throw new Error(forbiddenError);
         }
 
-        GameController.goToPreparation(game, wordsPerPlayer);
+        if (isTwoPlayerVariant) {
+            for (const player of game.players) {
+                player.enteredWords = [];
+                for (let j = 0; j < wordsPerPlayer; j++) {
+                    player.enteredWords.push(words.getRandom(language));
+                }
+            }
+        }
+
+        GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
 
         await gameDao.update(game);
 

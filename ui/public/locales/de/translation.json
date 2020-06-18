@@ -55,6 +55,8 @@
             "COPIED_LINK_ERROR": "Kopieren des Spiel-Links fehlgeschlagen, bitte manuell kopieren",
             "JOIN": "Mitspielen",
             "START_BUTTON": "Alle $t(COMMON.TEAMMATES) sind da",
+            "START_TWO_PLAYERS": "Spiel zu zweit",
+            "START_TWO_PLAYERS_DESCRIPTION": "In dieser Variante gibt ein Mitspieler drei Hinweise\nvon denen zufällig einer entfernt wird.\nDann versucht der andere Mitspieler den Begriff zu erraten.",
             "WAIT_MSG": "Warten auf $t(COMMON.TEAMMATES)... Sobald alle $t(COMMON.TEAMMATES) da sind,",
             "WAIT_MESSAGE_HOST": "$t(GAME.LOBBY.WAIT_MSG) kannst du das Spiel starten.",
             "WAIT_MESSAGE_PLAYER": "$t(GAME.LOBBY.WAIT_MSG) kann der Spielleiter das Spiel starten."
