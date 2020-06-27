@@ -3,7 +3,8 @@ import EventEmitter from 'events';
 import {SocketEvent} from "../types";
 
 const socket = io({
-    path: '/api'
+    path: '/api',
+    enablesXDR: true
 });
 
 socket.on(SocketEvent.Connect, () => {

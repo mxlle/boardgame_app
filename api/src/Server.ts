@@ -9,6 +9,7 @@ export const httpServer = http.createServer();
 const io = SocketIO(httpServer, {
     path: '/api',
     serveClient: false,
+    pingInterval: 3000,
 });
 
 interface GamesApiCall {

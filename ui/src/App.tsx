@@ -19,6 +19,8 @@ import JustOneHome from './one-word/OneWordHome';
 import OneWordGame from './one-word/OneWordGame';
 
 import './i18n';
+import ConnectionMonitor from "./one-word/components/ConnectionMonitor";
+import socket from "./shared/socket";
 
 const useStyles = makeStyles({
     root: {
@@ -61,7 +63,8 @@ export const App = () =>    {
                             <Switch>
                                 <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <OneWordGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
                                 <Route children={<JustOneHome/>} />
-                            </Switch> 
+                            </Switch>
+                            <ConnectionMonitor socket={socket}/>
                         </Paper>
                     </SnackbarProvider>
                 </Router>
