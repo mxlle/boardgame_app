@@ -7,7 +7,7 @@ import LooksTwoIcon from '@material-ui/icons/LooksTwo';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
 import { Trans } from 'react-i18next';
-import i18n, {getCurrentLanguage} from '../i18n';
+import i18n from '../i18n';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import WordHint from './components/WordHint';
 import NewPlayer from '../common/NewPlayer';
@@ -120,7 +120,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             roundDialogOpen: false
         });
 
-        await api.startPreparation(this.props.game.id, wordsPerPlayer, this.state.isTwoPlayerVariant, getCurrentLanguage());
+        await api.startPreparation(this.props.game.id, wordsPerPlayer, this.state.isTwoPlayerVariant);
     }
 
     shareGame() {

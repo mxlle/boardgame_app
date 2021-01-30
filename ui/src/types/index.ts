@@ -8,11 +8,15 @@ export interface IGame {
     players: IUser[];
     hostId: string;
     wordsPerPlayer: number;
+    language: 'de'|'en';
 
     round: number;
     phase: GamePhase;
 
     rounds: IGameRound[];
+
+    startTime?: Date;
+    endTime?: Date;
 
     isTwoPlayerVariant?: boolean;
     $isTutorial?: boolean;
@@ -57,13 +61,14 @@ export interface IGameApi {
     loadGames: () => Promise<IGame[]>;
     loadGame: (gameId: string) => Promise<IGame|null>;
     addGame: (game: IGame) => Promise<string>;
-    startPreparation: (gameId: string, wordsPerPlayer: number, isTwoPlayerVariant?: boolean, language?: 'de'|'en') => Promise<boolean>;
+    startPreparation: (gameId: string, wordsPerPlayer: number, isTwoPlayerVariant?: boolean) => Promise<boolean>;
     backToLobby: (gameId: string) => Promise<boolean>;
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
     updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;
     removePlayerFromGame: (gameId: string, playerId: string) => Promise<boolean>;
     submitHint: (gameId: string, hintId: string, hint: string) => Promise<boolean>;
     resetHint: (gameId: string, hintId: string) => Promise<boolean>;
+    endHintPhase: (gameId: string) => Promise<boolean>;
     toggleDuplicateHint: (gameId: string, hintId: string) => Promise<boolean>;
     showHints: (gameId: string) => Promise<boolean>;
     guess: (gameId: string, guess: string) => Promise<boolean>;

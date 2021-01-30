@@ -1,6 +1,6 @@
 import React from 'react';
 import i18n from '../../i18n';
-import { IGame, IHint } from '../../types';
+import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
@@ -11,6 +11,7 @@ import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
+import EndPhaseButton from "../components/EndPhaseButton";
 
 type GuessingViewProps = {
     game: IGame
@@ -46,6 +47,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
+        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
 
         const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -73,8 +75,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                         word={currentWord} 
                         guesser={guesser}
                         isGuesser={isGuesser}
+                        isGuessingPhase={true}
                         submitGuess={isGuesser ? this.guess : undefined}
                         key="1" />),
+                    <EndPhaseButton show={isGameHost && !isGuesser} endPhase={() => this.guess('')} actionMissingFrom={[guesser.name]} key="2"/>,
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 

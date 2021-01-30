@@ -15,6 +15,7 @@ export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayer
 
     game.wordsPerPlayer = wordsPerPlayer || game.wordsPerPlayer || DEFAULT_NUM_WORDS;
     game.isTwoPlayerVariant = isTwoPlayerVariant;
+    game.startTime = new Date();
     if (game.isTwoPlayerVariant) {
         startGame(game);
     } else {
@@ -218,6 +219,7 @@ export function resolveRound(game: IGame, countAsCorrect: boolean) {
 
 export function endOfGame(game: IGame) {
     game.phase = GamePhase.End;
+    game.endTime = new Date();
 }
 
 function justOne(word: string = ''): string {
@@ -270,6 +272,7 @@ export function emptyGame(): IGame {
         "players": [],
         "hostId": "",
         "wordsPerPlayer": DEFAULT_NUM_WORDS,
+        "language": "en",
         "round": 0,
         "phase": 0,
         "rounds": []

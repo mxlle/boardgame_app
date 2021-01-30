@@ -2,7 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import { Grid, Button } from '@material-ui/core';
-import { IGame, IHint } from '../../types';
+import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
@@ -13,6 +13,7 @@ import {getCurrentUserInGame} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
+import EndPhaseButton from "../components/EndPhaseButton";
 
 type SolutionViewProps = {
     game: IGame
@@ -48,7 +49,9 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
-        const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
+        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?', id: '?' };
+        const isRoundHost = currentUser && currentUser.id === roundHost.id;
+        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
 
         const currentWord = currentRound.word;
         const currentGuess = currentRound.guess;
@@ -99,6 +102,8 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                     </Button>
                 </Grid>
             );
+        } else if (isGameHost) {
+            leftCol.push(<EndPhaseButton show={isGameHost} endPhase={() => this.resolveRound(false)} actionMissingFrom={[roundHost.name]} key="endPhase"/>,);
         }
 
         if (game.$isTutorial) {

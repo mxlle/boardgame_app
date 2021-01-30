@@ -2,7 +2,7 @@ import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
 import {Grid, Button, Typography, Checkbox} from '@material-ui/core';
-import { IGame, IHint } from '../../types';
+import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
@@ -14,6 +14,7 @@ import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
 import {Mood as MoodIcon, MoodBad as MoodBadIcon} from "@material-ui/icons";
+import EndPhaseButton from "../components/EndPhaseButton";
 
 type HintComparingViewProps = {
     game: IGame
@@ -56,7 +57,9 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const guesserName = guesser.name;
-        const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
+        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?', id: '?' };
+        const isRoundHost = currentUser && currentUser.id === roundHost.id;
+        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
 
         const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -106,6 +109,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                         guesser={guesser}
                         isGuesser={isGuesser}
                         key="1" />),
+                    <EndPhaseButton show={isGameHost && !isRoundHost} endPhase={() => this.showHints()} actionMissingFrom={[roundHost.name]} key="2"/>,
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 

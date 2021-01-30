@@ -40,7 +40,10 @@
             "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",
             "CURRENT_GUESS": "{{guesserName}}s Rateversuch: {{guess}}",
             "CURRENT_GUESS_ME": "Mein Rateversuch: {{guess}}",
-            "ROUND_HOST": "Spielleiter"
+            "ROUND_HOST": "Spielleiter",
+            "TIME": "Spielzeit: {{time}}",
+            "END_PHASE": "Spiel fortsetzen ohne Aktion von {{playerList}}",
+            "END_PHASE_CONFIRM": "Du bist der Spielleiter und kannst diese Phase früher beenden, z.B. falls ein $t(COMMON.TEAMMATE) die Verbindung verloren hat.\n\nBist du sicher, dass du mit der nächsten Phase weiter machen möchtest?"
         },
         "LOBBY": {
             "ROUND_SELECT": {

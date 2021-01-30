@@ -32,18 +32,19 @@ class GameEndView extends React.Component<GameEndViewProps> {
         const wrongWords = getWrongRounds(game).map((round: IGameRound, index: number) => {
             return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={false}/>
         });
+        const total = game.rounds.length;
 
         return (
             <Grid container spacing={4} className="Game-end-view">
                 <Grid item xs={12} md={6} container spacing={2} className="Correct-words">
                     <Grid item xs={12} component={Typography} variant="h4">
-                        <Trans i18nKey="GAME.END.RIGHT" count={correctWords.length}>Richtig</Trans>
+                        <Trans i18nKey="GAME.END.RIGHT" count={correctWords.length} tOptions={{total}}>Richtig</Trans>
                     </Grid>
                     {correctWords}
                 </Grid>
                 <Grid item xs={12} md={6} container spacing={2} className="Wrong-words">
                     <Grid item xs={12} component={Typography} variant="h4">
-                        <Trans i18nKey="GAME.END.WRONG" count={wrongWords.length}>Falsch</Trans>
+                        <Trans i18nKey="GAME.END.WRONG" count={wrongWords.length} tOptions={{total}}>Falsch</Trans>
                     </Grid>
                     {wrongWords}
                 </Grid>

@@ -1,5 +1,5 @@
 import React from 'react';
-import {Button, Container, createStyles, Grid, Theme, withStyles, WithStyles} from '@material-ui/core';
+import {Box, Button, Container, createStyles, Grid, Theme, withStyles, WithStyles} from '@material-ui/core';
 import GameLobby from './GameLobby';
 import {GamePreparation} from './GamePreparation';
 import GameEndView from './GameEndView';
@@ -181,7 +181,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         if (!currentGame) return null;
 
-        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn;
+        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn, gameTime;
         const currentUser = getCurrentUserInGame(currentGame);
 
         const backToList = () => {
@@ -242,6 +242,11 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                         </ActionButton>
                     </Grid>
                 );
+                if (currentGame.endTime && currentGame.startTime) {
+                    const duration = new Date(currentGame.endTime).getTime() - new Date(currentGame.startTime).getTime();
+                    const time = new Date(duration).toISOString().substr(11, 8);
+                    gameTime = <Box margin={1} marginTop={8} marginBottom={-4}><Trans i18nKey="GAME.COMMON.TIME" tOptions={{time}}>Time: </Trans></Box>;
+                }
                 break;
         }
 
@@ -257,6 +262,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         return (
             <Container maxWidth="lg" className={classes.root}>
                 {gameContent}
+                {gameTime}
                 {returnBtn}
                 {resetTutorialBtn}
                 {confettiBtn}

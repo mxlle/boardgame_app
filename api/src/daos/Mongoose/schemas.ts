@@ -1,4 +1,4 @@
-import { Schema } from "mongoose";
+import { Schema } from 'mongoose';
 
 export const UserSchema: Schema = new Schema({
     id: String,
@@ -31,11 +31,15 @@ export const GameSchema: Schema = new Schema({
     players: [UserSchema],
     hostId: String,
     wordsPerPlayer: Number,
+    language: String,
 
     round: Number,
     phase: Number,
 
     rounds: [RoundSchema],
+
+    startTime: Date,
+    endTime: Date,
 
     isTwoPlayerVariant: {type: Boolean, required: false}
 });

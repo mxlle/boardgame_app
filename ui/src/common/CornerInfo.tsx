@@ -3,11 +3,13 @@ import { Box } from '@material-ui/core';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
 import { STYLES } from '../theme';
 
-const styles = (theme: Theme) => createStyles({
+const styles = (_theme: Theme) => createStyles({
     root: {
         position: 'absolute',
         whiteSpace: 'normal',
         fontSize: '1.2rem',
+        display: 'flex',
+        alignItems: 'center',
         lineHeight: 1
     }, 
     top: {

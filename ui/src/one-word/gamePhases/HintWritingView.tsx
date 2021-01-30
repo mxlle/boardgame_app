@@ -1,6 +1,6 @@
 import React from 'react';
 import i18n from '../../i18n';
-import { IGame, IHint } from '../../types';
+import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
 import GameField from './GameField';
@@ -13,6 +13,7 @@ import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
 import {IconButton} from "@material-ui/core";
 import EditIcon from '@material-ui/icons/Edit';
+import EndPhaseButton from "../components/EndPhaseButton";
 
 type HintWritingViewProps = {
     game: IGame
@@ -31,6 +32,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
 
         this.submitHint = this.submitHint.bind(this);
         this.resetHint = this.resetHint.bind(this);
+        this.forceEndPhase = this.forceEndPhase.bind(this);
     }
 
     componentDidMount() {
@@ -58,6 +60,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         await api.resetHint(this.props.game.id, hintId);
     }
 
+    async forceEndPhase() {
+        await api.endHintPhase(this.props.game.id);
+    }
+
     render() {
         const game: IGame = this.props.game;
         const { submittedHints } = this.state;
@@ -65,6 +71,9 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
+        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
+        let enteredHint: boolean = !!isGuesser;
+        let actionMissingFrom: string[] = [];
 
         const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -79,6 +88,13 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                 } else if (!hint) {
                     hint = submittedHints[hintObj.id].hint;
                 }
+            }
+            if (!!hint) {
+                if (hintIsMine) {
+                    enteredHint = true;
+                }
+            } else {
+                actionMissingFrom.push(authorName);
             }
             const showHint = !hint || hintIsMine;
             const showInput = !hint && hintIsMine;
@@ -113,6 +129,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         guesser={guesser}
                         isGuesser={isGuesser}
                         key="1" />),
+                    <EndPhaseButton show={isGameHost && enteredHint} endPhase={() => this.forceEndPhase()} actionMissingFrom={actionMissingFrom} key="2"/>,
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 

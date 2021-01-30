@@ -1,7 +1,7 @@
 import fs from 'fs';
 import csv from 'csv-parser';
 import path from 'path';
-import {randomInt} from "@shared/functions";
+import {randomInt} from '@shared/functions';
 
 class Words {
     private words: {de: string[], en: string[]} = {de: [], en: []};
@@ -13,7 +13,7 @@ class Words {
 
     async initWords(lng: 'en'|'de') {
         const data: any = [];
-        await new Promise((resolve, reject) => {
+        await new Promise((resolve, _reject) => {
             fs.createReadStream(path.resolve(__dirname, `../data/words-${lng}.csv`))
                 .pipe(csv({
                     headers: ['word']
@@ -28,7 +28,7 @@ class Words {
         this.words[lng] = data;
     }
 
-    getRandom(language: 'en'|'de' = 'de') {
+    getRandom(language: 'en'|'de' = 'en') {
         return this.words[language][randomInt(this.words[language].length)];
     }
 }

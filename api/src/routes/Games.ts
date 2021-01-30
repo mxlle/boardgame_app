@@ -1,11 +1,11 @@
 import {generateId} from '@shared/functions';
 
 import GameDao from '@daos/Game';
-import {GameController, GamePhase, IUser} from "@entities/Game";
+import {GameController, GamePhase, IUser} from '@entities/Game';
 import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/constants';
-import {Namespace} from "socket.io";
-import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from "@gameTypes";
-import words from "@shared/Words";
+import {Namespace} from 'socket.io';
+import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
+import words from '@shared/Words';
 
 // Init shared
 const gameDao = new GameDao();
@@ -46,7 +46,7 @@ class GameApi implements IGameApi {
         return createdGame.id as string;
     }
 
-    async startPreparation(gameId: string, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false, language: 'de'|'en' = 'en') {
+    async startPreparation(gameId: string, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false) {
         const game = await gameDao.getOne(gameId);
         if (!game) {
             throw new Error(gameNotFoundError);
@@ -59,7 +59,7 @@ class GameApi implements IGameApi {
             for (const player of game.players) {
                 player.enteredWords = [];
                 for (let j = 0; j < wordsPerPlayer; j++) {
-                    player.enteredWords.push(words.getRandom(language));
+                    player.enteredWords.push(words.getRandom(game.language));
                 }
             }
         }
@@ -189,6 +189,23 @@ class GameApi implements IGameApi {
         return true;
     };
 
+    async endHintPhase(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (game.hostId !== this.userId) {
+            throw new Error(forbiddenError);
+        }
+
+        GameController.compareHints(game);
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    };
+
     async toggleDuplicateHint(gameId: string, hintId: string) {
         const game = await gameDao.getOne(gameId);
 
@@ -208,7 +225,7 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
-        if (game.rounds[game.round].hostId !== this.userId) throw new Error(forbiddenError);
+        if (game.rounds[game.round].hostId !== this.userId && game.hostId !== this.userId) throw new Error(forbiddenError);
 
         GameController.showHints(game);
 
@@ -229,10 +246,14 @@ class GameApi implements IGameApi {
     async guess(gameId: string, guess: string) {
         const game = await gameDao.getOne(gameId);
 
+        if (guess === '' && game?.hostId === this.userId) {
+            guess = words.getRandom(game.language);
+        }
+
         if (!guess) throw new Error(paramMissingError);
         if (!game) throw new Error(gameNotFoundError);
         const currentRound = game.rounds[game.round];
-        if (currentRound.guesserId !== this.userId) throw new Error(forbiddenError);
+        if (currentRound.guesserId !== this.userId && game.hostId !== this.userId) throw new Error(forbiddenError);
 
         GameController.guess(game, guess);
 

@@ -12,7 +12,7 @@ import {SETTING_ID, SETTING_NAME} from '../shared/constants';
 import {setDocumentTitle} from '../shared/functions';
 import api from '../shared/apiFunctions';
 import {STYLES} from '../theme';
-import i18n from '../i18n';
+import i18n, {getCurrentLanguage} from '../i18n';
 import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
@@ -138,6 +138,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         let gameName = this.state.newGameName;
         if (gameName === null) gameName = getInitialGameName(this.currentUserName);
         game.name = gameName;
+        game.language = getCurrentLanguage();
 
         try {
             const gameId = await api.addGame(game);
