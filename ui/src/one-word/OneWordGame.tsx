@@ -18,7 +18,7 @@ import {RouteComponentProps, withRouter} from "react-router-dom";
 import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
-import {withSnackbar, WithSnackbarProps} from "notistack";
+import {SnackbarKey, withSnackbar, WithSnackbarProps} from "notistack";
 import i18n from '../i18n';
 import ActionButton from "../common/ActionButton";
 
@@ -56,6 +56,7 @@ export type OneWordGameChildProps = {}
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     public state: JustOneGameState = { triggerConfetti: ()=>{}, confettiAmmo: DEFAULT_CONFETTI_AMMO };
     private _isMounted: boolean = false;
+    private _notificationKeys: SnackbarKey[] = [];
 
     componentDidMount() {
         this._isMounted = true;
@@ -123,6 +124,12 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         this.setState({
             currentGame: game
         });
+        if (this._notificationKeys.length) {
+            this._notificationKeys.forEach((key) => {
+                this.props.closeSnackbar(key);
+            })
+            this._notificationKeys = [];
+        }
     }
 
     triggerConfetti(colors?: string[]) {
@@ -154,9 +161,17 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
     showNotification(options: NotificationEventOptions) {
         if (!options.audience || options.audience.includes(getCurrentUserId())) {
-            this.props.enqueueSnackbar(<Trans i18nKey={options.transKey} tOptions={options.tOptions}>{options.transKey}</Trans> , {
-                variant: options.variant
+            const isImportantMessage = options?.audience?.length === 1;
+            const notificationKey = this.props.enqueueSnackbar(<Trans i18nKey={options.transKey} tOptions={options.tOptions}>{options.transKey}</Trans> , {
+                variant: options.variant,
+                onClick: () => {
+                    this.props.closeSnackbar(notificationKey)
+                },
+                persist: isImportantMessage
             });
+            if (isImportantMessage) {
+                this._notificationKeys.push(notificationKey);
+            }
         }
     }
 
@@ -167,6 +182,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         if (!currentGame) return null;
 
         let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn;
+        const currentUser = getCurrentUserInGame(currentGame);
 
         const backToList = () => {
             if (currentGame.$isTutorial) removeTutorial();
@@ -217,7 +233,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                         </Button>
                     </Grid>
                 );
-                confettiBtn = (
+                confettiBtn = currentUser && (
                     <Grid item xs={12} className={classes.button}>
                         <ActionButton loading={!confettiAmmo}>
                             <Button variant="outlined" onClick={sendConfetti} disabled={!confettiAmmo}>

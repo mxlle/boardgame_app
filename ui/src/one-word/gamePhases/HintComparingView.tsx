@@ -58,7 +58,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const guesserName = guesser.name;
         const isRoundHost = currentUser && currentUser.id === currentRound.hostId;
 
-        const currentWord = isGuesser ? '?' : (currentRound.word || '');
+        const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
@@ -67,10 +67,10 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
             return (
                 <WordHint 
                     key={hintObj.id}
-                    hint={hintObj.hint} 
+                    hint={hintObj.hint}
                     color={author.color}
-                    showCheck={isGuesser}
-                    showCross={isGuesser&&hintObj.isDuplicate}
+                    showCheck={isGuesser||!currentUser}
+                    showCross={(isGuesser||!currentUser)&&hintObj.isDuplicate}
                     duplicate={hintObj.isDuplicate}
                     author={authorName}
                 >

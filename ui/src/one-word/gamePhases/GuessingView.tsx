@@ -47,7 +47,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
         const isGuesser = currentUser && currentUser.id === guesser.id;
 
-        const currentWord = isGuesser ? '?' : (currentRound.word || '');
+        const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hint: string = hintObj.hint;
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
