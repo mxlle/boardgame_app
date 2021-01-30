@@ -33,7 +33,7 @@
     "mongodb": "^3.5.7",
     "mongoose": "^5.9.14",
     "morgan": "^1.10.0",
-    "socket.io": "^2.3.0",
+    "socket.io": "^2.4.0",
     "uuid4": "^1.1.4",
     "winston": "^3.2.1"
   },
