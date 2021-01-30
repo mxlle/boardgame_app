@@ -8,7 +8,8 @@
         "YOUR_TURN": "Your turn!",
         "PLAYER_NAME": "Player name",
         "WELCOME_NAME": "Hi {{ name }}! Have fun!",
-        "CONFETTI": "Confetti!",
+        "CONFETTI": "Confetti! ({{confettiAmmo}})",
+        "RELOAD_CONFETTI": "Reloading confetti...",
         "BACK": "Back"
     },
     "HOME": {
@@ -39,7 +40,10 @@
             "GUESS_SPEC": "$t(GAME.COMMON.GUESS): {{guess}}",
             "CURRENT_GUESS": "{{guesserName}}'s guess: {{guess}}",
             "CURRENT_GUESS_ME": "My guess: {{guess}}",
-            "ROUND_HOST": "game master"
+            "ROUND_HOST": "game master",
+            "TIME": "Game time: {{time}}",
+            "END_PHASE": "Continue game without action from {{ playerList }}",
+            "END_PHASE_CONFIRM": "You are the game host and you can end this phase earlier, e.g. in case a $t(COMMON.TEAMMATE) lost the connection.\n\nAre you sure you want to proceed to the next phase?"
         },
         "LOBBY": {
             "ROUND_SELECT": {
@@ -81,6 +85,7 @@
             "WRONG": "Wrong: {{wrongCount}}",
             "PHASE": "Phase",
             "PHASE_WRITING": "{{ playersString }} are writing down $t(GAME.COMMON.HINTS)...",
+            "PHASE_WRITING_TWO_PLAYER": "{{ playersString }} is writing down $t(GAME.COMMON.HINTS)...",
             "PHASE_COMPARING": "{{ roundHostName }} is checking the $t(GAME.COMMON.HINTS) for duplicate or invalid words...",
             "PHASE_GUESSING": "{{ guesserName }} is trying to guess the word...",
             "PHASE_SOLUTION": "{{ guesserName }} was right!",
@@ -96,8 +101,8 @@
             "CONTINUE_RIGHT": "As good as correct"
         },
         "END": {
-            "RIGHT": "Correct ({{count}})",
-            "WRONG": "Wrong ({{count}})",
+            "RIGHT": "Correct ({{count}}/{{total}})",
+            "WRONG": "Wrong ({{count}}/{{total}})",
             "BACK_HOME": "Back to game list"
         },
         "MESSAGE": {
