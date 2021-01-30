@@ -8,7 +8,8 @@
         "YOUR_TURN": "Du bist dran!",
         "PLAYER_NAME": "Spielername",
         "WELCOME_NAME": "Hallo {{ name }}! Viel Spaß!",
-        "CONFETTI": "Konfetti!",
+        "CONFETTI": "Konfetti! ({{confettiAmmo}})",
+        "RELOAD_CONFETTI": "Konfetti nachladen...",
         "BACK": "Zurück"
     },
     "HOME": {

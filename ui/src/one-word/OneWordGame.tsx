@@ -20,6 +20,10 @@ import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {withSnackbar, WithSnackbarProps} from "notistack";
 import i18n from '../i18n';
+import ActionButton from "../common/ActionButton";
+
+const DEFAULT_CONFETTI_AMMO = 5;
+const CONFETTI_AMMO_RELOADING_TIME = 3000;
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -43,13 +47,14 @@ type JustOneGameProps = {
 }&RouteComponentProps&WithStyles<typeof styles>&WithSnackbarProps;
 type JustOneGameState = {
     currentGame?: IGame,
+    confettiAmmo: number,
     triggerConfetti: (colors?: string[], amount?: number)=>void
 };
 
 export type OneWordGameChildProps = {}
 
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
-    public state: JustOneGameState = { triggerConfetti: ()=>{} };
+    public state: JustOneGameState = { triggerConfetti: ()=>{}, confettiAmmo: DEFAULT_CONFETTI_AMMO };
     private _isMounted: boolean = false;
 
     componentDidMount() {
@@ -57,6 +62,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         this.updateGame = this.updateGame.bind(this);
         this.triggerConfetti = this.triggerConfetti.bind(this);
+        this.reduceConfettiAmmo = this.reduceConfettiAmmo.bind(this);
         this._setupConnection = this._setupConnection.bind(this);
         this.showNotification = this.showNotification.bind(this);
 
@@ -128,6 +134,24 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         this.state.triggerConfetti(colors, amount);
     }
 
+    reduceConfettiAmmo() {
+        this.setState((state) => {
+            const reducedAmmo = state.confettiAmmo - 1;
+
+            if (reducedAmmo === 0) {
+                setTimeout(() => {
+                    this.setState({
+                        confettiAmmo: DEFAULT_CONFETTI_AMMO
+                    })
+                }, CONFETTI_AMMO_RELOADING_TIME);
+            }
+
+            return {
+                confettiAmmo: reducedAmmo
+            }
+        });
+    }
+
     showNotification(options: NotificationEventOptions) {
         if (!options.audience || options.audience.includes(getCurrentUserId())) {
             this.props.enqueueSnackbar(<Trans i18nKey={options.transKey} tOptions={options.tOptions}>{options.transKey}</Trans> , {
@@ -138,7 +162,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
     render() {
         const {setTheme, history, classes} = this.props;
-        const {currentGame} = this.state;
+        const {currentGame, confettiAmmo} = this.state;
 
         if (!currentGame) return null;
 
@@ -158,6 +182,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 socket.emit(GameEvent.Confetti, currentGame.id, colors);
                 this.triggerConfetti(colors);
             }
+            this.reduceConfettiAmmo();
         }
 
         switch(currentGame.phase) {
@@ -194,9 +219,11 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 );
                 confettiBtn = (
                     <Grid item xs={12} className={classes.button}>
-                        <Button variant="outlined" onClick={sendConfetti}>
-                            <Trans i18nKey="COMMON.CONFETTI">Confetti!</Trans>
-                        </Button>
+                        <ActionButton loading={!confettiAmmo}>
+                            <Button variant="outlined" onClick={sendConfetti} disabled={!confettiAmmo}>
+                                <Trans i18nKey={confettiAmmo ? 'COMMON.CONFETTI' : 'COMMON.RELOAD_CONFETTI'} tOptions={{confettiAmmo}}>Confetti!</Trans>
+                            </Button>
+                        </ActionButton>
                     </Grid>
                 );
                 break;
