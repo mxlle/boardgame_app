@@ -80,7 +80,11 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
     private _setupConnection() {
         const gameId = this.props.gameId;
-        socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId));
+        socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId), (error: any) => {
+            if (error !== null) {
+                setTimeout(() => (this._setupConnection()), 1000);
+            }
+        });
         this.loadGame();
     }
 
