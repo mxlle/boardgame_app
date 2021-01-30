@@ -85,6 +85,7 @@
             "WRONG": "Wrong: {{wrongCount}}",
             "PHASE": "Phase",
             "PHASE_WRITING": "{{ playersString }} are writing down $t(GAME.COMMON.HINTS)...",
+            "PHASE_WRITING_TWO_PLAYER": "{{ playersString }} is writing down $t(GAME.COMMON.HINTS)...",
             "PHASE_COMPARING": "{{ roundHostName }} is checking the $t(GAME.COMMON.HINTS) for duplicate or invalid words...",
             "PHASE_GUESSING": "{{ guesserName }} is trying to guess the word...",
             "PHASE_SOLUTION": "{{ guesserName }} was right!",

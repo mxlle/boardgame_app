@@ -5,6 +5,7 @@ import { IGame, GamePhase } from '../../types';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";
 import {getCorrectRounds, getPlayerInGame, getWrongRounds} from "../gameFunctions";
+import {getNameListString} from "../../shared/functions";
 
 type GameStatsProps = {
     game: IGame
@@ -56,8 +57,12 @@ class GameStats extends React.Component<GameStatsProps> {
         switch(game.phase) {
             case GamePhase.HintWriting: 
                 const players = game.players.filter(p => p.id !== currentRound.guesserId).map(p => p.name);
-                const playersString = players.slice(0, players.length-1).join(', ') + ' und ' + players[players.length-1];
-                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING">{{playersString}} schreiben Hinweise auf...</Trans>;
+                let playersString = getNameListString(players);
+                if (game.isTwoPlayerVariant) {
+                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER">{{playersString}} schreibt Hinweise auf...</Trans>;
+                } else {
+                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING">{{playersString}} schreiben Hinweise auf...</Trans>;
+                }
                 break;
             case GamePhase.HintComparing: 
                 gamePhase = <Trans i18nKey="GAME.STATS.PHASE_COMPARING">{{roundHostName}} überprüft die Hinweise ...</Trans>;

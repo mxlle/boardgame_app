@@ -102,8 +102,8 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                     </Button>
                 </Grid>
             );
-        } else if (isGameHost) {
-            leftCol.push(<EndPhaseButton show={isGameHost} endPhase={() => this.resolveRound(false)} actionMissingFrom={[roundHost.name]} key="endPhase"/>,);
+        } else if (isGameHost && !game.isTwoPlayerVariant) {
+            leftCol.push(<EndPhaseButton show={isGameHost && !game.isTwoPlayerVariant} endPhase={() => this.resolveRound(false)} actionMissingFrom={[roundHost.name]} key="endPhase"/>,);
         }
 
         if (game.$isTutorial) {

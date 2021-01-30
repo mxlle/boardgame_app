@@ -23,6 +23,15 @@ export function randomInt(max: number) {
 	return Math.floor(Math.random()*max);
 }
 
+export function getNameListString(names: string[]) {
+	let nameListString = names.join(', ');
+	const n = nameListString.lastIndexOf(',');
+	if (n >= 0) {
+		nameListString = nameListString.substring(0, n) + ' &' + nameListString.substring(n+1, nameListString.length);
+	}
+	return nameListString;
+}
+
 export function setDocumentTitle(i18n: any, gameName?: string) {
 	const appTitleFallback = 'Nur ein Wort!';
     if (gameName) {
