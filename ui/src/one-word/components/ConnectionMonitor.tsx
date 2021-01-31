@@ -2,14 +2,12 @@ import React from "react";
 
 import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
 import {SocketEvent} from "../../types";
-import socket from "../../shared/socket";
 import {Trans} from "react-i18next";
 import {
     CheckCircle as ConnectedIcon,
     CloudOff as DisconnectedIcon,
-    Cached as ConnectingIcon
 } from '@material-ui/icons'
-import {CircularProgress} from "@material-ui/core";
+import {Box, CircularProgress} from "@material-ui/core";
 
 
 enum ConnectionStatus {
@@ -61,7 +59,7 @@ class ConnectionMonitor extends React.Component<ConnectionMonitorProps, Connecti
         const {socket} = this.props;
 
         for (let [,event] of Object.entries(SocketEvent)) {
-            socket.on(event, (data?: any) => {
+            socket.on(event, (_data?: any) => {
                 switch (event) {
                     case SocketEvent.Connect:
                     case SocketEvent.Reconnect:
@@ -97,8 +95,7 @@ class ConnectionMonitor extends React.Component<ConnectionMonitorProps, Connecti
                 {status === ConnectionStatus.Connected && <ConnectedIcon/>}
                 {status === ConnectionStatus.Disconnected && <DisconnectedIcon/>}
                 {status === ConnectionStatus.Connecting && <CircularProgress color="inherit" size={24}/>}
-                &nbsp;&nbsp;&nbsp;
-                <Trans i18nKey={"CONNECTION." + status}>{status}</Trans>
+                <Box marginLeft={1.5}><Trans i18nKey={"CONNECTION." + status}>{status}</Trans></Box>
             </div>
         );
     }
