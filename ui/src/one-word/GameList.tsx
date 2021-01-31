@@ -16,6 +16,7 @@ import { IGame, GamePhase } from '../types';
 
 import { SETTING_ID, SETTING_NAME } from '../shared/constants';
 import {getCurrentUserInGame} from "../shared/functions";
+import {getClearedForDeletion} from "./gameFunctions";
 
 type GameListProps = {
     allGames: IGame[],
@@ -39,6 +40,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
 
         const createListItem = (game: IGame) => {
             const playersString = game.players.map(p => p.name).join(', ') || '-';
+            const nowTime: number = (new Date()).getTime();
 
             return (
                 <ListItem key={game.id}
@@ -52,7 +54,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                         secondary={<Trans i18nKey="HOME.GAME_LIST.PLAYERS">Spieler: {{playersString}}</Trans>} 
                     />
                     {
-                        this.currentUserId === game.hostId && (
+                        (this.currentUserId === game.hostId || getClearedForDeletion(game, nowTime)) && (
                             <ListItemSecondaryAction>
                                 <IconButton onClick={() => deleteGame(game.id)}>
                                     <DeleteIcon/>

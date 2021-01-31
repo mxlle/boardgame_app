@@ -6,6 +6,7 @@ import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/cons
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
+import {getClearedForDeletion} from "@gameFunctions";
 
 // Init shared
 const gameDao = new GameDao();
@@ -38,6 +39,7 @@ class GameApi implements IGameApi {
 
         if (!game.id) game.id = generateId();
         if (!game.hostId) game.hostId = this.userId;
+        game.creationTime = new Date();
 
         const createdGame = await gameDao.add(game);
 
@@ -322,7 +324,7 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
-        if (game.hostId !== this.userId) throw new Error(forbiddenError);
+        if (game.hostId !== this.userId && !getClearedForDeletion(game)) throw new Error(forbiddenError);
 
         await gameDao.delete(gameId);
 

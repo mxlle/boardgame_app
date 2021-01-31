@@ -1,6 +1,7 @@
 // shared between api and app, needs to be in ui/src because of cra restrictions
 
 export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
+export const DELETE_CLEARANCE_TIME: number = 7 * 24 * 60 * 60 * 1000; // 1 week
 
 export interface IGame {
     id: string;
@@ -15,6 +16,7 @@ export interface IGame {
 
     rounds: IGameRound[];
 
+    creationTime?: Date;
     startTime?: Date;
     endTime?: Date;
 

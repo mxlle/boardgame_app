@@ -1,6 +1,6 @@
 // shared between api and app, needs to be in ui/src because of cra restrictions
 
-import {DEFAULT_NUM_WORDS, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
+import {DEFAULT_NUM_WORDS, DELETE_CLEARANCE_TIME, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
 import {generateId, randomInt} from "../shared/functions";
 import levenshtein from "fast-levenshtein";
 
@@ -289,4 +289,13 @@ export function getCorrectRounds(game: IGame): IGameRound[] {
 
 export function getWrongRounds(game: IGame): IGameRound[] {
     return game.rounds.filter(r => r.correct !== null && !r.correct && !r.countAnyway);
+}
+
+export function getClearedForDeletion(game: IGame, nowTime: number = (new Date()).getTime()): boolean {
+    if (game?.creationTime) {
+        const diff = nowTime - (new Date(game.creationTime).getTime());
+        return diff > DELETE_CLEARANCE_TIME;
+    } else {
+        return [GamePhase.Init, GamePhase.End].includes(game.phase);
+    }
 }

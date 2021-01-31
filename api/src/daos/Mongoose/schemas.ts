@@ -38,6 +38,7 @@ export const GameSchema: Schema = new Schema({
 
     rounds: [RoundSchema],
 
+    creationTime: Date,
     startTime: Date,
     endTime: Date,
 
