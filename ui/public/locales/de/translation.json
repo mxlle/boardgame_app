@@ -189,5 +189,10 @@
         "NO_CONNECTION": "Keine Verbindung!",
         "LOAD_GAMES": "$t(ERROR.NO_CONNECTION)",
         "CREATE_GAME": "$t(ERROR.NO_CONNECTION)"
+    },
+    "CONNECTION": {
+        "CONNECTED": "verbunden",
+        "DISCONNECTED": "keine Verbindung",
+        "CONNECTING": "Verbindung wird aufgebaut..."
     }
 }
