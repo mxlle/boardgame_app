@@ -20,6 +20,8 @@ export interface IGame {
     startTime?: Date;
     endTime?: Date;
 
+    rematchId?: string;
+
     isTwoPlayerVariant?: boolean;
     $isTutorial?: boolean;
 }
@@ -62,7 +64,7 @@ export enum GamePhase {
 export interface IGameApi {
     loadGames: () => Promise<IGame[]>;
     loadGame: (gameId: string) => Promise<IGame|null>;
-    addGame: (game: IGame) => Promise<string>;
+    addGame: (game: IGame, previousGameId?: string) => Promise<string>;
     startPreparation: (gameId: string, wordsPerPlayer: number, isTwoPlayerVariant?: boolean) => Promise<boolean>;
     backToLobby: (gameId: string) => Promise<boolean>;
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;

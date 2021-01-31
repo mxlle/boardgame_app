@@ -6,7 +6,7 @@ import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/cons
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
-import {getClearedForDeletion} from "@gameFunctions";
+import {getClearedForDeletion} from '@gameFunctions';
 
 // Init shared
 const gameDao = new GameDao();
@@ -32,7 +32,7 @@ class GameApi implements IGameApi {
         return gameDao.getOne(gameId);
     }
 
-    async addGame(game: IGame) {
+    async addGame(game: IGame, previousGameId?: string) {
         if (!game) {
             throw new Error(paramMissingError);
         }
@@ -44,6 +44,15 @@ class GameApi implements IGameApi {
         const createdGame = await gameDao.add(game);
 
         this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
+
+        if (previousGameId) {
+            const previousGame = await gameDao.getOne(previousGameId);
+            if (!!previousGame) {
+                previousGame.rematchId = game.id;
+                await gameDao.update(previousGame);
+                this.socket.to(ROOM_GAME(previousGame.id)).emit(GameEvent.Update, previousGame);
+            }
+        }
 
         return createdGame.id as string;
     }

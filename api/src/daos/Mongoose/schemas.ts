@@ -42,5 +42,7 @@ export const GameSchema: Schema = new Schema({
     startTime: Date,
     endTime: Date,
 
+    rematchId: String,
+
     isTwoPlayerVariant: {type: Boolean, required: false}
 });

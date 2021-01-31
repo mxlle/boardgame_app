@@ -19,8 +19,9 @@ import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {SnackbarKey, withSnackbar, WithSnackbarProps} from "notistack";
-import i18n from '../i18n';
+import i18n, {getCurrentLanguage} from '../i18n';
 import ActionButton from "../common/ActionButton";
+import {emptyGame} from "./gameFunctions";
 
 const DEFAULT_CONFETTI_AMMO = 5;
 const CONFETTI_AMMO_RELOADING_TIME = 3000;
@@ -66,10 +67,18 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         this.reduceConfettiAmmo = this.reduceConfettiAmmo.bind(this);
         this._setupConnection = this._setupConnection.bind(this);
         this.showNotification = this.showNotification.bind(this);
+        this.playAgain = this.playAgain.bind(this);
 
         this._setupConnection();
         this._subscribeToGame();
         socket.on(SocketEvent.Reconnect, this._setupConnection);
+    }
+
+    componentDidUpdate(prevProps: Readonly<JustOneGameProps>, prevState: Readonly<JustOneGameState>, snapshot?: any) {
+        if (prevProps.gameId !== this.props.gameId) {
+            socket.emit(GameEvent.Unsubscribe, ROOM_GAME(prevProps.gameId))
+            this._setupConnection();
+        }
     }
 
     componentWillUnmount() {
@@ -136,6 +145,28 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         }
     }
 
+    async playAgain() {
+        const game = this.state.currentGame;
+        if (!game) return;
+
+        if (game.rematchId) {
+            this.props.history.push('/'+game.rematchId);
+        } else {
+            const rematch: IGame = emptyGame();
+            rematch.name = game.name + ' - ' + i18n.t('GAME.AGAIN', 'Again!');
+            rematch.language = getCurrentLanguage();
+
+            try {
+                const rematchId = await api.addGame(rematch, game.id);
+
+                this.props.history.push('/'+rematchId);
+
+            } catch(e) {
+                this.props.enqueueSnackbar(<Trans i18nKey="ERROR.CREATE_GAME">Error</Trans>, { variant: 'error' });
+            }
+        }
+    }
+
     triggerConfetti(colors?: string[]) {
         const game = this.state.currentGame;
         let amount = 1;
@@ -185,7 +216,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         if (!currentGame) return null;
 
-        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn, gameTime;
+        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn, gameTime, againButton;
         const currentUser = getCurrentUserInGame(currentGame);
 
         const backToList = () => {
@@ -230,6 +261,13 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 break;
             case GamePhase.End:
                 gameContent = <GameEndView game={currentGame} />;
+                againButton = !currentGame.$isTutorial && (
+                    <Grid item xs={12} className={classes.button}>
+                        <Button variant="contained" color="primary" onClick={() => this.playAgain()}>
+                            <Trans i18nKey="GAME.AGAIN">Again!</Trans>
+                        </Button>
+                    </Grid>
+                );
                 returnBtn = (
                     <Grid item xs={12} className={classes.button}>
                         <Button variant="outlined" onClick={backToList}>
@@ -267,6 +305,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
             <Container maxWidth="lg" className={classes.root}>
                 {gameContent}
                 {gameTime}
+                {againButton}
                 {returnBtn}
                 {resetTutorialBtn}
                 {confettiBtn}
