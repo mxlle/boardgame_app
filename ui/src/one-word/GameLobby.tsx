@@ -1,6 +1,7 @@
 import React from 'react';
 import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
-import {Grid, Button, Paper, Typography, Box, Tooltip} from '@material-ui/core';
+import {Grid, Button, Paper, Typography, Box, Tooltip, IconButton} from '@material-ui/core';
+import DeleteIcon from "@material-ui/icons/Delete";
 import ShareIcon from '@material-ui/icons/Share';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import LooksTwoIcon from '@material-ui/icons/LooksTwo';
@@ -102,8 +103,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         });
     }
 
-    leaveGame() {
-        api.removePlayerFromGame(this.props.game.id, this.state.currentPlayer.id);
+    leaveGame(playerId: string = this.state.currentPlayer.id) {
+        api.removePlayerFromGame(this.props.game.id, playerId);
     }
 
     selectNumRounds(isTwoPlayerVariant: boolean = false) {
@@ -152,7 +153,14 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 isInGame = true;
             } 
             return (
-                <WordHint key={player.id} hint={player.name} color={player.color} />
+                <WordHint key={player.id} hint={player.name} color={player.color}>
+                    {isHost && (
+                        <IconButton
+                            onClick={ ()=>this.leaveGame(player.id) }>
+                            <DeleteIcon />
+                        </IconButton>
+                    )}
+                </WordHint>
             )
         });
         const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
@@ -189,7 +197,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                                 <br/>
                                 <Button variant="outlined"
                                         startIcon={<ArrowBackIcon />}
-                                        onClick={this.leaveGame}>
+                                        onClick={()=>this.leaveGame()}>
                                     <Trans i18nKey="COMMON.BACK">Back</Trans>
                                 </Button>
                             </Grid>
