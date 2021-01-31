@@ -16,6 +16,8 @@ export interface IGame {
 
     rounds: IGameRound[];
 
+    takeOverRequests: ITakeOverRequest[];
+
     creationTime?: Date;
     startTime?: Date;
     endTime?: Date;
@@ -51,6 +53,15 @@ export interface IHint {
     isDuplicate?: boolean;
 }
 
+export interface ITakeOverRequest {
+    id: string;
+    oldPlayerId: string;
+    oldPlayerName: string;
+    newPlayer: IUser;
+    accepted?: boolean;
+    denied?: boolean;
+}
+
 export enum GamePhase {
     Init,
     Preparation,
@@ -70,6 +81,8 @@ export interface IGameApi {
     addPlayer: (gameId: string, player: IUser) => Promise<boolean>;
     updatePlayer: (gameId: string, player: IUser) => Promise<boolean>;
     removePlayerFromGame: (gameId: string, playerId: string) => Promise<boolean>;
+    requestTakeOver: (gameId: string, oldPlayerId: string, newPlayer: IUser) => Promise<boolean>;
+    handleTakeOver: (gameId: string, takeOverId: string, deny?: boolean) => Promise<boolean>;
     submitHint: (gameId: string, hintId: string, hint: string) => Promise<boolean>;
     resetHint: (gameId: string, hintId: string) => Promise<boolean>;
     endHintPhase: (gameId: string) => Promise<boolean>;

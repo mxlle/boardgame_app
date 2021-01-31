@@ -2,7 +2,7 @@ import {generateId} from '@shared/functions';
 
 import GameDao from '@daos/Game';
 import {GameController, GamePhase, IUser} from '@entities/Game';
-import {forbiddenError, gameNotFoundError, paramMissingError} from '@shared/constants';
+import {forbiddenError, gameNotFoundError, paramMissingError, takeOverRequestNotFoundError} from '@shared/constants';
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
@@ -151,6 +151,56 @@ class GameApi implements IGameApi {
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    }
+
+    async requestTakeOver(gameId: string, oldPlayerId: string, newPlayer: IUser) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+
+        if (!newPlayer || !newPlayer.id || !oldPlayerId) throw new Error(paramMissingError);
+        const oldPlayerName = game.players.find(p => p.id === oldPlayerId)?.name;
+        if (!oldPlayerName || game.players.findIndex(p => p.id === newPlayer.id) > -1) throw new Error(forbiddenError);
+
+        game.takeOverRequests.push({ id: generateId(), oldPlayerId, oldPlayerName, newPlayer });
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
+    }
+
+    async handleTakeOver(gameId: string, takeOverRequestId: string, deny: boolean = false) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+        if (!takeOverRequestId) throw new Error(paramMissingError);
+        const takeOverRequest = game.takeOverRequests.find((req) => req.id === takeOverRequestId);
+        if (!takeOverRequest) throw new Error(takeOverRequestNotFoundError);
+        if (takeOverRequest.oldPlayerId !== this.userId && this.userId !== game.hostId) throw new Error(forbiddenError);
+
+        const notificationOptions: NotificationEventOptions = {
+            transKey: '',
+            audience: [takeOverRequest.newPlayer.id],
+        };
+        if (deny) {
+            takeOverRequest.denied = true;
+            notificationOptions.transKey = 'GAME.MESSAGE.TAKE_OVER_REQUEST_DENIED';
+            notificationOptions.variant = 'error';
+        } else {
+            takeOverRequest.accepted = true;
+            notificationOptions.transKey = 'GAME.MESSAGE.TAKE_OVER_REQUEST_ACCEPTED';
+            notificationOptions.variant = 'success';
+            GameController.takeOverPlayer(game, takeOverRequest);
+        }
+
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, notificationOptions);
 
         return true;
     }

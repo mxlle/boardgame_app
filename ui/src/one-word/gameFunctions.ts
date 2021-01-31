@@ -1,6 +1,15 @@
 // shared between api and app, needs to be in ui/src because of cra restrictions
 
-import {DEFAULT_NUM_WORDS, DELETE_CLEARANCE_TIME, GamePhase, IGame, IGameRound, IHint, IUser} from "../types";
+import {
+    DEFAULT_NUM_WORDS,
+    DELETE_CLEARANCE_TIME,
+    GamePhase,
+    IGame,
+    IGameRound,
+    IHint,
+    ITakeOverRequest,
+    IUser
+} from "../types";
 import {generateId, randomInt} from "../shared/functions";
 import levenshtein from "fast-levenshtein";
 
@@ -45,6 +54,24 @@ export function removePlayerFromGame(game: IGame, playerId: string) {
     if (index > -1) {
         game.players.splice(index, 1);
     }
+}
+
+export function takeOverPlayer(game: IGame, takeOverRequest: ITakeOverRequest) {
+    const { oldPlayerId, newPlayer } = takeOverRequest;
+    const oldPlayer = game.players.find(p => p.id === oldPlayerId);
+    if (!oldPlayer) return;
+    oldPlayer.id = newPlayer.id;
+    oldPlayer.name = newPlayer.name;
+    oldPlayer.color = newPlayer.color || oldPlayer.color;
+    if (game.hostId === oldPlayerId) game.hostId = newPlayer.id;
+    game.rounds.forEach((round) => {
+        if (round.hostId === oldPlayerId) round.hostId = newPlayer.id;
+        if (round.guesserId === oldPlayerId) round.guesserId = newPlayer.id;
+        if (round.authorId === oldPlayerId) round.authorId = newPlayer.id;
+        round.hints.forEach((hint) => {
+           if (hint.authorId === oldPlayerId) hint.authorId = newPlayer.id;
+        });
+    });
 }
 
 export function startGame(game: IGame) {
@@ -273,6 +300,7 @@ export function emptyGame(): IGame {
         "hostId": "",
         "wordsPerPlayer": DEFAULT_NUM_WORDS,
         "language": "en",
+        "takeOverRequests": [],
         "round": 0,
         "phase": 0,
         "rounds": []

@@ -6,7 +6,7 @@ type UserConfigProps = {
     tKey: string,
     onClose: (value: string)=>void,
     selectedValue: string,
-    possibleValues: {val: string, tKey: string}[],
+    possibleValues: {val: string, tKey?: string, displayVal?: string}[],
     open: boolean
 };
 
@@ -28,9 +28,9 @@ export class UserConfig extends React.Component<UserConfigProps> {
                     <Trans i18nKey={tKey}>Einstellung</Trans>
                 </DialogTitle>
                 <List>
-                    {possibleValues.map((value: {val: string, tKey: string}) => (
+                    {possibleValues.map((value: {val: string, tKey?: string, displayVal?: string}) => (
                         <ListItem button onClick={() => handleListItemClick(value.val)} key={value.val} selected={selectedValue === value.val}>
-                            <ListItemText primary={<Trans i18nKey={value.tKey}>{value.val}</Trans>} />
+                            <ListItemText primary={value.tKey ? <Trans i18nKey={value.tKey}>{value.val}</Trans> : (value.displayVal || value.val)} />
                         </ListItem>
                     ))}
                 </List>
