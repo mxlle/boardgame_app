@@ -1,15 +1,14 @@
 import http from 'http';
-import SocketIO from "socket.io";
+import SocketIO from 'socket.io';
 import GameApi from './routes/Games';
-import {GameEvent, IGameApi, ROOM_GAME, WordEvent} from "@gameTypes";
-import words from "@shared/Words";
+import {GameEvent, IGameApi, ROOM_GAME, WordEvent} from '@gameTypes';
+import words from '@shared/Words';
 
 
 export const httpServer = http.createServer();
 const io = SocketIO(httpServer, {
     path: '/api',
     serveClient: false,
-    pingInterval: 3000,
 });
 
 interface GamesApiCall {
