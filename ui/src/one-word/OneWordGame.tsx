@@ -85,7 +85,6 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         this.playAgain = this.playAgain.bind(this);
 
         this._setupConnection();
-        this._subscribeToGame();
         socket.on(SocketEvent.Reconnect, this._setupConnection);
     }
 
@@ -103,6 +102,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     }
 
     private _setupConnection() {
+        this._unsubscribeFromGame();
         const gameId = this.props.gameId;
         socket.emit(GameEvent.Subscribe, ROOM_GAME(gameId), (error: any) => {
             if (error !== null) {
@@ -110,6 +110,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
             }
         });
         this.loadGame();
+        this._subscribeToGame();
     }
 
     async loadGame() {

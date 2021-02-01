@@ -65,7 +65,7 @@ export function joinDuringGame(game: IGame, joiningRequest: IJoiningRequest) {
         const round = game.rounds[i];
         if (i !== 0 && i % (previousPlayerCount - 1) === 0) { // replace guesser with new one
             // new round
-            const word = player.enteredWords ? player.enteredWords[i/previousPlayerCount - 1] : '';
+            const word = player.enteredWords ? player.enteredWords[i/(previousPlayerCount - 1) - 1] : '';
             const newRoundGuesserId = round.guesserId;
             const newRoundHints = _initHints(game.players, newRoundGuesserId);
             newRounds.push({
