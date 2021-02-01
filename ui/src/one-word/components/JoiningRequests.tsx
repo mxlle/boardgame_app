@@ -9,7 +9,7 @@ import {
 } from '@material-ui/core';
 import {createStyles, Theme, withStyles, WithStyles} from "@material-ui/core/styles";
 import { Trans } from 'react-i18next';
-import {ITakeOverRequest} from "../../types";
+import {IJoiningRequest} from "../../types";
 import HighlightOffIcon from '@material-ui/icons/HighlightOff';
 import DeleteIcon from "@material-ui/icons/Delete";
 
@@ -24,7 +24,7 @@ const styles = (theme: Theme) => createStyles({
 });
 
 type JoiningRequestsProps = {
-    takeOverRequests: ITakeOverRequest[],
+    takeOverRequests: IJoiningRequest[],
     onAccept: (id: string)=>void,
     onDeny: (id: string)=>void
 }&WithStyles<typeof styles>;
@@ -44,6 +44,9 @@ class JoiningRequests extends React.Component<JoiningRequestsProps> {
         const entries = takeOverRequests.map(req => {
             const newPlayerName = req.newPlayer.name;
             const oldPlayerName = req.oldPlayerName;
+            const requestDescription = req.joinAsNewPlayer ?
+                <Trans i18nKey="GAME.JOINING.JOIN_AS_NEW">{{newPlayerName}} wants to join</Trans> :
+                <Trans i18nKey="GAME.JOINING.TAKEOVER_REQUEST">{{newPlayerName}} wants to take over {{oldPlayerName}}</Trans>;
             const state = <Trans i18nKey={req.accepted ? 'GAME.JOINING.ACCEPTED' : (req.denied ? 'GAME.JOINING.DENIED' : 'GAME.JOINING.OPEN')}>open</Trans>;
             return (
                 <ListItem key={req.id}
@@ -53,7 +56,7 @@ class JoiningRequests extends React.Component<JoiningRequestsProps> {
                 >
                     <ListItemText
                         id={req.id}
-                        primary={<Trans i18nKey="GAME.JOINING.TAKEOVER_REQUEST">{{newPlayerName}} wants to take over {{oldPlayerName}}</Trans> }
+                        primary={requestDescription}
                         secondary={state}
                     />
                     <ListItemSecondaryAction className={classes.secondaryAction}>

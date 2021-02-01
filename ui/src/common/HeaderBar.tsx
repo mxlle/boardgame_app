@@ -12,7 +12,7 @@ import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/s
 
 import { SETTING_NAME, ThemeMode } from '../shared/constants';
 
-import { UserConfig } from './UserConfig';
+import { SelectionDialog } from './SelectionDialog';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -107,14 +107,14 @@ const HeaderBar = (props: HeaderBarProps) => {
                         <Trans i18nKey="LANGPICK.HEADING">Sprache</Trans>
                     </MenuItem>
                 </Menu>
-                <UserConfig 
+                <SelectionDialog
                     tKey="THEMEPICK.HEADING"
                     open={themeConfigOpen} 
                     onClose={(theme: string) => { applyUserTheme(theme); setThemeConfigOpen(false); }}
                     selectedValue={userTheme} 
                     possibleValues={availableThemes}
                 />
-                <UserConfig 
+                <SelectionDialog
                     tKey="LANGPICK.HEADING"
                     open={languageConfigOpen} 
                     onClose={(lng: string) => { changeLanguage(lng); setLanguageConfigOpen(false); }}

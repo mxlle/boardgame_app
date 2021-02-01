@@ -107,11 +107,12 @@
             "BACK_HOME": "Back to game list"
         },
         "JOINING": {
-            "JOIN": "Join game",
             "REQUESTED_JOIN": "Requested to join",
-            "REQUEST_TAKEOVER": "Take over player",
+            "REQUEST_TAKEOVER": "Take over {{playerName}}",
+            "NEW_PLAYER": "New player",
             "REQUESTS": "Joining requests",
             "TAKEOVER_REQUEST": "{{newPlayerName}} wants to take over {{oldPlayerName}}",
+            "JOIN_AS_NEW": "{{newPlayerName}} wants to join",
             "ACCEPTED": "accepted",
             "DENIED": "denied",
             "OPEN": "click to accept"

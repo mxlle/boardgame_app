@@ -8,7 +8,7 @@ import HintWritingView from './gamePhases/HintWritingView';
 import HintComparingView from './gamePhases/HintComparingView';
 import GuessingView from './gamePhases/GuessingView';
 import SolutionView from './gamePhases/SolutionView';
-import {GameEvent, GamePhase, IGame, NotificationEventOptions, ROOM_GAME, SocketEvent} from '../types';
+import {GameEvent, GamePhase, IGame, IUser, NotificationEventOptions, ROOM_GAME, SocketEvent} from '../types';
 
 import api from '../shared/apiFunctions';
 import {getCurrentUserId, getCurrentUserInGame, setDocumentTitle} from '../shared/functions';
@@ -16,7 +16,7 @@ import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans} from "react-i18next";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import Confetti from "../common/Confetti";
-import {allColors} from "../common/ColorPicker";
+import {allColors, getRandomColor} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {SnackbarKey, withSnackbar, WithSnackbarProps} from "notistack";
 import i18n, {getCurrentLanguage} from '../i18n';
@@ -24,7 +24,8 @@ import ActionButton from "../common/ActionButton";
 import {emptyGame} from "./gameFunctions";
 import {SETTING_COLOR, SETTING_ID, SETTING_NAME} from "../shared/constants";
 import JoiningRequests from "./components/JoiningRequests";
-import {UserConfig} from "../common/UserConfig";
+import {SelectionDialogOption, SelectionDialog} from "../common/SelectionDialog";
+import NewPlayer from "../common/NewPlayer";
 
 const DEFAULT_CONFETTI_AMMO = 5;
 const CONFETTI_AMMO_RELOADING_TIME = 3000;
@@ -51,6 +52,7 @@ type JustOneGameProps = {
 }&RouteComponentProps&WithStyles<typeof styles>&WithSnackbarProps;
 type JustOneGameState = {
     currentGame?: IGame,
+    currentPlayer: IUser,
     confettiAmmo: number,
     triggerConfetti: (colors?: string[], amount?: number)=>void,
     joinGameDialogOpen: boolean
@@ -59,7 +61,16 @@ type JustOneGameState = {
 export type OneWordGameChildProps = {}
 
 class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
-    public state: JustOneGameState = { triggerConfetti: ()=>{}, confettiAmmo: DEFAULT_CONFETTI_AMMO, joinGameDialogOpen: false };
+    public state: JustOneGameState = {
+        currentPlayer: {
+            id: localStorage.getItem(SETTING_ID) || '',
+            name: localStorage.getItem(SETTING_NAME) || '',
+            color: localStorage.getItem(SETTING_COLOR) || ''
+        },
+        triggerConfetti: ()=>{},
+        confettiAmmo: DEFAULT_CONFETTI_AMMO,
+        joinGameDialogOpen: false
+    };
     private _isMounted: boolean = false;
     private _notificationKeys: SnackbarKey[] = [];
 
@@ -216,11 +227,12 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
     render() {
         const {setTheme, history, classes} = this.props;
-        const {currentGame, confettiAmmo, joinGameDialogOpen} = this.state;
+        const {currentGame, currentPlayer, confettiAmmo, joinGameDialogOpen} = this.state;
 
         if (!currentGame) return null;
 
-        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn, gameTime, againButton, takeOverRequests, takeOverButton;
+        let gameContent, gameStats, returnBtn, resetTutorialBtn, confettiBtn, gameTime, againButton, joiningRequests, joinButton;
+        let joiningList: SelectionDialogOption[] = [];
         const currentUser = getCurrentUserInGame(currentGame);
 
         const backToList = () => {
@@ -243,17 +255,12 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         const requestTakeOver = async (oldPlayerId?: string) => {
             if (oldPlayerId) {
-                const id = localStorage.getItem(SETTING_ID) || '';
-                if (!id) return;
-                const name = localStorage.getItem(SETTING_NAME) || '';
-                const color = localStorage.getItem(SETTING_COLOR) || '';
-                const newPlayer = {
-                    id,
-                    name,
-                    color
+                if (!currentPlayer.id) return;
+                if (this.props.setTheme && currentPlayer.color) {
+                    this.props.setTheme(currentPlayer.color);
                 }
                 try {
-                    await api.requestTakeOver(currentGame.id, oldPlayerId, newPlayer);
+                    await api.requestJoining(currentGame.id, oldPlayerId, currentPlayer);
                 } catch(e) {
                     console.log(e);
                 }
@@ -265,9 +272,14 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         }
 
-        const joinGame = () => {
+        const joinGame = (player: IUser = currentPlayer) => {
+            if (player) {
+                localStorage.setItem(SETTING_NAME, player.name);
+                if (player.color) localStorage.setItem('playerColor', player.color);
+            }
             this.setState({
-                joinGameDialogOpen: true
+                joinGameDialogOpen: true,
+                currentPlayer: player
             });
         }
 
@@ -328,25 +340,44 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         }
 
         if ([GamePhase.HintWriting, GamePhase.HintComparing, GamePhase.Guessing, GamePhase.Solution].includes(currentGame.phase)) {
+            if (!currentUser) {
+                const requestedTakeOver = currentGame.joiningRequests.findIndex(req => req.newPlayer.id === localStorage.getItem(SETTING_ID) && !req.denied && !req.accepted) > -1;
+                const currentUserName = localStorage.getItem(SETTING_NAME) || '';
+                let newPlayer: IUser = {
+                    color: getRandomColor(localStorage.getItem(SETTING_COLOR), currentGame.players.map(p => p.color)),
+                    ...currentPlayer
+                };
 
-            const requestedTakeOver = currentGame.takeOverRequests.findIndex(req => req.newPlayer.id === localStorage.getItem(SETTING_ID) && !req.denied && !req.accepted) > -1;
+                joiningList = currentGame.players.map(p => ({ val: p.id, displayVal: i18n.t('GAME.JOINING.REQUEST_TAKEOVER', { playerName: p.name })}));
+                if (currentGame.players.length > 3) {
+                    joiningList.unshift({
+                        val: getCurrentUserId(),
+                        displayVal: i18n.t('GAME.JOINING.NEW_PLAYER')
+                    })
+                }
 
-            takeOverButton = !currentUser && (
-                <Grid item xs={12} className={classes.button}>
-                    <Button variant="outlined" onClick={joinGame} disabled={requestedTakeOver}>
-                        <Trans i18nKey={requestedTakeOver ? 'GAME.JOINING.REQUESTED_JOIN' : 'GAME.JOINING.JOIN'}>Join</Trans>
-                    </Button>
-                </Grid>
-            );
-            if (currentUser && currentGame.takeOverRequests.length) {
-                const filteredTakeOverRequests = currentGame.takeOverRequests.filter(req => [currentGame.hostId, req.oldPlayerId].includes(currentUser.id));
+                joinButton = !!currentUserName ? (
+                    <Grid item xs={12} className={classes.button}>
+                        <Button variant="outlined" onClick={() => joinGame()} disabled={requestedTakeOver}>
+                            <Trans i18nKey={requestedTakeOver ? 'GAME.JOINING.REQUESTED_JOIN' : 'GAME.JOINING.JOIN'}>Join</Trans>
+                        </Button>
+                    </Grid>
+                ) : (
+                    <Grid item xs={12} className={classes.button}>
+                        <NewPlayer currentPlayer={newPlayer}
+                                   addPlayer={(player) => joinGame(player)}
+                                   updatePlayer={(player) => { this.setState({ currentPlayer: player })}}/>
+                    </Grid>
+                );
+            } else if (currentGame.joiningRequests.length) {
+                const filteredTakeOverRequests = currentGame.joiningRequests.filter(req => [currentGame.hostId, req.oldPlayerId].includes(currentUser.id));
                 const onRequestAccept = (id: string) => {
-                    api.handleTakeOver(currentGame.id, id);
+                    api.handleJoining(currentGame.id, id);
                 };
                 const onRequestDeny = (id: string) => {
-                    api.handleTakeOver(currentGame.id, id, true);
+                    api.handleJoining(currentGame.id, id, true);
                 };
-                takeOverRequests = filteredTakeOverRequests.length > 0 && (
+                joiningRequests = filteredTakeOverRequests.length > 0 && (
                     <JoiningRequests takeOverRequests={filteredTakeOverRequests} onAccept={onRequestAccept} onDeny={onRequestDeny}/>
                 );
             }
@@ -364,20 +395,20 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         return (
             <Container maxWidth="lg" className={classes.root}>
                 {gameContent}
-                {takeOverRequests}
-                {takeOverButton}
+                {joiningRequests}
+                {joinButton}
                 {gameTime}
                 {againButton}
                 {returnBtn}
                 {resetTutorialBtn}
                 {confettiBtn}
                 {gameStats}
-                {!currentUser && <UserConfig
-                    tKey="GAME.JOINING.REQUEST_TAKEOVER"
+                {!currentUser && <SelectionDialog
+                    tKey="GAME.JOINING.JOIN"
                     open={joinGameDialogOpen}
                     onClose={(playerId: string) => { requestTakeOver(playerId); }}
                     selectedValue={''}
-                    possibleValues={currentGame.players.map(p => ({ val: p.id, displayVal: p.name}))}
+                    possibleValues={joiningList}
                 />}
                 <Confetti colors={allColors} getTrigger={(triggerConfetti) => this.setState({triggerConfetti})} />
             </Container>

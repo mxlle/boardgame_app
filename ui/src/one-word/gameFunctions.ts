@@ -7,7 +7,7 @@ import {
     IGame,
     IGameRound,
     IHint,
-    ITakeOverRequest,
+    IJoiningRequest,
     IUser
 } from "../types";
 import {generateId, randomInt} from "../shared/functions";
@@ -56,8 +56,45 @@ export function removePlayerFromGame(game: IGame, playerId: string) {
     }
 }
 
-export function takeOverPlayer(game: IGame, takeOverRequest: ITakeOverRequest) {
-    const { oldPlayerId, newPlayer } = takeOverRequest;
+export function joinDuringGame(game: IGame, joiningRequest: IJoiningRequest) {
+    const player = joiningRequest.newPlayer;
+    const previousPlayerCount = game.players.length;
+    const newRounds: {index: number, round: IGameRound}[] = [];
+    game.players.push(player);
+    for (let i = game.round; i < game.rounds.length; i++) {
+        const round = game.rounds[i];
+        if (i !== 0 && i % (previousPlayerCount - 1) === 0) { // replace guesser with new one
+            // new round
+            const word = player.enteredWords ? player.enteredWords[i/previousPlayerCount - 1] : '';
+            const newRoundGuesserId = round.guesserId;
+            const newRoundHints = _initHints(game.players, newRoundGuesserId);
+            newRounds.push({
+                index: i,
+                round: {
+                    word,
+                    authorId: player.id,
+                    guesserId: newRoundGuesserId,
+                    hostId: player.id,
+                    hints: newRoundHints,
+                    guess: '',
+                    correct: null,
+                    countAnyway: null
+                }
+            });
+            // current round
+            round.hints = _initHints(game.players, player.id);
+            round.guesserId = player.id;
+        } else {
+            round.hints.push({ authorId: player.id, hint: '', id: generateId() });
+        }
+    }
+    for (let j = newRounds.length - 1; j >= 0; j--) {
+        game.rounds.splice(newRounds[j].index + 1, 0, newRounds[j].round);
+    }
+}
+
+export function takeOverPlayer(game: IGame, joiningRequest: IJoiningRequest) {
+    const { oldPlayerId, newPlayer } = joiningRequest;
     const oldPlayer = game.players.find(p => p.id === oldPlayerId);
     if (!oldPlayer) return;
     oldPlayer.id = newPlayer.id;
@@ -300,7 +337,7 @@ export function emptyGame(): IGame {
         "hostId": "",
         "wordsPerPlayer": DEFAULT_NUM_WORDS,
         "language": "en",
-        "takeOverRequests": [],
+        "joiningRequests": [],
         "round": 0,
         "phase": 0,
         "rounds": []

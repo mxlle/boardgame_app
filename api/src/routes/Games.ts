@@ -2,7 +2,7 @@ import {generateId} from '@shared/functions';
 
 import GameDao from '@daos/Game';
 import {GameController, GamePhase, IUser} from '@entities/Game';
-import {forbiddenError, gameNotFoundError, paramMissingError, takeOverRequestNotFoundError} from '@shared/constants';
+import {forbiddenError, gameNotFoundError, paramMissingError, joiningRequestNotFoundError} from '@shared/constants';
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
@@ -155,55 +155,68 @@ class GameApi implements IGameApi {
         return true;
     }
 
-    async requestTakeOver(gameId: string, oldPlayerId: string, newPlayer: IUser) {
+    async requestJoining(gameId: string, oldPlayerId: string, newPlayer: IUser) {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
 
         if (!newPlayer || !newPlayer.id || !oldPlayerId) throw new Error(paramMissingError);
-        const oldPlayerName = game.players.find(p => p.id === oldPlayerId)?.name;
+        const oldPlayerName = game.players.find(p => p.id === oldPlayerId)?.name || newPlayer.name;
         if (!oldPlayerName || game.players.findIndex(p => p.id === newPlayer.id) > -1) throw new Error(forbiddenError);
+        const joinAsNewPlayer = oldPlayerId === newPlayer.id;
 
-        game.takeOverRequests.push({ id: generateId(), oldPlayerId, oldPlayerName, newPlayer });
+        game.joiningRequests.push({ id: generateId(), oldPlayerId, oldPlayerName, newPlayer, joinAsNewPlayer });
+        const joiningRequestAudience = [ game.hostId ];
+        if (![game.hostId, newPlayer.id].includes(oldPlayerName)) joiningRequestAudience.push(oldPlayerName);
 
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
             transKey: 'GAME.MESSAGE.NEW_JOINING_REQUEST',
-            audience: [game.hostId, oldPlayerId]
+            audience: joiningRequestAudience
         });
 
         return true;
     }
 
-    async handleTakeOver(gameId: string, takeOverRequestId: string, deny: boolean = false) {
+    async handleJoining(gameId: string, joiningRequestId: string, deny: boolean = false) {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
-        if (!takeOverRequestId) throw new Error(paramMissingError);
-        const takeOverRequest = game.takeOverRequests.find((req) => req.id === takeOverRequestId);
-        if (!takeOverRequest) throw new Error(takeOverRequestNotFoundError);
-        if (takeOverRequest.oldPlayerId !== this.userId && this.userId !== game.hostId) throw new Error(forbiddenError);
+        if (!joiningRequestId) throw new Error(paramMissingError);
+        const joiningRequest = game.joiningRequests.find((req) => req.id === joiningRequestId);
+        if (!joiningRequest) throw new Error(joiningRequestNotFoundError);
+        if (joiningRequest.oldPlayerId !== this.userId && this.userId !== game.hostId) throw new Error(forbiddenError);
 
         let notificationOptions: NotificationEventOptions|null = null;
 
-        if (deny && (takeOverRequest.accepted || takeOverRequest.denied)) {
-            game.takeOverRequests.splice(game.takeOverRequests.findIndex(req => req.id === takeOverRequestId), 1);
+        if (deny && (joiningRequest.accepted || joiningRequest.denied)) {
+            game.joiningRequests.splice(game.joiningRequests.findIndex(req => req.id === joiningRequestId), 1);
         } else {
             notificationOptions = {
                 transKey: '',
-                audience: [takeOverRequest.newPlayer.id],
+                audience: [joiningRequest.newPlayer.id],
             };
             if (deny) {
-                takeOverRequest.denied = true;
+                joiningRequest.denied = true;
                 notificationOptions.transKey = 'GAME.MESSAGE.JOINING_REQUEST_DENIED';
                 notificationOptions.variant = 'error';
             } else {
-                takeOverRequest.accepted = true;
+                joiningRequest.accepted = true;
                 notificationOptions.transKey = 'GAME.MESSAGE.JOINING_REQUEST_ACCEPTED';
                 notificationOptions.variant = 'success';
-                GameController.takeOverPlayer(game, takeOverRequest);
+                if (joiningRequest.joinAsNewPlayer) {
+                    if (!joiningRequest.newPlayer.enteredWords || joiningRequest.newPlayer.enteredWords.length === 0) {
+                       joiningRequest.newPlayer.enteredWords = [];
+                       for (let i = 0; i < game.wordsPerPlayer; i++) {
+                           joiningRequest.newPlayer.enteredWords.push(words.getRandom(game.language));
+                       }
+                    }
+                    GameController.joinDuringGame(game, joiningRequest);
+                } else {
+                    GameController.takeOverPlayer(game, joiningRequest);
+                }
             }
         }
 

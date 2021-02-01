@@ -25,11 +25,12 @@ export const RoundSchema: Schema = new Schema({
     countAnyway: {type: Boolean, required: false}
 });
 
-export const TakeOverRequestSchema: Schema = new Schema({
+export const JoiningRequestSchema: Schema = new Schema({
     id: String,
     oldPlayerId: String,
     oldPlayerName: String,
     newPlayer: UserSchema,
+    joinAsNewPlayer: {type: Boolean, required: false},
     accepted: {type: Boolean, required: false},
     denied: {type: Boolean, required: false}
 });
@@ -47,7 +48,7 @@ export const GameSchema: Schema = new Schema({
 
     rounds: [RoundSchema],
 
-    takeOverRequests: { type: [TakeOverRequestSchema], default: [] },
+    joiningRequests: { type: [JoiningRequestSchema], default: [] },
 
     creationTime: Date,
     startTime: Date,

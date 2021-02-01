@@ -107,11 +107,12 @@
             "BACK_HOME": "Zurück zur Spieleliste"
         },
         "JOINING": {
-            "JOIN": "Spiel beitreten",
             "REQUESTED_JOIN": "Spielteilnahme angefragt",
-            "REQUEST_TAKEOVER": "Spieler übernehmen",
+            "REQUEST_TAKEOVER": "{{playerName}} übernehmen",
+            "NEW_PLAYER": "Neuer Spieler",
             "REQUESTS": "Beitrittsanfragen",
             "TAKEOVER_REQUEST": "{{newPlayerName}} möchte {{oldPlayerName}} übernehmen",
+            "JOIN_AS_NEW": "{{newPlayerName}} möchte mitspielen",
             "ACCEPTED": "angenommen",
             "DENIED": "abgelehnt",
             "OPEN": "zum Annehmen klicken"
