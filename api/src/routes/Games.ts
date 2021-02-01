@@ -169,6 +169,10 @@ class GameApi implements IGameApi {
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
+            transKey: 'GAME.MESSAGE.NEW_JOINING_REQUEST',
+            audience: [game.hostId, oldPlayerId]
+        });
 
         return true;
     }
@@ -182,25 +186,31 @@ class GameApi implements IGameApi {
         if (!takeOverRequest) throw new Error(takeOverRequestNotFoundError);
         if (takeOverRequest.oldPlayerId !== this.userId && this.userId !== game.hostId) throw new Error(forbiddenError);
 
-        const notificationOptions: NotificationEventOptions = {
-            transKey: '',
-            audience: [takeOverRequest.newPlayer.id],
-        };
-        if (deny) {
-            takeOverRequest.denied = true;
-            notificationOptions.transKey = 'GAME.MESSAGE.TAKE_OVER_REQUEST_DENIED';
-            notificationOptions.variant = 'error';
+        let notificationOptions: NotificationEventOptions|null = null;
+
+        if (deny && (takeOverRequest.accepted || takeOverRequest.denied)) {
+            game.takeOverRequests.splice(game.takeOverRequests.findIndex(req => req.id === takeOverRequestId), 1);
         } else {
-            takeOverRequest.accepted = true;
-            notificationOptions.transKey = 'GAME.MESSAGE.TAKE_OVER_REQUEST_ACCEPTED';
-            notificationOptions.variant = 'success';
-            GameController.takeOverPlayer(game, takeOverRequest);
+            notificationOptions = {
+                transKey: '',
+                audience: [takeOverRequest.newPlayer.id],
+            };
+            if (deny) {
+                takeOverRequest.denied = true;
+                notificationOptions.transKey = 'GAME.MESSAGE.JOINING_REQUEST_DENIED';
+                notificationOptions.variant = 'error';
+            } else {
+                takeOverRequest.accepted = true;
+                notificationOptions.transKey = 'GAME.MESSAGE.JOINING_REQUEST_ACCEPTED';
+                notificationOptions.variant = 'success';
+                GameController.takeOverPlayer(game, takeOverRequest);
+            }
         }
 
         await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, notificationOptions);
+        if (!!notificationOptions) this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, notificationOptions);
 
         return true;
     }

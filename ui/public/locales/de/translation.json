@@ -29,10 +29,6 @@
     "GAME": {
         "AGAIN": "Nochmal!",
         "BACK_HOME": "Zurück zur Spielliste",
-        "JOIN": "Spiel beitreten",
-        "REQUESTED_JOIN": "Spielteilnahme angefragt",
-        "REQUEST_TAKEOVER": "Spieler übernehmen",
-        "TAKE_OVER_REQUESTS": "Spielerübernahme-Anfragen",
         "COMMON": {
             "WORD": "Begriff",
             "HINT": "Hinweis",
@@ -110,14 +106,25 @@
             "WRONG": "Falsch ({{count}})",
             "BACK_HOME": "Zurück zur Spieleliste"
         },
+        "JOINING": {
+            "JOIN": "Spiel beitreten",
+            "REQUESTED_JOIN": "Spielteilnahme angefragt",
+            "REQUEST_TAKEOVER": "Spieler übernehmen",
+            "REQUESTS": "Beitrittsanfragen",
+            "TAKEOVER_REQUEST": "{{newPlayerName}} möchte {{oldPlayerName}} übernehmen",
+            "ACCEPTED": "angenommen",
+            "DENIED": "abgelehnt",
+            "OPEN": "zum Annehmen klicken"
+        },
         "MESSAGE": {
             "RESULT": "{{guesserName}} hat geraten",
             "RESULT_CORRECT": "{{guesserName}} lag richtig!",
             "RESULT_WRONG": "{{guesserName}}s Rateversuch: \"{{guess}}\"",
             "PREV_RESULT_CORRECT": "\"{{word}}\" zählt trotzdem!",
             "PREV_RESULT_WRONG": "\"{{word}}\" zählt nicht!",
-            "TAKE_OVER_REQUEST_ACCEPTED": "Beitrittsanfrage akzeptiert",
-            "TAKE_OVER_REQUEST_DENIED": "Beitrittsanfrage abgelehnt",
+            "JOINING_REQUEST_ACCEPTED": "Beitrittsanfrage akzeptiert",
+            "JOINING_REQUEST_DENIED": "Beitrittsanfrage abgelehnt",
+            "NEW_JOINING_REQUEST": "Neue Beitrittsanfrage",
             "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
             "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Gib einen $t(GAME.COMMON.HINT) ein.",
             "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Markiere ungültige $t(GAME.COMMON.HINTS).",

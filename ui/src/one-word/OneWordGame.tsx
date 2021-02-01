@@ -23,7 +23,7 @@ import i18n, {getCurrentLanguage} from '../i18n';
 import ActionButton from "../common/ActionButton";
 import {emptyGame} from "./gameFunctions";
 import {SETTING_COLOR, SETTING_ID, SETTING_NAME} from "../shared/constants";
-import {TakeOverRequests} from "./components/TakeOverRequests";
+import JoiningRequests from "./components/JoiningRequests";
 import {UserConfig} from "../common/UserConfig";
 
 const DEFAULT_CONFETTI_AMMO = 5;
@@ -329,12 +329,12 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
         if ([GamePhase.HintWriting, GamePhase.HintComparing, GamePhase.Guessing, GamePhase.Solution].includes(currentGame.phase)) {
 
-            const requestedTakeOver = currentGame.takeOverRequests.findIndex(req => req.newPlayer.id === localStorage.getItem(SETTING_ID) && !req.denied) > -1;
+            const requestedTakeOver = currentGame.takeOverRequests.findIndex(req => req.newPlayer.id === localStorage.getItem(SETTING_ID) && !req.denied && !req.accepted) > -1;
 
             takeOverButton = !currentUser && (
                 <Grid item xs={12} className={classes.button}>
                     <Button variant="outlined" onClick={joinGame} disabled={requestedTakeOver}>
-                        <Trans i18nKey={requestedTakeOver ? 'GAME.REQUESTED_JOIN' : 'GAME.JOIN'}>Join</Trans>
+                        <Trans i18nKey={requestedTakeOver ? 'GAME.JOINING.REQUESTED_JOIN' : 'GAME.JOINING.JOIN'}>Join</Trans>
                     </Button>
                 </Grid>
             );
@@ -347,7 +347,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                     api.handleTakeOver(currentGame.id, id, true);
                 };
                 takeOverRequests = filteredTakeOverRequests.length > 0 && (
-                    <TakeOverRequests takeOverRequests={filteredTakeOverRequests} onAccept={onRequestAccept} onDeny={onRequestDeny}/>
+                    <JoiningRequests takeOverRequests={filteredTakeOverRequests} onAccept={onRequestAccept} onDeny={onRequestDeny}/>
                 );
             }
         }
@@ -372,13 +372,13 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 {resetTutorialBtn}
                 {confettiBtn}
                 {gameStats}
-                <UserConfig
-                    tKey="GAME.REQUEST_TAKEOVER"
+                {!currentUser && <UserConfig
+                    tKey="GAME.JOINING.REQUEST_TAKEOVER"
                     open={joinGameDialogOpen}
                     onClose={(playerId: string) => { requestTakeOver(playerId); }}
                     selectedValue={''}
                     possibleValues={currentGame.players.map(p => ({ val: p.id, displayVal: p.name}))}
-                />
+                />}
                 <Confetti colors={allColors} getTrigger={(triggerConfetti) => this.setState({triggerConfetti})} />
             </Container>
         );
