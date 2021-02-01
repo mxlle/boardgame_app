@@ -27,6 +27,7 @@
         "START_TUTORIAL": "How to play"
     },
     "GAME": {
+        "AGAIN": "Again!",
         "BACK_HOME": "Back to game list",
         "COMMON": {
             "WORD": "Word",
@@ -105,12 +106,26 @@
             "WRONG": "Wrong ({{count}}/{{total}})",
             "BACK_HOME": "Back to game list"
         },
+        "JOINING": {
+            "REQUESTED_JOIN": "Requested to join",
+            "REQUEST_TAKEOVER": "Take over {{playerName}}",
+            "NEW_PLAYER": "New player",
+            "REQUESTS": "Joining requests",
+            "TAKEOVER_REQUEST": "{{newPlayerName}} wants to take over {{oldPlayerName}}",
+            "JOIN_AS_NEW": "{{newPlayerName}} wants to join",
+            "ACCEPTED": "accepted",
+            "DENIED": "denied",
+            "OPEN": "click to accept"
+        },
         "MESSAGE": {
             "RESULT": "{{guesserName}} guessed",
             "RESULT_CORRECT": "{{guesserName}} guessed correctly",
             "RESULT_WRONG": "{{guesserName}}'s guess: \"{{guess}}\"",
             "PREV_RESULT_CORRECT": "\"{{word}}\" counts anyway!",
             "PREV_RESULT_WRONG": "\"{{word}}\" doesn't count!",
+            "JOINING_REQUEST_ACCEPTED": "Joining request accepted",
+            "JOINING_REQUEST_DENIED": "Joining request denied",
+            "NEW_JOINING_REQUEST": "New joining request",
             "YOUR_TURN": "$t(COMMON.YOUR_TURN)",
             "YOUR_TURN_HINT_WRITING": "$t(COMMON.YOUR_TURN) Enter a $t(GAME.COMMON.HINT).",
             "YOUR_TURN_HINT_COMPARING": "$t(COMMON.YOUR_TURN) Mark invalid $t(GAME.COMMON.HINTS)",
@@ -189,5 +204,10 @@
         "NO_CONNECTION": "No connection!",
         "LOAD_GAMES": "$t(ERROR.NO_CONNECTION)",
         "CREATE_GAME": "$t(ERROR.NO_CONNECTION)"
+    },
+    "CONNECTION": {
+        "CONNECTED": "Connected",
+        "DISCONNECTED": "Disconnected",
+        "CONNECTING": "Connecting..."
     }
 }
