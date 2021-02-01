@@ -154,7 +154,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
             } 
             return (
                 <WordHint key={player.id} hint={player.name} color={player.color}>
-                    {isHost && (
+                    {isHost && !game.$isTutorial && (
                         <IconButton
                             onClick={ ()=>this.leaveGame(player.id) }>
                             <DeleteIcon />
