@@ -197,7 +197,7 @@ export function newRound(game: IGame, gameStart: boolean = false) {
 export function addHint(game: IGame, hintId: string, hint: string, playerId: string) {
     let hintObj = game.rounds[game.round].hints.find(h => h.id === hintId && h.authorId === playerId);
     if (!hintObj) return;
-    hintObj.hint = justOne(hint);
+    hintObj.hint = hint.trim();
 
     if (game.rounds[game.round].hints.every(h => h.hint && h.hint.length > 0)) {
         if (game.isTwoPlayerVariant) {
@@ -228,6 +228,9 @@ export function compareHints(game: IGame) {
             }
         }
         if (!hint1.isDuplicate && areDuplicates(hint1.hint, currentRound.word)) {
+            hint1.isDuplicate = true;
+        }
+        if (!hint1.isDuplicate && hint1.hint?.includes(' ')) {
             hint1.isDuplicate = true;
         }
     }
@@ -290,17 +293,17 @@ function justOne(word: string = ''): string {
     return word.split(' ')[0];
 }
 
-function isSameWord(word1: string, word2: string): boolean {
+function isSameWord(word1: string = '', word2: string = ''): boolean {
     return justOne(word1).toLowerCase() === justOne(word2).toLowerCase();
 }
 
-function getSimilarity(word1: string, word2: string) {
+function getSimilarity(word1: string = '', word2: string = '') {
     const levDistance = levenshtein.get(word1, word2);
     const combinedLength = word1.length + word2.length;
     return (combinedLength-levDistance)/combinedLength;
 }
 
-function getBiggestSubstring(word1: string, word2: string) {
+function getBiggestSubstring(word1: string = '', word2: string = '') {
     for (let substrLength = Math.min(word1.length, word2.length); substrLength > 0; substrLength--) {
         for (let i = 0; i <= word1.length-substrLength; i++) {
             const wordPart = word1.substr(i, substrLength);
@@ -310,7 +313,7 @@ function getBiggestSubstring(word1: string, word2: string) {
     return '';
 }
 
-function areDuplicates(word1: string, word2: string): boolean {
+function areDuplicates(word1: string = '', word2: string = ''): boolean {
     let result = false;
     word1 = word1.toLowerCase();
     word2 = word2.toLowerCase();
