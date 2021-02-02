@@ -79,7 +79,7 @@ class WordHint extends React.Component<WordHintProps> {
         } else if (showCheck) {
             content = <Box fontSize={80}>✓</Box>;
         } else {
-            const hintClasses = [];
+            const hintClasses = ['notranslate'];
             if (hint && hint.length > 16) hintClasses.push(classes.hugeWord);
             else if (hint && hint.length > 10) hintClasses.push(classes.longWord);
             if (duplicate) hintClasses.push(classes.lineThrough);

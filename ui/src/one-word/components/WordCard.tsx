@@ -63,7 +63,7 @@ class WordCard extends React.Component<WordCardProps> {
     render() {
         const { word, guesser, isGuesser, guess, guessedRight, isGuessingPhase, submitGuess, small, classes} = this.props;
 
-        const classList = [classes.wordCard];
+        const classList = [classes.wordCard, 'notranslate'];
         const cardStyle = {borderColor: guesser?.color};
         let guesserInfo: React.ReactElement[], originalWord;
         guesserInfo = [<span>{guesser?.name}</span>];
