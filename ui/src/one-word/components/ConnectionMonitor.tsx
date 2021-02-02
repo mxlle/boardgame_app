@@ -20,7 +20,7 @@ enum ConnectionStatus {
 const styles = (theme: Theme) => createStyles({
     root: {
         position: 'fixed',
-        bottom: 50,
+        bottom: 80,
         left: 0,
         borderRadius: ' 0 5px 5px 0',
         padding: theme.spacing(1, 2),
