@@ -130,7 +130,7 @@ class GameApi implements IGameApi {
             // send notification for next phase
             const options: NotificationEventOptions = {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
-                audience: game.actionRequiredFrom?.map(p => p.id) || []
+                audience: game.actionRequiredFrom.map(p => p.id)
             };
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
         }
@@ -246,7 +246,7 @@ class GameApi implements IGameApi {
             // send notification for next phase
             const options: NotificationEventOptions = {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_COMPARING',
-                audience: game.actionRequiredFrom?.map(p => p.id) || []
+                audience: game.actionRequiredFrom.map(p => p.id)
             };
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
         }
@@ -319,7 +319,7 @@ class GameApi implements IGameApi {
         // send notification for next phase
         const options: NotificationEventOptions = {
             transKey: 'GAME.MESSAGE.YOUR_TURN_GUESSING',
-            audience: game.actionRequiredFrom?.map(p => p.id) || []
+            audience: game.actionRequiredFrom.map(p => p.id)
         };
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
 
@@ -357,7 +357,7 @@ class GameApi implements IGameApi {
         } else {
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_SOLUTION',
-                audience: game.actionRequiredFrom?.map(p => p.id) || []
+                audience: game.actionRequiredFrom.map(p => p.id)
             });
         }
 
@@ -393,7 +393,7 @@ class GameApi implements IGameApi {
         if (game.phase === GamePhase.HintWriting) {
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
-                audience: game.actionRequiredFrom?.map(p => p.id) || []
+                audience: game.actionRequiredFrom.map(p => p.id)
             });
         }
 

@@ -85,13 +85,14 @@
             "RIGHT": "Richtige: {{rightCount}}",
             "WRONG": "Falsche: {{wrongCount}}",
             "PHASE": "Phase",
-            "PHASE_WRITING": "{{ actionRequiredFrom }} schreibt einen $t(GAME.COMMON.HINT) auf...",
-            "PHASE_WRITING_plural": "{{ actionRequiredFrom }} schreiben $t(GAME.COMMON.HINTS) auf...",
-            "PHASE_WRITING_TWO_PLAYER": "{{ actionRequiredFrom }} schreibt $t(GAME.COMMON.HINTS) auf...",
-            "PHASE_COMPARING": "{{ actionRequiredFrom }} überprüft die $t(GAME.COMMON.HINTS) auf ungültige oder doppelte Wörter...",
-            "PHASE_GUESSING": "{{ actionRequiredFrom }} versucht den $t(GAME.COMMON.WORD) zu erraten...",
-            "PHASE_SOLUTION": "{{ guesserName }} lag genau richtig!",
-            "PHASE_SOLUTION_WRONG": " {{ guesserName }} lag daneben! {{ actionRequiredFrom }} entscheidet ob es trotzdem zählt..."
+            "PHASE_WRITING": " schreibt einen $t(GAME.COMMON.HINT) auf...",
+            "PHASE_WRITING_plural": " schreiben $t(GAME.COMMON.HINTS) auf...",
+            "PHASE_WRITING_TWO_PLAYER": " schreibt $t(GAME.COMMON.HINTS) auf...",
+            "PHASE_COMPARING": " überprüft die $t(GAME.COMMON.HINTS) auf ungültige oder doppelte Wörter...",
+            "PHASE_GUESSING": " versucht den $t(GAME.COMMON.WORD) zu erraten...",
+            "PHASE_SOLUTION": " lag genau richtig!",
+            "PHASE_SOLUTION_WRONG": " lag daneben!",
+            "PHASE_SOLUTION_WRONG_2": " entscheidet ob es trotzdem zählt..."
         },
         "COMPARING": {
             "INFO": "Benutze die Smiley-Buttons auf den Hinweisen um doppelte oder ungültige Werte zu markieren.",

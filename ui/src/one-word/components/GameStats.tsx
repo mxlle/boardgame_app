@@ -1,11 +1,10 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import i18n from '../../i18n';
-import { IGame, GamePhase } from '../../types';
+import {IGame, GamePhase, IUser} from '../../types';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";
 import {getCorrectRounds, getPlayerInGame, getWrongRounds} from "../gameFunctions";
-import {getNameListString} from "../../shared/functions";
 
 type GameStatsProps = {
     game: IGame
@@ -21,6 +20,7 @@ const styles = (theme: Theme) => createStyles({
         top: 'auto',
         bottom: 0,
         marginBottom: 0,
+        backgroundColor: theme.palette.background.paper,
     },
     contents: {
         display: 'flex',
@@ -33,8 +33,25 @@ const styles = (theme: Theme) => createStyles({
             transform: 'translateY(-48px)',
         }
     },
-    phase: {
-        fontStyle: 'italic'
+    statusMessage: {
+        color: theme.palette.text.secondary,
+        fontWeight: 'bold',
+    },
+    nameTag: {
+        '&.isFirst': {
+            marginLeft: theme.spacing(0.5),
+        },
+        '&:not(.isFirst)': {
+            '&:before': {
+                color: theme.palette.text.secondary,
+                content: '","',
+                marginRight: theme.spacing(0.5),
+            },
+            '&.isLast:before': {
+                content: '"&"',
+                marginLeft: theme.spacing(0.5),
+            }
+        }
     }
 });
 
@@ -50,32 +67,41 @@ class GameStats extends React.Component<GameStatsProps> {
     render() {
         const {game, classes} = this.props;
         const currentRound = game.rounds[game.round];
+        let listKey = 0;
 
-        const actionRequiredFrom = getNameListString(game.actionRequiredFrom?.map(p => p.name) || []);
+        const getNameTag = (player: IUser, isFirst = true, isLast = true) => {
+            let classNames = classes.nameTag;
+            if (isFirst) classNames += ' isFirst';
+            if (isLast) classNames += ' isLast';
+            return <span className={classNames} style={{color: player.color}} key={listKey++}>{player.name}</span>;
+        }
 
-        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?' };
-        const guesserName = guesser.name;
 
-        let gamePhase;
+        const actionRequiredFrom = game.actionRequiredFrom.map((p, i, ps) => getNameTag(p, i === 0, i === ps.length-1));
+
+        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
+
+        let statusMessageElements: JSX.Element[] = [];
         switch(game.phase) {
             case GamePhase.HintWriting:
                 if (game.isTwoPlayerVariant) {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER">{{actionRequiredFrom}} schreibt Hinweise auf...</Trans>;
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER">writes hints</Trans>);
                 } else {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING" count={game.actionRequiredFrom?.length}>{{actionRequiredFrom}} schreiben Hinweise auf...</Trans>;
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING" count={game.actionRequiredFrom.length}>write hints</Trans>);
                 }
                 break;
             case GamePhase.HintComparing: 
-                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_COMPARING">{{actionRequiredFrom}} überprüft die Hinweise ...</Trans>;
+                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_COMPARING">checks hints</Trans>);
                 break;
             case GamePhase.Guessing: 
-                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_GUESSING">{{actionRequiredFrom}} versucht den Begriff zu erraten...</Trans>;
+                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_GUESSING">guesses</Trans>);
                 break;
             case GamePhase.Solution: 
                 if (currentRound.correct) {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION">{{guesserName}} lag genau richtig!</Trans>;
+                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION">was right!</Trans>);
                 } else {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG">{{guesserName}} lag daneben! {{actionRequiredFrom}} entscheidet ob es trotzdem zählt...</Trans>;
+                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG">was wrong!</Trans>);
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG_2">decides</Trans>);
                 }
                 break;
         }
@@ -94,7 +120,7 @@ class GameStats extends React.Component<GameStatsProps> {
                                 Runde {{round}}/{{roundCount}}
                             </Trans>
                         </div>
-                        <div className={classes.phase}>{gamePhase}</div>
+                        <div className={classes.statusMessage}>{statusMessageElements}</div>
                         <div>
                             <CardIcon type={CardTypes.CORRECT} title={i18n.t('GAME.STATS.RIGHT', {rightCount}).toString()}>{rightCount}</CardIcon>
                             <CardIcon type={CardTypes.WRONG} title={i18n.t('GAME.STATS.WRONG', {wrongCount}).toString()}>{wrongCount}</CardIcon>
