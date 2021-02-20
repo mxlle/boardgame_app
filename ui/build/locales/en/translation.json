@@ -85,12 +85,14 @@
             "RIGHT": "Correct: {{rightCount}}",
             "WRONG": "Wrong: {{wrongCount}}",
             "PHASE": "Phase",
-            "PHASE_WRITING": "{{ playersString }} are writing down $t(GAME.COMMON.HINTS)...",
-            "PHASE_WRITING_TWO_PLAYER": "{{ playersString }} is writing down $t(GAME.COMMON.HINTS)...",
-            "PHASE_COMPARING": "{{ roundHostName }} is checking the $t(GAME.COMMON.HINTS) for duplicate or invalid words...",
-            "PHASE_GUESSING": "{{ guesserName }} is trying to guess the word...",
-            "PHASE_SOLUTION": "{{ guesserName }} was right!",
-            "PHASE_SOLUTION_WRONG": " {{ guesserName }} wrong! {{ roundHostName }} is deciding if it still counts..."
+            "PHASE_WRITING": " is writing down a $t(GAME.COMMON.HINT)...",
+            "PHASE_WRITING_plural": " are writing down $t(GAME.COMMON.HINTS)...",
+            "PHASE_WRITING_TWO_PLAYER": " is writing down $t(GAME.COMMON.HINTS)...",
+            "PHASE_COMPARING": " is checking the $t(GAME.COMMON.HINTS) for duplicate or invalid words...",
+            "PHASE_GUESSING": " is trying to guess the word...",
+            "PHASE_SOLUTION": " was right!",
+            "PHASE_SOLUTION_WRONG": " was wrong!",
+            "PHASE_SOLUTION_WRONG_2": " is deciding if it still counts..."
         },
         "COMPARING": {
             "INFO": "Use the smiley buttons on the $t(GAME.COMMON.HINTS) to mark duplicate or invalid $t(GAME.COMMON.HINTS)",
