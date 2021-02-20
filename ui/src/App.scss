@@ -49,6 +49,24 @@ $breakPoint_md: 720px; // TODO
     }
 }
 
+.Game-end-view .Evaluation {
+    margin-bottom: 2*$gridSize;
+    .MuiLinearProgress-root {
+        width: 100%;
+        margin: 2*$gridSize;
+        height: 3*$gridSize;
+    }
+    .Percentage, .ResultEmoji {
+        width: 100%;
+        font-size: 3*$gridSize;
+        font-weight: bold;
+        margin: $gridSize;
+    }
+    .ResultEmoji {
+        font-size: 8*$gridSize;
+    }
+}
+
 .MuiPaper-root.StatusInfo {
     padding: $standardMargin;
 }
