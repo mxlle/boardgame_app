@@ -56,14 +56,14 @@ export function removePlayerFromGame(game: IGame, playerId: string) {
     }
 }
 
-export function joinDuringGame(game: IGame, joiningRequest: IJoiningRequest) {
+export function joinDuringGame(game: IGame, joiningRequest: IJoiningRequest, addNewRounds: boolean = false) {
     const player = joiningRequest.newPlayer;
     const previousPlayerCount = game.players.length;
     const newRounds: {index: number, round: IGameRound}[] = [];
     game.players.push(player);
     for (let i = game.round; i < game.rounds.length; i++) {
         const round = game.rounds[i];
-        if (i !== 0 && i % (previousPlayerCount - 1) === 0) { // replace guesser with new one
+        if (addNewRounds && i !== 0 && i % (previousPlayerCount - 1) === 0) { // replace guesser with new one
             // new round
             const word = player.enteredWords ? player.enteredWords[i/(previousPlayerCount - 1) - 1] : '';
             const newRoundGuesserId = round.guesserId;
@@ -88,8 +88,10 @@ export function joinDuringGame(game: IGame, joiningRequest: IJoiningRequest) {
             round.hints.push({ authorId: player.id, hint: '', id: generateId() });
         }
     }
-    for (let j = newRounds.length - 1; j >= 0; j--) {
-        game.rounds.splice(newRounds[j].index + 1, 0, newRounds[j].round);
+    if (addNewRounds) {
+        for (let j = newRounds.length - 1; j >= 0; j--) {
+            game.rounds.splice(newRounds[j].index + 1, 0, newRounds[j].round);
+        }
     }
 }
 
