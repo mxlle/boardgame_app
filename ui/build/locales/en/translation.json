@@ -104,6 +104,7 @@
             "CONTINUE_RIGHT": "As good as correct"
         },
         "END": {
+            "HEADING": "Your result",
             "RIGHT": "Correct ({{count}}/{{total}})",
             "WRONG": "Wrong ({{count}}/{{total}})",
             "BACK_HOME": "Back to game list"

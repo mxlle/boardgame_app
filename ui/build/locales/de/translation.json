@@ -104,6 +104,7 @@
             "CONTINUE_RIGHT": "Das zählt trotzdem"
         },
         "END": {
+            "HEADING": "Euer Ergebnis",
             "RIGHT": "Richtig ({{count}})",
             "WRONG": "Falsch ({{count}})",
             "BACK_HOME": "Zurück zur Spieleliste"
