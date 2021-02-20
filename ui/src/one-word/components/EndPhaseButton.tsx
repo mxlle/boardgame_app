@@ -3,10 +3,11 @@ import {Theme, withStyles, createStyles, WithStyles, Button, Grid} from "@materi
 import {Trans} from "react-i18next";
 import i18n from "../../i18n";
 import {getNameListString} from "../../shared/functions";
+import {IUser} from "../../types";
 
 type EndPhaseButtonProps = {
     endPhase: () => void,
-    actionMissingFrom: string[],
+    actionRequiredFrom: IUser[],
     show: boolean
 } & WithStyles<typeof styles>;
 
@@ -18,8 +19,8 @@ const styles = (_theme: Theme) => createStyles({
 
 class EndPhaseButton extends React.Component<EndPhaseButtonProps> {
     render() {
-        const { show, endPhase, actionMissingFrom } = this.props;
-        let playerList = getNameListString(actionMissingFrom);
+        const { show, endPhase, actionRequiredFrom } = this.props;
+        let playerList = getNameListString(actionRequiredFrom.map(p => p.name));
 
         if (!show) {
             return null;

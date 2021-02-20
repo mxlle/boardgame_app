@@ -291,6 +291,34 @@ export function endOfGame(game: IGame) {
     game.endTime = new Date();
 }
 
+export function getPlayersWithRequiredAction(game: IGame): IUser[] {
+    let actionRequiredFromIds: string[] = [];
+    switch (game.phase) {
+        case GamePhase.Init:
+            break;
+        case GamePhase.Preparation:
+            actionRequiredFromIds = game.players.filter(p => !p.enteredWords || p.enteredWords.length < game.wordsPerPlayer).map(p => p.id);
+            break;
+        case GamePhase.HintWriting:
+            actionRequiredFromIds = game.rounds[game.round].hints.filter(h => !h.hint).map(h => h.authorId);
+            break;
+        case GamePhase.HintComparing:
+            actionRequiredFromIds = [game.rounds[game.round].hostId];
+            break;
+        case GamePhase.Guessing:
+            actionRequiredFromIds = [game.rounds[game.round].guesserId];
+            break;
+        case GamePhase.Solution:
+            if (!game.rounds[game.round].correct && !game.rounds[game.round].countAnyway) {
+                actionRequiredFromIds = [game.rounds[game.round].hostId];
+            }
+            break;
+        case GamePhase.End:
+            break;
+    }
+    return game.players.filter(p => actionRequiredFromIds.includes(p.id)).map(p => ({ id: p.id, name: p.name, color: p.color}));
+}
+
 function justOne(word: string = ''): string {
     return word.split(' ')[0];
 }
@@ -345,7 +373,8 @@ export function emptyGame(): IGame {
         "joiningRequests": [],
         "round": 0,
         "phase": 0,
-        "rounds": []
+        "rounds": [],
+        "actionRequiredFrom": []
     };
 }
 

@@ -32,6 +32,9 @@ const styles = (theme: Theme) => createStyles({
         '& .MuiCollapse-wrapperInner': {
             transform: 'translateY(-48px)',
         }
+    },
+    phase: {
+        fontStyle: 'italic'
     }
 });
 
@@ -48,33 +51,31 @@ class GameStats extends React.Component<GameStatsProps> {
         const {game, classes} = this.props;
         const currentRound = game.rounds[game.round];
 
-        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?' };
-        const roundHostName = roundHost.name;
+        const actionRequiredFrom = getNameListString(game.actionRequiredFrom?.map(p => p.name) || []);
+
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?' };
         const guesserName = guesser.name;
 
         let gamePhase;
         switch(game.phase) {
-            case GamePhase.HintWriting: 
-                const players = game.players.filter(p => p.id !== currentRound.guesserId).map(p => p.name);
-                let playersString = getNameListString(players);
+            case GamePhase.HintWriting:
                 if (game.isTwoPlayerVariant) {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER">{{playersString}} schreibt Hinweise auf...</Trans>;
+                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER">{{actionRequiredFrom}} schreibt Hinweise auf...</Trans>;
                 } else {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING">{{playersString}} schreiben Hinweise auf...</Trans>;
+                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_WRITING" count={game.actionRequiredFrom?.length}>{{actionRequiredFrom}} schreiben Hinweise auf...</Trans>;
                 }
                 break;
             case GamePhase.HintComparing: 
-                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_COMPARING">{{roundHostName}} überprüft die Hinweise ...</Trans>;
+                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_COMPARING">{{actionRequiredFrom}} überprüft die Hinweise ...</Trans>;
                 break;
             case GamePhase.Guessing: 
-                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_GUESSING">{{guesserName}} versucht den Begriff zu erraten...</Trans>;
+                gamePhase = <Trans i18nKey="GAME.STATS.PHASE_GUESSING">{{actionRequiredFrom}} versucht den Begriff zu erraten...</Trans>;
                 break;
             case GamePhase.Solution: 
                 if (currentRound.correct) {
                     gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION">{{guesserName}} lag genau richtig!</Trans>;
                 } else {
-                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG">{{roundHostName}} lag daneben! {{guesserName}} entscheidet ob es trotzdem zählt...</Trans>;
+                    gamePhase = <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG">{{guesserName}} lag daneben! {{actionRequiredFrom}} entscheidet ob es trotzdem zählt...</Trans>;
                 }
                 break;
         }
@@ -93,7 +94,7 @@ class GameStats extends React.Component<GameStatsProps> {
                                 Runde {{round}}/{{roundCount}}
                             </Trans>
                         </div>
-                        <div><Trans i18nKey="GAME.STATS.PHASE">Phase</Trans>: {gamePhase}</div>
+                        <div className={classes.phase}>{gamePhase}</div>
                         <div>
                             <CardIcon type={CardTypes.CORRECT} title={i18n.t('GAME.STATS.RIGHT', {rightCount}).toString()}>{rightCount}</CardIcon>
                             <CardIcon type={CardTypes.WRONG} title={i18n.t('GAME.STATS.WRONG', {wrongCount}).toString()}>{wrongCount}</CardIcon>

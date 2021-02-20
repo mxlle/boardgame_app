@@ -25,7 +25,10 @@ export interface IGame {
     rematchId?: string;
 
     isTwoPlayerVariant?: boolean;
-    $isTutorial?: boolean;
+
+    actionRequiredFrom: IUser[]; // calculated virtual property
+
+    $isTutorial?: boolean; // only in FE
 }
 
 export interface IUser {

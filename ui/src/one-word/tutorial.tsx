@@ -3,7 +3,15 @@ import {Trans} from "react-i18next";
 import {Step} from "react-joyride";
 import {GameEvent, GamePhase, IGame, IUser} from "../types";
 import {getCurrentUserId} from "../shared/functions";
-import {addHint, emptyGame, guess, newRound, resolveRound, toggleDuplicateHint} from "./gameFunctions";
+import {
+    addHint,
+    getPlayersWithRequiredAction,
+    emptyGame,
+    guess,
+    newRound,
+    resolveRound,
+    toggleDuplicateHint
+} from "./gameFunctions";
 import {getRandomColor} from "../common/ColorPicker";
 import {tutorialEmitter} from "../shared/socket";
 
@@ -20,6 +28,7 @@ function createTutorial(): IGame {
 }
 
 export function saveTutorial(game: IGame) {
+    game.actionRequiredFrom = getPlayersWithRequiredAction(game);
     sessionStorage.setItem(SETTING_TUTORIAL, JSON.stringify(game));
     tutorialEmitter.emit(GameEvent.Update, game);
 }

@@ -6,7 +6,6 @@ import {forbiddenError, gameNotFoundError, paramMissingError, joiningRequestNotF
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
-import {getClearedForDeletion} from '@gameFunctions';
 
 // Init shared
 const gameDao = new GameDao();
@@ -77,9 +76,9 @@ class GameApi implements IGameApi {
 
         GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
@@ -91,9 +90,9 @@ class GameApi implements IGameApi {
 
         GameController.backToLobby(game);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
@@ -107,9 +106,9 @@ class GameApi implements IGameApi {
         if (!player.id) player.id = this.userId;
         GameController.addPlayer(game, player);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
         this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
 
         return true;
@@ -124,14 +123,14 @@ class GameApi implements IGameApi {
 
         GameController.updatePlayer(game, player);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
         if (game.phase === GamePhase.HintWriting) {
             // send notification for next phase
             const options: NotificationEventOptions = {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
-                audience: game.players.filter(p => p.id !== game.rounds[game.round].guesserId).map(p => p.id)
+                audience: game.actionRequiredFrom?.map(p => p.id) || []
             };
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
         }
@@ -148,9 +147,9 @@ class GameApi implements IGameApi {
 
         GameController.removePlayerFromGame(game, playerId);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     }
@@ -169,9 +168,9 @@ class GameApi implements IGameApi {
         const joiningRequestAudience = [ game.hostId ];
         if (![game.hostId, newPlayer.id].includes(oldPlayerName)) joiningRequestAudience.push(oldPlayerName);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
             transKey: 'GAME.MESSAGE.NEW_JOINING_REQUEST',
             audience: joiningRequestAudience
@@ -220,9 +219,9 @@ class GameApi implements IGameApi {
             }
         }
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
         if (!!notificationOptions) this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, notificationOptions);
 
         return true;
@@ -239,15 +238,15 @@ class GameApi implements IGameApi {
 
         GameController.addHint(game, hintId, hint, this.userId);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         if (game.phase === GamePhase.HintComparing) {
             // send notification for next phase
             const options: NotificationEventOptions = {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_COMPARING',
-                audience: [game.rounds[game.round].hostId]
+                audience: game.actionRequiredFrom?.map(p => p.id) || []
             };
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
         }
@@ -266,9 +265,9 @@ class GameApi implements IGameApi {
 
         GameController.resetHint(game, hintId, this.userId);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
@@ -283,9 +282,9 @@ class GameApi implements IGameApi {
 
         GameController.compareHints(game);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
@@ -298,9 +297,9 @@ class GameApi implements IGameApi {
 
         GameController.toggleDuplicateHint(game, hintId);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
@@ -313,14 +312,14 @@ class GameApi implements IGameApi {
 
         GameController.showHints(game);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         // send notification for next phase
         const options: NotificationEventOptions = {
             transKey: 'GAME.MESSAGE.YOUR_TURN_GUESSING',
-            audience: [game.rounds[game.round].guesserId]
+            audience: game.actionRequiredFrom?.map(p => p.id) || []
         };
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, options);
 
@@ -341,9 +340,9 @@ class GameApi implements IGameApi {
 
         GameController.guess(game, guess);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         // send notification
         const guesserName = game.players.find(p => p.id === currentRound.guesserId)?.name;
@@ -358,7 +357,7 @@ class GameApi implements IGameApi {
         } else {
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_SOLUTION',
-                audience: [currentRound.hostId]
+                audience: game.actionRequiredFrom?.map(p => p.id) || []
             });
         }
 
@@ -387,15 +386,14 @@ class GameApi implements IGameApi {
 
         GameController.resolveRound(game, !!correct);
 
-        await gameDao.update(game);
+        const updatedGame = await gameDao.update(game);
 
         // send notification for next phase
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
         if (game.phase === GamePhase.HintWriting) {
-            const audience: string[] = game.players.filter(p => p.id !== game.rounds[game.round].guesserId).map(p => p.id);
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
-                audience
+                audience: game.actionRequiredFrom?.map(p => p.id) || []
             });
         }
 
@@ -406,7 +404,7 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
-        if (game.hostId !== this.userId && !getClearedForDeletion(game)) throw new Error(forbiddenError);
+        if (game.hostId !== this.userId && !GameController.getClearedForDeletion(game)) throw new Error(forbiddenError);
 
         await gameDao.delete(gameId);
 

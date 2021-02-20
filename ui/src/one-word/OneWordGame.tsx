@@ -77,7 +77,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
     componentDidMount() {
         this._isMounted = true;
 
-        this.updateGame = this.updateGame.bind(this);
+        this.setGameAfterUpdate = this.setGameAfterUpdate.bind(this);
         this.triggerConfetti = this.triggerConfetti.bind(this);
         this.reduceConfettiAmmo = this.reduceConfettiAmmo.bind(this);
         this._setupConnection = this._setupConnection.bind(this);
@@ -121,16 +121,18 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
         } else {
             game = await api.loadGame(gameId);
         }
-        if (game) this.updateGame(game);
+        if (game) {
+            this.setGameAfterUpdate(game);
+        }
     }
 
     private _subscribeToGame() {
         const { gameId } = this.props;
         if (gameId === TUTORIAL_ID) {
-            tutorialEmitter.on(GameEvent.Update, this.updateGame);
+            tutorialEmitter.on(GameEvent.Update, this.setGameAfterUpdate);
             tutorialEmitter.on(GameEvent.Confetti, this.triggerConfetti);
         } else {
-            socket.on(GameEvent.Update, this.updateGame);
+            socket.on(GameEvent.Update, this.setGameAfterUpdate);
             socket.on(GameEvent.Confetti, this.triggerConfetti);
             socket.on(GameEvent.Notification, this.showNotification);
         }
@@ -138,14 +140,14 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
 
     private _unsubscribeFromGame() {
         socket.emit(GameEvent.Unsubscribe, ROOM_GAME(this.props.gameId))
-        socket.off(GameEvent.Update, this.updateGame);
+        socket.off(GameEvent.Update, this.setGameAfterUpdate);
         socket.off(GameEvent.Confetti, this.triggerConfetti);
         socket.off(GameEvent.Notification, this.showNotification);
-        tutorialEmitter.off(GameEvent.Update, this.updateGame);
+        tutorialEmitter.off(GameEvent.Update, this.setGameAfterUpdate);
         tutorialEmitter.off(GameEvent.Confetti, this.triggerConfetti);
     }
 
-    updateGame(game: IGame) {
+    setGameAfterUpdate(game: IGame) {
         if (!this._isMounted) return;
         if (this.props.gameId !== game.id) return;
 
@@ -360,7 +362,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 joinButton = !!currentUserName ? (
                     <Grid item xs={12} className={classes.button}>
                         <Button variant="outlined" onClick={() => joinGame()} disabled={requestedTakeOver}>
-                            <Trans i18nKey={requestedTakeOver ? 'GAME.JOINING.REQUESTED_JOIN' : 'GAME.JOINING.JOIN'}>Join</Trans>
+                            <Trans i18nKey={requestedTakeOver ? 'GAME.JOINING.REQUESTED_JOIN' : 'GAME.LOBBY.JOIN'}>Join</Trans>
                         </Button>
                     </Grid>
                 ) : (
@@ -405,7 +407,7 @@ class OneWordGame extends React.Component<JustOneGameProps,JustOneGameState> {
                 {confettiBtn}
                 {gameStats}
                 {!currentUser && <SelectionDialog
-                    tKey="GAME.JOINING.JOIN"
+                    tKey="GAME.LOBBY.JOIN"
                     open={joinGameDialogOpen}
                     onClose={(playerId: string) => { requestTakeOver(playerId); }}
                     selectedValue={''}

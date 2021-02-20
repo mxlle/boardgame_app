@@ -1,4 +1,5 @@
 import { Schema } from 'mongoose';
+import { getPlayersWithRequiredAction } from '@gameFunctions';
 
 export const UserSchema: Schema = new Schema({
     id: String,
@@ -35,7 +36,7 @@ export const JoiningRequestSchema: Schema = new Schema({
     denied: {type: Boolean, required: false}
 });
 
-export const GameSchema: Schema = new Schema({
+const GameSchema: Schema = new Schema({
     id: String,
     name: String,
     players: [UserSchema],
@@ -57,4 +58,11 @@ export const GameSchema: Schema = new Schema({
     rematchId: String,
 
     isTwoPlayerVariant: {type: Boolean, required: false}
+}, { toJSON: { virtuals: true } });
+
+GameSchema.virtual('actionRequiredFrom').get(function() {
+    // @ts-ignore
+    return getPlayersWithRequiredAction(this);
 });
+
+export {GameSchema};

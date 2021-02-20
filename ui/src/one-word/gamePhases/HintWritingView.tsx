@@ -73,7 +73,6 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         const isGuesser = currentUser && currentUser.id === guesser.id;
         const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
         let enteredHint: boolean = !!isGuesser;
-        let actionMissingFrom: string[] = [];
 
         const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
@@ -93,8 +92,6 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                 if (hintIsMine) {
                     enteredHint = true;
                 }
-            } else {
-                actionMissingFrom.push(authorName);
             }
             const showHint = !hint || hintIsMine;
             const showInput = !hint && hintIsMine;
@@ -129,7 +126,11 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         guesser={guesser}
                         isGuesser={isGuesser}
                         key="1" />),
-                    <EndPhaseButton show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial} endPhase={() => this.forceEndPhase()} actionMissingFrom={actionMissingFrom} key="2"/>,
+                    (<EndPhaseButton
+                        show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial}
+                        endPhase={() => this.forceEndPhase()}
+                        actionRequiredFrom={game.actionRequiredFrom}
+                        key="2"/>),
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
