@@ -13,13 +13,13 @@ type EndPhaseButtonProps = {
 
 const styles = (_theme: Theme) => createStyles({
     root: {
-
+        opacity: 0.5
     },
 });
 
 class EndPhaseButton extends React.Component<EndPhaseButtonProps> {
     render() {
-        const { show, endPhase, actionRequiredFrom } = this.props;
+        const { show, endPhase, actionRequiredFrom, classes } = this.props;
         let playerList = getNameListString(actionRequiredFrom.map(p => p.name));
 
         if (!show) {
@@ -33,8 +33,8 @@ class EndPhaseButton extends React.Component<EndPhaseButtonProps> {
         };
 
         return (
-            <Grid item xs={12}>
-                <Button variant="outlined"
+            <Grid item xs={12} className={classes.root}>
+                <Button variant="outlined" size="small"
                         onClick={() => confirmEndPhase()}>
                     <Trans i18nKey="GAME.COMMON.END_PHASE" tOptions={{playerList}}>Phase beenden</Trans>
                 </Button>
