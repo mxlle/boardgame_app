@@ -114,6 +114,9 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                         endPhase={() => this.showHints()}
                         actionRequiredFrom={game.actionRequiredFrom}
                         key="2"/>),
+                    game.$isTutorial && game.round === 1 ? (<Button onClick={() => {nextTutorialStep();}} className="tutorialBtn" key="tutorialBtn">
+                        <Trans i18nKey="TUTORIAL.CONTINUE">Continue</Trans>
+                    </Button>) : <span/>,
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 

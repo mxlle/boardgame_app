@@ -76,7 +76,12 @@ export function nextTutorialStep(word?: string) {
             break;
         case GamePhase.HintComparing:
             game.phase = GamePhase.Guessing;
-            if (game.rounds[game.round].guesserId.length === 1) tutorialGuess(game, word);
+            if (game.rounds[game.round].guesserId.length === 1) {
+                setTimeout(() => {
+                    tutorialGuess(game);
+                    saveTutorial(game);
+                }, MAGIC_TUTORIAL_DELAY);
+            }
             break;
         case GamePhase.Guessing:
             tutorialGuess(game, word);
@@ -142,10 +147,13 @@ function triggerAddingHint(game: IGame, index: number) {
             triggerAddingHint(game, index+1);
         }
         // check if want to skip phases
-        if (game.phase === GamePhase.HintComparing && game.rounds[game.round].hostId.length === 1) { // if not tutorial player is host
+        if (game.phase === GamePhase.HintComparing && game.round !== 1 && game.rounds[game.round].hostId.length === 1) { // if not tutorial player is host
             game.phase = GamePhase.Guessing;
             if (game.rounds[game.round].guesserId.length === 1) {
-                tutorialGuess(game);
+                setTimeout(() => {
+                    tutorialGuess(game);
+                    saveTutorial(game);
+                }, MAGIC_TUTORIAL_DELAY);
             }
             saveTutorial(game);
         }
@@ -376,7 +384,19 @@ const JOYRIDE_WRITING_STEPS: Step[][] = [
 ];
 const JOYRIDE_COMPARING_STEPS: Step[][] = [
     [],
-    [],
+    [
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO">Notice that duplicate hints will be removed</Trans>,
+            title: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO_TITLE">Oh no!</Trans>,
+            target: '.Current-hints',
+            placement: 'center',
+            disableBeacon: true
+        },
+        {
+            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.WRONG_CONTINUE">Press here to continue</Trans>,
+            target: '.tutorialBtn'
+        },
+    ],
     [
         {
             content: <Trans i18nKey="TUTORIAL.GAME.TOGGLE_INFO">Toggle hints</Trans>,
@@ -420,19 +440,9 @@ const JOYRIDE_SOLUTION_STEPS: Step[][] = [
     ],
     [
         {
-            content: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO">Notice that duplicate hints will be removed</Trans>,
-            title: <Trans i18nKey="TUTORIAL.GAME.DUPLICATE_INFO_TITLE">Oh no!</Trans>,
-            target: '.Current-hints',
-            placement: 'center',
-            disableBeacon: true
-        },
-        {
             content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.WRONG" tOptions={{player: TUTORIAL_PLAYERS[1].name}}>The answer was wrong</Trans>,
-            target: '.Current-word'
-        },
-        {
-            content: <Trans i18nKey="TUTORIAL.GAME.SOLUTION.WRONG_CONTINUE">Press here to continue</Trans>,
-            target: '.tutorialBtn'
+            target: '.Current-word',
+            disableBeacon: true
         },
     ],
     [
