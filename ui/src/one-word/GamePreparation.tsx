@@ -96,7 +96,6 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
 
         const myWordCards = myWords.map(word => <WordCard key={word} small word={word} />)
 
-        // TODO not in game users
         // TODO css classes
         return (
             <Grid container spacing={4} className="Game-lobby">

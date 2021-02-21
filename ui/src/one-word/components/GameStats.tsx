@@ -69,6 +69,8 @@ class GameStats extends React.Component<GameStatsProps> {
         const currentRound = game.rounds[game.round];
         let listKey = 0;
 
+        if ([GamePhase.Init, GamePhase.Preparation, GamePhase.End].includes(game.phase)) return null;
+
         const getNameTag = (player: IUser, isFirst = true, isLast = true) => {
             let classNames = classes.nameTag;
             if (isFirst) classNames += ' isFirst';
@@ -85,23 +87,23 @@ class GameStats extends React.Component<GameStatsProps> {
         switch(game.phase) {
             case GamePhase.HintWriting:
                 if (game.isTwoPlayerVariant) {
-                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER"> writes hints</Trans>);
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING_TWO_PLAYER" key={listKey++}> writes hints</Trans>);
                 } else {
-                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING" count={game.actionRequiredFrom.length}> write hints</Trans>);
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_WRITING" count={game.actionRequiredFrom.length} key={listKey++}> write hints</Trans>);
                 }
                 break;
             case GamePhase.HintComparing: 
-                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_COMPARING"> checks hints</Trans>);
+                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_COMPARING" key={listKey++}> checks hints</Trans>);
                 break;
             case GamePhase.Guessing: 
-                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_GUESSING"> guesses</Trans>);
+                statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_GUESSING" key={listKey++}> guesses</Trans>);
                 break;
             case GamePhase.Solution: 
                 if (currentRound.correct) {
-                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION"> was right!</Trans>);
+                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION" key={listKey++}> was right!</Trans>);
                 } else {
-                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG"> was wrong!</Trans>);
-                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG_2"> decides</Trans>);
+                    statusMessageElements.push(getNameTag(guesser), <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG" key={listKey++}> was wrong!</Trans>);
+                    statusMessageElements.push(...actionRequiredFrom, <Trans i18nKey="GAME.STATS.PHASE_SOLUTION_WRONG_2" key={listKey++}> decides</Trans>);
                 }
                 break;
         }

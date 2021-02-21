@@ -1,26 +1,55 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
-import {Grid, LinearProgress, Typography} from '@material-ui/core';
+import {Box, Button, createStyles, Grid, Theme, Typography, withStyles} from '@material-ui/core';
 import WordCard from './components/WordCard';
-import {IGame, IGameRound} from '../types';
-import { getCorrectRounds, getPlayerInGame, getWrongRounds} from "./gameFunctions";
+import {GameEvent, IGame, IGameRound} from '../types';
+import {emptyGame, getCorrectRounds, getPlayerInGame, getWrongRounds} from "./gameFunctions";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
+import Evaluation from "./components/Evaluation";
+import {WithStyles} from "@material-ui/core/styles";
+import {getCurrentUserInGame} from "../shared/functions";
+import {removeTutorial, TUTORIAL_ID} from "./tutorial";
+import socket from "../shared/socket";
+import i18n, {getCurrentLanguage} from "../i18n";
+import api from "../shared/apiFunctions";
+import {RouteComponentProps, withRouter} from "react-router-dom";
+import ConfettiButton from "../common/ConfettiButton";
+import TimerIcon from '@material-ui/icons/Timer';
+
+const styles = (theme: Theme) => createStyles({
+    timeBox: {
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      margin: theme.spacing(1),
+      marginTop: theme.spacing(8),
+      '& > svg': {
+          marginRight: theme.spacing(1)
+      }
+    },
+    buttons: {
+        display: 'flex',
+        flexDirection: 'column',
+        alignItems: 'center',
+        marginBottom: theme.spacing(2),
+        '& > *': {
+            margin: theme.spacing(1)
+        }
+    }
+});
 
 type GameEndViewProps = {
     game: IGame
-}&WithSnackbarProps&OneWordGameChildProps;
-
-type GameEndViewState = {
-    resultPercentage?: number
-}
-
-class GameEndView extends React.Component<GameEndViewProps, GameEndViewState> {
+    triggerConfetti: (colors?: string[], amount?: number)=>void,
+}&RouteComponentProps&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
+class GameEndView extends React.Component<GameEndViewProps> {
     private _isMounted: boolean = false;
 
     componentDidMount() {
         this._isMounted = true;
+        this.playAgain = this.playAgain.bind(this);
     }
 
     componentWillUnmount() {
@@ -28,9 +57,30 @@ class GameEndView extends React.Component<GameEndViewProps, GameEndViewState> {
         this.props.closeSnackbar();
     }
 
+    async playAgain() {
+        const game = this.props.game;
+        if (!game) return;
+
+        if (game.rematchId) {
+            this.props.history.push('/'+game.rematchId);
+        } else {
+            const rematch: IGame = emptyGame();
+            rematch.name = game.name + ' - ' + i18n.t('GAME.AGAIN', 'Again!');
+            rematch.language = getCurrentLanguage();
+
+            try {
+                const rematchId = await api.addGame(rematch, game.id);
+
+                this.props.history.push('/'+rematchId);
+
+            } catch(e) {
+                this.props.enqueueSnackbar(<Trans i18nKey="ERROR.CREATE_GAME">Error</Trans>, { variant: 'error' });
+            }
+        }
+    }
+
     render() {
-        const game: IGame = this.props.game;
-        const resultPercentage: number | undefined = this.state?.resultPercentage;
+        const { game, triggerConfetti, classes, history } = this.props;
         const correctWords = getCorrectRounds(game).map((round: IGameRound, index: number) => {
             return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={true}/>
         });
@@ -38,43 +88,41 @@ class GameEndView extends React.Component<GameEndViewProps, GameEndViewState> {
             return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={false}/>
         });
         const total = game.rounds.length;
-        let resultEmoji = '🤔';
+        let gameTime;
 
-        if (resultPercentage === undefined) {
-            const backgroundGradient = `linear-gradient(to right, ${game.players.map(p => p.color).join(',')})`;
-            try {
-                document.styleSheets[document.styleSheets.length-1].insertRule(`.Game-end-view .Evaluation .MuiLinearProgress-bar { background: ${backgroundGradient}; }`);
-            } catch (e) {
-                console.log(e);
-            }
+        if (game.endTime && game.startTime) {
+            const duration = new Date(game.endTime).getTime() - new Date(game.startTime).getTime();
+            const time = new Date(duration).toISOString().substr(11, 8);
+            gameTime = (
+                <Grid item xs={12}>
+                    <Box className={classes.timeBox}>
+                        <TimerIcon/> <Trans i18nKey="GAME.COMMON.TIME">Time: {{ time }}</Trans>
+                    </Box>
+                </Grid>
+            );
+        }
 
-            setTimeout(() => {
-                if (this._isMounted) {
-                    this.setState({
-                        resultPercentage: Math.ceil(correctWords.length / total * 100)
-                    })
-                }
-            }, 1000);
-        } else {
-            if (resultPercentage < 25) {
-                resultEmoji = '😵';
-            } else if (resultPercentage < 51) {
-                resultEmoji = '🥴';
-            } else if (resultPercentage < 100) {
-                resultEmoji = '😎';
-            } else if (resultPercentage === 100) {
-                resultEmoji = '🤩';
+        const currentUser = getCurrentUserInGame(game);
+
+        const backToList = () => {
+            if (game.$isTutorial) removeTutorial();
+            history.push('/');
+        };
+
+        const sendConfetti = () => {
+            if (game?.id === TUTORIAL_ID) {
+                triggerConfetti();
+            } else {
+                const color = currentUser?.color;
+                const colors = color ? [color] : undefined;
+                socket.emit(GameEvent.Confetti, game.id, colors);
+                triggerConfetti(colors);
             }
         }
 
         return (
             <Grid container spacing={4} className="Game-end-view">
-                <Grid item xs={12} container spacing={2} className="Evaluation">
-                    <Typography variant="h3"><Trans i18nKey="GAME.END.HEADING">Game over</Trans></Typography>
-                    <LinearProgress variant="determinate" value={resultPercentage || 0} />
-                    <Typography variant="body1" className="Percentage">{resultPercentage || 0} %</Typography>
-                    <Typography variant="body1" className="ResultEmoji">{resultEmoji}</Typography>
-                </Grid>
+                <Evaluation players={game.players} correctCount={correctWords.length} totalCount={total}/>
                 <Grid item xs={12} md={6} container spacing={2} className="Correct-words">
                     <Grid item xs={12} component={Typography} variant="h4">
                         <Trans i18nKey="GAME.END.RIGHT" count={correctWords.length} tOptions={{total}}>Richtig</Trans>
@@ -87,10 +135,22 @@ class GameEndView extends React.Component<GameEndViewProps, GameEndViewState> {
                     </Grid>
                     {wrongWords}
                 </Grid>
+                {gameTime}
+                <Grid item xs={12} className={classes.buttons}>
+                    {!game.$isTutorial && (
+                        <Button variant="contained" color="primary" onClick={() => this.playAgain()}>
+                            <Trans i18nKey="GAME.AGAIN">Again!</Trans>
+                        </Button>
+                    )}
+                    <Button variant="outlined" onClick={backToList}>
+                        <Trans i18nKey={game.$isTutorial ? 'TUTORIAL.CLOSE' : 'GAME.BACK_HOME'}>Back</Trans>
+                    </Button>
+                    {currentUser && <ConfettiButton onConfetti={sendConfetti}/>}
+                </Grid>
                 <TutorialOverlay game={game} key="tutorial" />
             </Grid>
         );
     }
 }
 
-export default withSnackbar(GameEndView);
+export default withRouter(withSnackbar(withStyles(styles)(GameEndView)));

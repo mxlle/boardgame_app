@@ -74,7 +74,7 @@ class WordCard extends React.Component<WordCardProps> {
         } else if (guesser && guesser.name) {
             guesserInfo = [<Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}} key="name">{{guesser: guesser.name}} muss raten</Trans>];
             if (!!isGuessingPhase && !isGuesser) {
-                guesserInfo.push(<Box className={classes.smallPencil}><PencilAnimation color={guesser?.color} key="pencil"/></Box>);
+                guesserInfo.push(<Box className={classes.smallPencil} key="pencil"><PencilAnimation color={guesser?.color} key="pencil"/></Box>);
             }
         }
         if (small) classList.push(classes.small);
