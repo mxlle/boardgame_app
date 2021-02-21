@@ -40,3 +40,9 @@ export function setDocumentTitle(i18n: any, gameName?: string) {
         document.title = i18n.t('APP_TITLE', appTitleFallback);
     }
 }
+
+export function easeInQuad(x: number, of: number): number {
+	const x1 = x / of;
+	const x_quad = x1 * x1;
+	return Math.ceil(x_quad * of);
+}

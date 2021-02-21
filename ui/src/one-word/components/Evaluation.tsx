@@ -1,8 +1,13 @@
 import React from 'react';
 import { Trans } from 'react-i18next';
-import {createStyles, Grid, LinearProgress, Theme, Typography, withStyles} from '@material-ui/core';
+import {createStyles, Grid, Theme, Typography, withStyles} from '@material-ui/core';
 import {IUser} from "../../types";
 import {WithStyles} from "@material-ui/core/styles";
+import ProgressBar from "../../common/ProgressBar";
+import {getRandomColor} from "../../common/ColorPicker";
+import {easeInQuad} from "../../shared/functions";
+
+const RESULT_ANIMATION_MILLIS = 1000;
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -12,16 +17,14 @@ const styles = (theme: Theme) => createStyles({
         marginBottom: theme.spacing(2),
     },
     progressBar: {
-        width: '100%',
-        height: theme.spacing(3),
-        margin: theme.spacing(2),
+        margin: theme.spacing(2, 0),
     },
     percentage: {
         fontSize: theme.spacing(3),
         fontWeight: 'bold'
     },
     emoji: {
-        fontSize: theme.spacing(8),
+        fontSize: theme.spacing(10),
     }
 });
 
@@ -32,11 +35,16 @@ type EvaluationProps = {
 }&WithStyles<typeof styles>;
 
 type EvaluationState = {
-    resultPercentage?: number
+    easedPercentage: number,
 }
 
 class Evaluation extends React.Component<EvaluationProps, EvaluationState> {
+    public state: EvaluationState = {
+        easedPercentage: 0,
+    }
     private _isMounted: boolean = false;
+    private _linearPercentage: number = 0;
+    private _timeout: number | undefined = undefined;
 
     componentDidMount() {
         this._isMounted = true;
@@ -48,43 +56,42 @@ class Evaluation extends React.Component<EvaluationProps, EvaluationState> {
 
     render() {
         const {players, correctCount, totalCount, classes} = this.props;
-        const resultPercentage: number | undefined = this.state?.resultPercentage;
-
+        const {easedPercentage} = this.state;
+        const colors: string[] = players.map(p => p.color || getRandomColor());
+        const resultPercentage = Math.ceil(correctCount / totalCount * 100);
         let resultEmoji = '🤔';
+        let emojiStyle: React.CSSProperties = { transform: `scale(${easedPercentage/resultPercentage})` };
 
-        if (resultPercentage === undefined) {
-            const backgroundGradient = `linear-gradient(to right, ${players.map(p => p.color).join(',')})`;
-            try {
-                document.styleSheets[document.styleSheets.length-1].insertRule(`.Game-end-view .MuiLinearProgress-bar { background: ${backgroundGradient}; }`);
-            } catch (e) {
-                console.log(e);
-            }
-
-            setTimeout(() => {
+        if (easedPercentage < resultPercentage && !this._timeout) {
+            this._timeout = window.setTimeout(() => {
+                this._timeout = undefined;
                 if (this._isMounted) {
+                    this._linearPercentage = this._linearPercentage + 1;
                     this.setState({
-                        resultPercentage: Math.ceil(correctCount / totalCount * 100)
-                    })
+                        easedPercentage: easeInQuad(this._linearPercentage, resultPercentage)
+                    });
                 }
-            }, 1000);
-        } else {
-            if (resultPercentage < 25) {
-                resultEmoji = '😵';
-            } else if (resultPercentage < 51) {
-                resultEmoji = '🥴';
-            } else if (resultPercentage < 100) {
-                resultEmoji = '😎';
-            } else if (resultPercentage === 100) {
-                resultEmoji = '🤩';
-            }
+            }, RESULT_ANIMATION_MILLIS / resultPercentage);
+        }
+
+        if (easedPercentage < 20) {
+            resultEmoji = '😵';
+        } else if (easedPercentage < 50) {
+            resultEmoji = '🥴';
+        } else if (easedPercentage < 75) {
+            resultEmoji = '🙂';
+        } else if (easedPercentage < 100) {
+            resultEmoji = '😎';
+        } else if (easedPercentage === 100) {
+            resultEmoji = '🤩';
         }
 
         return (
             <Grid item xs={12} container spacing={2} className={classes.root}>
                 <Typography variant="h3"><Trans i18nKey="GAME.END.HEADING">Game over</Trans></Typography>
-                <LinearProgress className={classes.progressBar} variant="determinate" value={resultPercentage || 0} />
-                <Typography variant="body1" className={classes.percentage}>{resultPercentage || 0} %</Typography>
-                <Typography variant="body1" className={classes.emoji}>{resultEmoji}</Typography>
+                <ProgressBar value={easedPercentage} colors={colors} className={classes.progressBar}/>
+                <Typography variant="body1" className={classes.percentage}>{easedPercentage} %</Typography>
+                <Typography variant="body1" className={classes.emoji} style={emojiStyle}>{resultEmoji}</Typography>
             </Grid>
         );
     }
