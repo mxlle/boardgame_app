@@ -4,20 +4,23 @@ import { STYLES } from '../../theme';
 import WordHintInput from './WordHintInput';
 import CornerInfo from '../../common/CornerInfo';
 import PencilAnimation from '../../common/PencilAnimation';
-import { Grid, Paper, Typography, Box } from '@material-ui/core';
+import { Grid, Paper, Box } from '@material-ui/core';
 
 const styles = (theme: Theme) => createStyles({
     root: { 
         ...STYLES.flexCenter,
-        height: 100,
+        minHeight: 80,
         fontSize: 48,
         border: '2px solid black',
-        whiteSpace: 'nowrap',
         position: 'relative',
-        padding: theme.spacing(0, 3.5, 0, 5)
+        padding: theme.spacing(1, 4, 1, 4)
     },
     writing: {
         borderStyle: 'dotted',
+    },
+    word: {
+        ...STYLES.handwriting,
+        lineHeight: 1.2,
     },
     longWord: {
         fontSize: 32,
@@ -79,12 +82,12 @@ class WordHint extends React.Component<WordHintProps> {
         } else if (showCheck) {
             content = <Box fontSize={80}>✓</Box>;
         } else {
-            const hintClasses = ['notranslate'];
+            const hintClasses = ['notranslate', classes.word];
             if (hint && hint.length > 16) hintClasses.push(classes.hugeWord);
             else if (hint && hint.length > 10) hintClasses.push(classes.longWord);
             if (duplicate) hintClasses.push(classes.lineThrough);
 
-            content = <Typography variant="h2" className={hintClasses.join(' ')}>{hint}</Typography>;
+            content = <Box className={hintClasses.join(' ')}>{hint}</Box>;
         }
 
         return (
