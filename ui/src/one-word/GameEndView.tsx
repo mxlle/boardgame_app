@@ -9,7 +9,7 @@ import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
 import Evaluation from "./components/Evaluation";
 import {WithStyles} from "@material-ui/core/styles";
-import {getCurrentUserInGame} from "../shared/functions";
+import {getCurrentUserInGame, getGameDuration} from "../shared/functions";
 import {removeTutorial, TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
 import {getCurrentLanguage} from "../i18n";
@@ -80,7 +80,7 @@ class GameEndView extends React.Component<GameEndViewProps> {
     }
 
     render() {
-        const { game, triggerConfetti, classes, history } = this.props;
+        const { game, triggerConfetti, classes, history, i18n } = this.props;
         const correctWords = getCorrectRounds(game).map((round: IGameRound, index: number) => {
             return <WordCard key={index} small guesser={getPlayerInGame(game, round.guesserId)} word={round.word} guess={round.guess} guessedRight={true}/>
         });
@@ -92,7 +92,15 @@ class GameEndView extends React.Component<GameEndViewProps> {
 
         if (game.endTime && game.startTime) {
             const duration = new Date(game.endTime).getTime() - new Date(game.startTime).getTime();
-            const time = new Date(duration).toISOString().substr(11, 8);
+            const {days, hours, minutes, seconds} = getGameDuration(duration);
+
+            const timeStrings: string[] = [];
+            if (days > 0) timeStrings.push(i18n.t('COMMON.DAYS', { count: days }));
+            if (hours > 0) timeStrings.push(i18n.t('COMMON.HOURS', { count: hours }));
+            if (minutes > 0) timeStrings.push(i18n.t('COMMON.MINUTES', { count: minutes }));
+            if (seconds > 0) timeStrings.push(i18n.t('COMMON.SECONDS', { count: seconds }));
+            const time = timeStrings.join(', ');
+
             gameTime = (
                 <Grid item xs={12}>
                     <Box className={classes.timeBox}>
