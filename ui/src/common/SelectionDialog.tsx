@@ -31,7 +31,7 @@ export class SelectionDialog extends React.Component<SelectionDialogProps> {
         return (
             <Dialog onClose={handleClose} open={open}>
                 <DialogTitle>
-                    <Trans i18nKey={tKey}>Einstellung</Trans>
+                    <Trans i18nKey={tKey}>Setting</Trans>
                 </DialogTitle>
                 <List>
                     {possibleValues.map((value: SelectionDialogOption) => (

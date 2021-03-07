@@ -7,7 +7,7 @@ import ColorPicker from '../common/ColorPicker';
 import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
 import {STYLES} from "../theme";
 
-const styles = (theme: Theme) => createStyles({
+const styles = (_theme: Theme) => createStyles({
     root: {
         ...STYLES.flexCenter,
         flexDirection: 'column'
@@ -52,14 +52,14 @@ class NewPlayer extends React.Component<NewPlayerProps> {
 
         return (
             <div className={classes.root}>
-                <TextField className="name-input" required label={<Trans i18nKey="COMMON.PLAYER_NAME">Spielername</Trans>}
+                <TextField className="name-input" required label={<Trans i18nKey="COMMON.PLAYER_NAME">Name</Trans>}
                     name='name'
                     value={currentPlayer.name} 
                     onChange={this.handleChange}/>
                 <ColorPicker select={this.setColor} selected={currentPlayer.color}/>
                 <Button variant="contained" color="primary" className="submitBtn"
                     disabled={!currentPlayer.name} 
-                    onClick={this.addPlayer}><Trans i18nKey="GAME.LOBBY.JOIN">Mitspielen</Trans></Button>
+                    onClick={this.addPlayer}><Trans i18nKey="GAME.LOBBY.JOIN">Join</Trans></Button>
             </div>
         );
     }

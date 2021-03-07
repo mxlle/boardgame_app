@@ -1,6 +1,5 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import i18n from '../../i18n';
+import { Trans, withTranslation, WithTranslation } from 'react-i18next';
 import {Grid, Button, Typography, Checkbox} from '@material-ui/core';
 import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
@@ -18,7 +17,7 @@ import EndPhaseButton from "../components/EndPhaseButton";
 
 type HintComparingViewProps = {
     game: IGame
-}&OneWordGameChildProps;
+}&WithTranslation&OneWordGameChildProps;
 
 type HintComparingViewState = {};
 
@@ -51,7 +50,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 
     render() {
-        const game: IGame = this.props.game;
+        const {game, i18n} = this.props;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
@@ -65,7 +64,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
+            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
 
             return (
                 <WordHint 
@@ -90,12 +89,12 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         if (isRoundHost) { // TODO - maybe not use Grid for these elements (?)
             currentHints.push((
                 <Grid item xs={12} component={Typography} variant="subtitle1" key="info">
-                    <Trans i18nKey="GAME.COMPARING.INFO">Markiere ungültige Hinweise</Trans>
+                    <Trans i18nKey="GAME.COMPARING.INFO">Mark invalid hints</Trans>
                 </Grid>
             ),(
                 <Grid item xs={12} key="button">
                     <Button variant="contained" color="primary" onClick={this.showHints} className="submitBtn">
-                        <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} kann losraten!</Trans>
+                        <Trans i18nKey="GAME.COMPARING.BUTTON">{{guesserName}} can start!</Trans>
                     </Button>
                 </Grid>
             ));
@@ -126,4 +125,4 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 }
 
-export default HintComparingView;
+export default withTranslation()(HintComparingView);

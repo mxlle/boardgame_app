@@ -1,6 +1,5 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import i18n from '../../i18n';
+import { Trans, WithTranslation, withTranslation } from 'react-i18next';
 import { Grid, Button } from '@material-ui/core';
 import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
@@ -17,7 +16,7 @@ import EndPhaseButton from "../components/EndPhaseButton";
 
 type SolutionViewProps = {
     game: IGame
-}&OneWordGameChildProps;
+}&WithTranslation&OneWordGameChildProps;
 
 type SolutionViewState = {};
 
@@ -44,7 +43,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     render() {
-        const game: IGame = this.props.game;
+        const {game, i18n} = this.props;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
@@ -58,7 +57,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
+            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
 
             return (
                 <WordHint 
@@ -85,7 +84,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             leftCol.push(
                 <Grid item xs={12} key="button1">
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(true)}>
-                        <Trans i18nKey="GAME.SOLUTION.CONTINUE">Weiter</Trans>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE">Continue</Trans>
                     </Button>
                 </Grid>
             );
@@ -93,12 +92,12 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
             leftCol.push(
                 <Grid item xs={12} key="button1">
                     <Button variant="contained" onClick={() => this.resolveRound(true)} className="submitBtn correct">
-                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Das zählt trotzdem</Trans>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_RIGHT">Correct!</Trans>
                     </Button>
                 </Grid>,
                 <Grid item xs={12} key="button2">
                     <Button variant="contained" color="primary" onClick={() => this.resolveRound(false)} className="submitBtn wrong">
-                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Leider falsch</Trans>
+                        <Trans i18nKey="GAME.SOLUTION.CONTINUE_WRONG">Wrong!</Trans>
                     </Button>
                 </Grid>
             );
@@ -128,4 +127,4 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 }
 
-export default SolutionView;
+export default withTranslation()(SolutionView);

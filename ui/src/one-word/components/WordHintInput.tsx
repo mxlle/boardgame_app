@@ -1,10 +1,10 @@
 import React from 'react';
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
-import i18n from '../../i18n';
 import { Box, IconButton } from '@material-ui/core';
 import { Send as SendIcon } from '@material-ui/icons';
 import TextField from '@material-ui/core/TextField';
 import { STYLES } from '../../theme';
+import {WithTranslation, withTranslation} from "react-i18next";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -20,7 +20,7 @@ type WordHintInputProps = {
     submitHint: (hint: string)=>void;
     label?: string;
     defaultValue?: string;
-}&WithStyles<typeof styles>;
+}&WithTranslation&WithStyles<typeof styles>;
 type WordHintInputState = {
     value: string;
 };
@@ -52,12 +52,12 @@ class WordHintInput extends React.Component<WordHintInputProps,WordHintInputStat
     }
 
     render() {
-        const { label, classes } = this.props;
+        const { label, classes, i18n } = this.props;
         const { value } = this.state;
 
         return (
 	        <Box className={classes.root}>
-	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Hinweis eingeben')}
+	        	<TextField label={label || i18n.t('GAME.COMMON.ENTER_HINT', 'Enter hint')}
                     fullWidth
 	        		value={value}
 	        		onChange={this.handleChange} 
@@ -73,4 +73,4 @@ class WordHintInput extends React.Component<WordHintInputProps,WordHintInputStat
 
 }
 
-export default withStyles(styles)(WordHintInput);
+export default withTranslation()(withStyles(styles)(WordHintInput));

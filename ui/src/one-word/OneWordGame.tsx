@@ -11,14 +11,13 @@ import SolutionView from './gamePhases/SolutionView';
 import {GameEvent, GamePhase, IGame, NotificationEventOptions, ROOM_GAME, SocketEvent} from '../types';
 
 import api from '../shared/apiFunctions';
-import {getCurrentUserId, setDocumentTitle} from '../shared/functions';
+import {getCurrentUserId} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
-import {Trans} from "react-i18next";
+import {Trans, WithTranslation, withTranslation} from "react-i18next";
 import Confetti from "../common/Confetti";
 import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {SnackbarKey, withSnackbar, WithSnackbarProps} from "notistack";
-import i18n from '../i18n';
 import JoiningLater from "./components/JoiningLater";
 
 const styles = (theme: Theme) => createStyles({
@@ -37,7 +36,7 @@ const styles = (theme: Theme) => createStyles({
 type OneWordGameProps = {
     gameId: string,
     setTheme?: (color: string)=>void
-}&WithStyles<typeof styles>&WithSnackbarProps;
+}&WithTranslation&WithStyles<typeof styles>&WithSnackbarProps;
 type OneWordGameState = {
     currentGame?: IGame,
     triggerConfetti: (colors?: string[], amount?: number)=>void,
@@ -127,7 +126,8 @@ class OneWordGame extends React.Component<OneWordGameProps,OneWordGameState> {
         if (!this._isMounted) return;
         if (this.props.gameId !== game.id) return;
 
-        setDocumentTitle(i18n, game.name);
+        document.title = `${game.name} - ${this.props.i18n.t('APP_TITLE', 'Just one word!')}`;
+
         this.setState({
             currentGame: game
         });
@@ -208,4 +208,4 @@ class OneWordGame extends React.Component<OneWordGameProps,OneWordGameState> {
     }
 }
 
-export default withSnackbar(withStyles(styles)(OneWordGame));
+export default withTranslation()(withSnackbar(withStyles(styles)(OneWordGame)));

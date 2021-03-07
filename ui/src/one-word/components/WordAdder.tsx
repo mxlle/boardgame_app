@@ -1,9 +1,9 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
+import { Trans, withTranslation, WithTranslation } from 'react-i18next';
 import {Button, IconButton, InputAdornment, Typography} from '@material-ui/core';
 import CasinoIcon from '@material-ui/icons/Casino';
 import TextField from '@material-ui/core/TextField';
-import i18n, {getCurrentLanguage} from '../../i18n';
+import {getCurrentLanguage} from "../../i18n";
 import {WordEvent} from "../../types";
 import socket from "../../shared/socket";
 import ActionButton from "../../common/ActionButton";
@@ -13,14 +13,14 @@ type WordAdderProps = {
     numOfWords: number,
     allowRandom?: boolean,
     defaultValues?: string[]
-}
+}&WithTranslation;
 
 type WordAdderState = {
     words: string[],
     randomLoading: boolean[]
 }
 
-export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
+class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
 
     constructor(props: WordAdderProps) {
         super(props);
@@ -35,7 +35,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     handleChange(event: React.ChangeEvent<HTMLInputElement>) {
         const index = parseInt(event.target.name.substr(4));
         const word = event.target.value;
-        this.setState((state, props) => {
+        this.setState((state, _props) => {
             const newWords = state.words;
             newWords[index] = word;
             return {
@@ -53,7 +53,7 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     }
 
     render() {
-        const { add, numOfWords, allowRandom } = this.props;
+        const { add, numOfWords, allowRandom, i18n } = this.props;
         const { words, randomLoading } = this.state;
 
         const getRandomWord = (index: number) => {
@@ -76,11 +76,11 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
 
         const wordFields = [];
         for (let i=0; i<numOfWords; i++) {
-            const label = i18n.t("GAME.PREP.WORD_ADDER.LABEL", "Wort "+(i+1), {count: numOfWords, index: i+1});
+            const label = i18n.t("GAME.PREP.WORD_ADDER.LABEL", "Word "+(i+1), {count: numOfWords, index: i+1});
             wordFields.push(
                 <TextField required label={label}
                     variant="filled"
-                    placeholder={i18n.t("GAME.PREP.WORD_ADDER.PLACEHOLDER", "Ratebegriff eingeben")}
+                    placeholder={i18n.t("GAME.PREP.WORD_ADDER.PLACEHOLDER", "Enter word")}
                     name={`word${i}`}
                     key={`word${i}`}
                     value={words[i]||''}
@@ -106,16 +106,18 @@ export class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
         return (
             <div className="Word-adder">
                 <Typography variant="subtitle1">
-                    <Trans i18nKey="GAME.PREP.WORD_ADDER.HEADING" count={numOfWords}>Gib Begriffe für das Spiel ein</Trans>
+                    <Trans i18nKey="GAME.PREP.WORD_ADDER.HEADING" count={numOfWords}>Enter words</Trans>
                 </Typography>
                 {wordFields}
                 <Button variant="contained" color="primary" className="submitBtn"
                     disabled={enterDisabled}
                     onClick={() => add(words)}>
-                    <Trans i18nKey="GAME.PREP.WORD_ADDER.BUTTON" count={numOfWords}>Jetzt abschicken</Trans>
+                    <Trans i18nKey="GAME.PREP.WORD_ADDER.BUTTON" count={numOfWords}>Submit</Trans>
                 </Button>
             </div>
         );
     }
 
 }
+
+export default withTranslation()(WordAdder);

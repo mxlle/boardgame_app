@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
+import {Trans, WithTranslation, withTranslation} from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import {Box, Button, createStyles, Grid, Theme, Typography, withStyles} from '@material-ui/core';
 import WordCard from './components/WordCard';
@@ -12,7 +12,7 @@ import {WithStyles} from "@material-ui/core/styles";
 import {getCurrentUserInGame} from "../shared/functions";
 import {removeTutorial, TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
-import i18n, {getCurrentLanguage} from "../i18n";
+import {getCurrentLanguage} from "../i18n";
 import api from "../shared/apiFunctions";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import ConfettiButton from "../common/ConfettiButton";
@@ -43,7 +43,7 @@ const styles = (theme: Theme) => createStyles({
 type GameEndViewProps = {
     game: IGame
     triggerConfetti: (colors?: string[], amount?: number)=>void,
-}&RouteComponentProps&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
+}&WithTranslation&RouteComponentProps&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
 class GameEndView extends React.Component<GameEndViewProps> {
     private _isMounted: boolean = false;
 
@@ -58,7 +58,7 @@ class GameEndView extends React.Component<GameEndViewProps> {
     }
 
     async playAgain() {
-        const game = this.props.game;
+        const { game, i18n } = this.props;
         if (!game) return;
 
         if (game.rematchId) {
@@ -125,13 +125,13 @@ class GameEndView extends React.Component<GameEndViewProps> {
                 <Evaluation players={game.players} correctCount={correctWords.length} totalCount={total}/>
                 <Grid item xs={12} md={6} container spacing={2} className="Correct-words">
                     <Grid item xs={12} component={Typography} variant="h4">
-                        <Trans i18nKey="GAME.END.RIGHT" count={correctWords.length} tOptions={{total}}>Richtig</Trans>
+                        <Trans i18nKey="GAME.END.RIGHT" count={correctWords.length} tOptions={{total}}>Correct</Trans>
                     </Grid>
                     {correctWords}
                 </Grid>
                 <Grid item xs={12} md={6} container spacing={2} className="Wrong-words">
                     <Grid item xs={12} component={Typography} variant="h4">
-                        <Trans i18nKey="GAME.END.WRONG" count={wrongWords.length} tOptions={{total}}>Falsch</Trans>
+                        <Trans i18nKey="GAME.END.WRONG" count={wrongWords.length} tOptions={{total}}>Wrong</Trans>
                     </Grid>
                     {wrongWords}
                 </Grid>
@@ -153,4 +153,4 @@ class GameEndView extends React.Component<GameEndViewProps> {
     }
 }
 
-export default withRouter(withSnackbar(withStyles(styles)(GameEndView)));
+export default withTranslation()(withRouter(withSnackbar(withStyles(styles)(GameEndView))));

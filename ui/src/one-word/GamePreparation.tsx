@@ -4,7 +4,7 @@ import { IGame, DEFAULT_NUM_WORDS } from '../types';
 import {Box, Button, Grid, IconButton, Paper, Typography} from '@material-ui/core';
 import WordHint from './components/WordHint';
 import WordCard from './components/WordCard';
-import { WordAdder } from './components/WordAdder';
+import WordAdder from './components/WordAdder';
 
 import { SETTING_ID } from '../shared/constants';
 import api from '../shared/apiFunctions';
@@ -104,7 +104,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                         allMyWordsEntered || !isInGame ? (
                             <Grid item xs={12}> 
                                 <Paper className="StatusInfo">
-                                    <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Warten auf Mitspieler ... Sobald alle fertig sind, geht's los.</Trans>
+                                    <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Waiting for teammates</Trans>
                                 </Paper>
                             </Grid>
                         ) : (
@@ -120,7 +120,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                     }
                     {allMyWordsEntered && myWordCards.length > 0 && (
                         <Grid item xs={12} component={Typography} variant="subtitle1">
-                            <Trans i18nKey="GAME.PREP.MY_WORDS" count={myWords.length}>Meine Begriffe</Trans>
+                            <Trans i18nKey="GAME.PREP.MY_WORDS" count={myWords.length}>My words</Trans>
                             {!game.$isTutorial && (<IconButton onClick={this.resetWords} component={Box} ml={1}>
                                 <EditIcon fontSize="small" />
                             </IconButton>)}
@@ -137,7 +137,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                 </Grid>
                 <Grid item xs={12} sm={6} container spacing={2} alignItems="center" className="Player-list">
                     <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
+                        <Trans i18nKey="COMMON.TEAMMATES">Teammates</Trans>
                     </Grid>
                     {listOfPlayers}
                 </Grid>

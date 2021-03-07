@@ -1,5 +1,5 @@
 import React from 'react';
-import i18n from '../../i18n';
+import {withTranslation, WithTranslation} from "react-i18next";
 import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
@@ -17,7 +17,7 @@ import EndPhaseButton from "../components/EndPhaseButton";
 
 type HintWritingViewProps = {
     game: IGame
-}&OneWordGameChildProps;
+}&WithTranslation&OneWordGameChildProps;
 
 type HintWritingViewState = {
     submittedHints: {[key: string]: { hint: string, reset?: boolean }},
@@ -65,7 +65,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     render() {
-        const game: IGame = this.props.game;
+        const {game, i18n} = this.props;
         const { submittedHints } = this.state;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
@@ -80,7 +80,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
             let defaultValue = '';
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
+            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
             if (hintIsMine && submittedHints[hintObj.id]) {
                 if (submittedHints[hintObj.id].reset) {
                     defaultValue = submittedHints[hintObj.id].hint;
@@ -140,4 +140,4 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 }
 
-export default HintWritingView;
+export default withTranslation()(HintWritingView);

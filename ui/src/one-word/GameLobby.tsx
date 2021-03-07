@@ -7,8 +7,7 @@ import ArrowBackIcon from '@material-ui/icons/ArrowBack';
 import LooksTwoIcon from '@material-ui/icons/LooksTwo';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
-import { Trans } from 'react-i18next';
-import i18n from '../i18n';
+import {Trans, WithTranslation, withTranslation} from 'react-i18next';
 import { withSnackbar, WithSnackbarProps } from 'notistack';
 import WordHint from './components/WordHint';
 import NewPlayer from '../common/NewPlayer';
@@ -43,7 +42,7 @@ const styles = (theme: Theme) => createStyles({
 type GameLobbyProps = {
     game: IGame,
     setTheme?: (color: string)=>void
-}&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
+}&WithTranslation&WithSnackbarProps&OneWordGameChildProps&WithStyles<typeof styles>;
 
 type GameLobbyState = {
     currentPlayer: IUser,
@@ -128,16 +127,16 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         const gameUrl = window.location.href;
         if (navigator.share) {
             navigator.share({
-                title: document.title || i18n.t('APP_TITLE', 'Nur ein Wort!'),
-                text: i18n.t('GAME.LOBBY.INVITE_PLAYERS_MESSAGE', 'Spiele online mit mir'),
+                title: document.title || this.props.i18n.t('APP_TITLE', 'Just one word!'),
+                text: this.props.i18n.t('GAME.LOBBY.INVITE_PLAYERS_MESSAGE', 'Play online'),
                 url: gameUrl,
             });
         } else {
             try {
                 navigator.clipboard.writeText(gameUrl);
-                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK">Link kopiert</Trans>);
+                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK">Copied</Trans>);
             } catch (e) {
-                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK_ERROR">Fehler beim Link kopieren</Trans>, {variant: 'error'});
+                this.props.enqueueSnackbar(<Trans i18nKey="GAME.LOBBY.COPIED_LINK_ERROR">Error copying</Trans>, {variant: 'error'});
             }      
         }
     }
@@ -174,7 +173,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                             <Grid item xs={12}>
                                 <Paper className="StatusInfo">
                                     <Trans i18nKey="GAME.LOBBY.WAIT_MESSAGE" tOptions={{context: isHost ? 'HOST' : 'PLAYER'}}>
-                                        Warten auf Mitspieler ... Sobald alle Mitspieler da sind, kann der Spielleiter das Spiel starten.
+                                        Waiting for teammates
                                     </Trans> 
                                 </Paper>
                             </Grid>
@@ -192,7 +191,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                                 <Button variant="outlined"
                                     startIcon={<ShareIcon />}
                                     onClick={this.shareGame}>
-                                    <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Personen einladen</Trans>
+                                    <Trans i18nKey="GAME.LOBBY.INVITE_PLAYERS">Share</Trans>
                                 </Button>
                                 <br/>
                                 <Button variant="outlined"
@@ -217,7 +216,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 </Grid>
                 <Grid item xs={12} sm={6} container spacing={2} alignItems="center" className="Player-list">
                     <Grid item xs={12} component={Typography} variant="h5">
-                        <Trans i18nKey="COMMON.TEAMMATES">Mitspieler</Trans>
+                        <Trans i18nKey="COMMON.TEAMMATES">Teammates</Trans>
                     </Grid>
                     {listOfPlayers}
                     {!isInGame && <WordHint hint={newPlayerName} color={newPlayerColor} showPencil={true} />}
@@ -244,4 +243,4 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
 
 }
 
-export default withStyles(styles)(withSnackbar(GameLobby));
+export default withTranslation()(withStyles(styles)(withSnackbar(GameLobby)));

@@ -51,7 +51,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                     <ListItemText 
                         id={game.id} 
                         primary={`${game.name || game.id}`}
-                        secondary={<Trans i18nKey="HOME.GAME_LIST.PLAYERS">Spieler: {{playersString}}</Trans>} 
+                        secondary={<Trans i18nKey="HOME.GAME_LIST.PLAYERS">Players: {{playersString}}</Trans>}
                     />
                     {
                         (this.currentUserId === game.hostId || getClearedForDeletion(game, nowTime)) && (
@@ -71,9 +71,9 @@ export class GameList extends React.Component<GameListProps,GameListState> {
         const doneGamesList = doneGames.map(createListItem);
 
         const categories = [
-            { key: 'ongoing', elementList: onGoingGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.ONGOING">Meine laufenden Spiele</Trans> },
-            { key: 'new', elementList: newGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.NEW">Neue Spiele</Trans> },
-            { key: 'done', elementList: doneGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.DONE">Meine beendeten Spiele</Trans> },
+            { key: 'ongoing', elementList: onGoingGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.ONGOING">Ongoing</Trans> },
+            { key: 'new', elementList: newGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.NEW">New</Trans> },
+            { key: 'done', elementList: doneGamesList, heading: <Trans i18nKey="HOME.GAME_LIST.DONE">Finished</Trans> },
         ];
 
         const content = categories.filter(category => category.elementList.length > 0).map((category) => (

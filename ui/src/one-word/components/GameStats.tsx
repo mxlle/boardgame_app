@@ -1,6 +1,5 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import i18n from '../../i18n';
+import { Trans, WithTranslation, withTranslation } from 'react-i18next';
 import {IGame, GamePhase, IUser} from '../../types';
 import {AppBar, createStyles, Theme, withStyles, WithStyles} from "@material-ui/core";
 import CardIcon, { CardTypes } from "./CardIcon";
@@ -8,7 +7,7 @@ import {getCorrectRounds, getPlayerInGame, getWrongRounds} from "../gameFunction
 
 type GameStatsProps = {
     game: IGame
-} & WithStyles<typeof styles>;
+} & WithTranslation & WithStyles<typeof styles>;
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -65,7 +64,7 @@ class GameStats extends React.Component<GameStatsProps> {
     }
 
     render() {
-        const {game, classes} = this.props;
+        const {game, classes, i18n} = this.props;
         const currentRound = game.rounds[game.round];
         let listKey = 0;
 
@@ -119,7 +118,7 @@ class GameStats extends React.Component<GameStatsProps> {
                     <div className={classes.contents}>
                         <div>
                             <Trans i18nKey="GAME.STATS.ROUND">
-                                Runde {{round}}/{{roundCount}}
+                                Round {{round}}/{{roundCount}}
                             </Trans>
                         </div>
                         <div className={classes.statusMessage}>{statusMessageElements}</div>
@@ -134,4 +133,4 @@ class GameStats extends React.Component<GameStatsProps> {
     }
 }
 
-export default withStyles(styles)(GameStats);
+export default withTranslation()(withStyles(styles)(GameStats));

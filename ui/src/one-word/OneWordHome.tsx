@@ -2,17 +2,16 @@ import React from 'react';
 import {RouteComponentProps, withRouter} from 'react-router-dom'
 import {Box, Button, Container, TextField} from '@material-ui/core';
 import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
-import {Trans} from 'react-i18next';
+import {Trans, WithTranslation, withTranslation} from 'react-i18next';
 import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
 import {GameEvent, IGame, ROOM_GAME_LIST, SocketEvent} from '../types';
 import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
 import {SETTING_ID, SETTING_NAME} from '../shared/constants';
-import {setDocumentTitle} from '../shared/functions';
 import api from '../shared/apiFunctions';
 import {STYLES} from '../theme';
-import i18n, {getCurrentLanguage} from '../i18n';
+import {getCurrentLanguage} from '../i18n';
 import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
@@ -33,7 +32,7 @@ const styles = (theme: Theme) => createStyles({
     }
 });
 
-type JustOneHomeProps = {}&WithSnackbarProps&RouteComponentProps&WithStyles<typeof styles>;
+type JustOneHomeProps = {}&WithTranslation&WithSnackbarProps&RouteComponentProps&WithStyles<typeof styles>;
 type JustOneHomeState = {
     newGameName: string|null,
     allGames: IGame[],
@@ -63,7 +62,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     componentDidMount() {
         this._isMounted = true;
 
-        setDocumentTitle(i18n);
+        document.title = this.props.i18n.t('APP_TITLE', 'Just one word!');
 
         this._setupConnection();
         socket.on(GameEvent.UpdateList, this.loadGames);
@@ -75,6 +74,10 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         socket.emit(GameEvent.Unsubscribe, ROOM_GAME_LIST);
         socket.off(GameEvent.UpdateList, this.loadGames);
         socket.off(SocketEvent.Reconnect, this._setupConnection);
+    }
+
+    private _getInitialGameName(userName?: string) {
+        return userName ? this.props.i18n.t('HOME.NEW_GAME_PERSONAL', 'New game', {name: userName}) : this.props.i18n.t('HOME.NEW_GAME', 'New game');
     }
 
     private _setupConnection() {
@@ -94,7 +97,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                 gamesLoading: false
             });
         } catch(e) {
-            this.props.enqueueSnackbar(<Trans i18nKey="ERROR.LOAD_GAMES">Fehler</Trans>, { variant: 'error' });
+            this.props.enqueueSnackbar(<Trans i18nKey="ERROR.LOAD_GAMES">Error</Trans>, { variant: 'error' });
             this.setState({
                 gamesLoading: false
             });
@@ -110,7 +113,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         const action = (key: string) => (
             <React.Fragment>
                 <Button onClick={() => { this.props.closeSnackbar(key); this.loadGames(); }} color="inherit">
-                    <Trans i18nKey="COMMON.UNDO">Rückgängig</Trans>
+                    <Trans i18nKey="COMMON.UNDO">Undo</Trans>
                 </Button>
             </React.Fragment>
         );
@@ -136,7 +139,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     async createGame() {
         const game: IGame = emptyGame();
         let gameName = this.state.newGameName;
-        if (gameName === null) gameName = getInitialGameName(this.currentUserName);
+        if (gameName === null) gameName = this._getInitialGameName(this.currentUserName);
         game.name = gameName;
         game.language = getCurrentLanguage();
 
@@ -157,14 +160,14 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     render() {
         let { classes } = this.props;
         let {newGameName, allGames, gamesLoading} = this.state;
-        if (newGameName === null) newGameName = getInitialGameName(this.currentUserName);
+        if (newGameName === null) newGameName = this._getInitialGameName(this.currentUserName);
 
         return (
             <Container maxWidth="sm" className={classes.root}>
                 <Box className={classes.newGame}>
-                    <TextField label={<Trans i18nKey="HOME.GAME_NAME">Spielname</Trans>} value={newGameName} onChange={this.handleChange} />
+                    <TextField label={<Trans i18nKey="HOME.GAME_NAME">Game name</Trans>} value={newGameName} onChange={this.handleChange} />
                     <Button variant="contained" color="primary" onClick={this.createGame}>
-                        <Trans i18nKey="HOME.NEW_GAME">Neues Spiel</Trans>
+                        <Trans i18nKey="HOME.NEW_GAME">New game</Trans>
                     </Button>         
                 </Box>
                 <Box mb={2}>
@@ -175,7 +178,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                 <Box mb={2}>
                     <ActionButton loading={gamesLoading}>
                         <Button variant="contained" onClick={this.loadGames}>
-                            <Trans i18nKey="HOME.LOAD_GAMES">Spiele aktualisieren</Trans>
+                            <Trans i18nKey="HOME.LOAD_GAMES">Refresh</Trans>
                         </Button>
                     </ActionButton>
                 </Box>
@@ -185,8 +188,4 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
     }
 }
 
-function getInitialGameName(userName?: string) {
-    return userName ? i18n.t('HOME.NEW_GAME_PERSONAL', 'Neues Spiel', {name: userName}) : i18n.t('HOME.NEW_GAME', 'Neues Spiel');
-}
-
-export default withRouter(withSnackbar(withStyles(styles)(OneWordHome)));
+export default withTranslation()(withRouter(withSnackbar(withStyles(styles)(OneWordHome))));

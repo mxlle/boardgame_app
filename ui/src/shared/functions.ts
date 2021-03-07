@@ -32,15 +32,6 @@ export function getNameListString(names: string[]) {
 	return nameListString;
 }
 
-export function setDocumentTitle(i18n: any, gameName?: string) {
-	const appTitleFallback = 'Nur ein Wort!';
-    if (gameName) {
-        document.title = `${i18n.t('APP_TITLE', appTitleFallback)} - ${gameName}`;
-    } else {
-        document.title = i18n.t('APP_TITLE', appTitleFallback);
-    }
-}
-
 export function easeInQuad(x: number, of: number): number {
 	const x1 = x / of;
 	const x_quad = x1 * x1;

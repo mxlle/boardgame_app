@@ -81,7 +81,7 @@ const HeaderBar = (props: HeaderBarProps) => {
                     </IconButton>
                 </Link>
                 <Typography variant="h2" className={classes.title}>
-                    <Trans i18nKey="APP_TITLE">Nur ein Wort!</Trans>
+                    <Trans i18nKey="APP_TITLE">Just one word!</Trans>
                 </Typography>
                 { 
                     currentUserName ? 
@@ -100,11 +100,11 @@ const HeaderBar = (props: HeaderBarProps) => {
                 >
                     <MenuItem onClick={()=>{setThemeConfigOpen(true);handleMenuClose();}}>
                         <ListItemIcon><BrightnessMediumIcon/></ListItemIcon>
-                        <Trans i18nKey="THEMEPICK.HEADING">Nachtmodus</Trans>
+                        <Trans i18nKey="THEMEPICK.HEADING">Dark theme</Trans>
                     </MenuItem>
                     <MenuItem onClick={()=>{setLanguageConfigOpen(true);handleMenuClose();}}>
                         <ListItemIcon><TranslateIcon/></ListItemIcon>
-                        <Trans i18nKey="LANGPICK.HEADING">Sprache</Trans>
+                        <Trans i18nKey="LANGPICK.HEADING">Language</Trans>
                     </MenuItem>
                 </Menu>
                 <SelectionDialog

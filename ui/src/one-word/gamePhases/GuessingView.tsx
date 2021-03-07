@@ -1,5 +1,5 @@
 import React from 'react';
-import i18n from '../../i18n';
+import {WithTranslation, withTranslation} from "react-i18next";
 import {IGame, IHint} from '../../types';
 import WordCard from '../components/WordCard';
 import WordHint from '../components/WordHint';
@@ -15,7 +15,7 @@ import EndPhaseButton from "../components/EndPhaseButton";
 
 type GuessingViewProps = {
     game: IGame
-}&OneWordGameChildProps;
+}&WithTranslation&OneWordGameChildProps;
 
 type GuessingViewState = {};
 
@@ -42,7 +42,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 
     render() {
-        const game: IGame = this.props.game;
+        const {game, i18n} = this.props;
         const currentRound = game.rounds[game.round];
         const currentUser = getCurrentUserInGame(game);
         const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
@@ -54,7 +54,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
             const hint: string = hintObj.hint;
             const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
             const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Ich') : author.name;
+            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
 
             return (
                 <WordHint 
@@ -92,4 +92,4 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 }
 
-export default GuessingView;
+export default withTranslation()(GuessingView);

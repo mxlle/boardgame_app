@@ -27,8 +27,8 @@ export class RoundSelector extends React.Component<RoundSelectorProps> {
             options.push(
                 <ListItem button onClick={() => handleListItemClick(wordCount)} key={wordCount}>
                     <ListItemText 
-                        primary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.NUM" count={roundCount}>{{roundCount}} Runden</Trans>}
-                        secondary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{{wordCount}} Begriff(e) pro Spieler</Trans>} />
+                        primary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.NUM" count={roundCount}>{{roundCount}} rounds</Trans>}
+                        secondary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{{wordCount}} words per player</Trans>} />
                 </ListItem>
             );
         }
@@ -36,7 +36,7 @@ export class RoundSelector extends React.Component<RoundSelectorProps> {
         return (
             <Dialog onClose={handleClose} open={open} disableBackdropClick>
                 <DialogTitle>
-                    <Trans i18nKey="GAME.LOBBY.ROUND_SELECT.HEADING">Lege die Rundenanzahl fest</Trans>
+                    <Trans i18nKey="GAME.LOBBY.ROUND_SELECT.HEADING">Set number of rounds</Trans>
                 </DialogTitle>
                 <List>
                     {options}

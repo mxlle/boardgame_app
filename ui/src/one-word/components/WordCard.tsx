@@ -1,6 +1,5 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import i18n from '../../i18n';
+import {Trans, withTranslation, WithTranslation} from 'react-i18next';
 import {Box, Grid, Paper} from '@material-ui/core';
 
 import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
@@ -56,12 +55,12 @@ type WordCardProps = {
     isGuessingPhase?: boolean;
     small?: boolean;
     submitGuess?: (hint:string)=>void
-}&WithStyles<typeof styles>;
+}&WithTranslation&WithStyles<typeof styles>;
 
 class WordCard extends React.Component<WordCardProps> {
 
     render() {
-        const { word, guesser, isGuesser, guess, guessedRight, isGuessingPhase, submitGuess, small, classes} = this.props;
+        const { word, guesser, isGuesser, guess, guessedRight, isGuessingPhase, submitGuess, small, classes, i18n} = this.props;
 
         const classList = [classes.wordCard, 'notranslate'];
         const cardStyle = {borderColor: guesser?.color};
@@ -69,10 +68,10 @@ class WordCard extends React.Component<WordCardProps> {
         guesserInfo = [<span>{guesser?.name}</span>];
         
         if (guess) {
-            originalWord = i18n.t('GAME.COMMON.WORD', 'Begriff') + ': ' + word;
+            originalWord = i18n.t('GAME.COMMON.WORD', 'Word') + ': ' + word;
             if (!guessedRight) classList.push(classes.wrong);
         } else if (guesser && guesser.name) {
-            guesserInfo = [<Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}} key="name">{{guesser: guesser.name}} muss raten</Trans>];
+            guesserInfo = [<Trans i18nKey="GAME.COMMON.TURN_GUESSING" tOptions={{context: (isGuesser ? 'ME' : '')}} key="name">{{guesser: guesser.name}}'s turn to guess</Trans>];
             if (!!isGuessingPhase && !isGuesser) {
                 guesserInfo.push(<Box className={classes.smallPencil} key="pencil"><PencilAnimation color={guesser?.color} key="pencil"/></Box>);
             }
@@ -85,7 +84,7 @@ class WordCard extends React.Component<WordCardProps> {
     	        <Paper className={classList.join(' ')} style={cardStyle}>
     	        	{
                         (submitGuess) ?
-                        <WordHintInput submitHint={submitGuess} label={i18n.t('GAME.COMMON.GUESS', 'Rateversuch')}/> :
+                        <WordHintInput submitHint={submitGuess} label={i18n.t('GAME.COMMON.GUESS', 'Guess')}/> :
                         <span className={guess && classes.guess} style={{color: (guess) ? guesser?.color : undefined}}>{guess || word}</span>
                     }
                     <CornerInfo bottom left handwriting color={guesser?.color} m={2}>
@@ -99,4 +98,4 @@ class WordCard extends React.Component<WordCardProps> {
 
 }
 
-export default withStyles(styles)(WordCard);
+export default withTranslation()(withStyles(styles)(WordCard));

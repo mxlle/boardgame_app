@@ -4,9 +4,8 @@ import {GamePhase, IGame, IUser} from '../../types';
 
 import api from '../../shared/apiFunctions';
 import {getCurrentUserId, getCurrentUserInGame} from '../../shared/functions';
-import {Trans} from "react-i18next";
+import {Trans, WithTranslation, withTranslation} from "react-i18next";
 import {getRandomColor} from "../../common/ColorPicker";
-import i18n from '../../i18n';
 import {SETTING_COLOR, SETTING_ID, SETTING_NAME} from "../../shared/constants";
 import JoiningRequests from "../components/JoiningRequests";
 import {SelectionDialog, SelectionDialogOption} from "../../common/SelectionDialog";
@@ -25,7 +24,7 @@ const styles = (theme: Theme) => createStyles({
 type JoiningLaterProps = {
     game: IGame,
     setTheme?: (color: string)=>void
-}&WithStyles<typeof styles>;
+}&WithTranslation&WithStyles<typeof styles>;
 type JoiningLaterState = {
     currentPlayer: IUser,
     joinGameDialogOpen: boolean
@@ -51,7 +50,7 @@ class JoiningLater extends React.Component<JoiningLaterProps,JoiningLaterState> 
     }
 
     render() {
-        const {game, setTheme, classes} = this.props;
+        const {game, setTheme, classes, i18n} = this.props;
         const {currentPlayer, joinGameDialogOpen} = this.state;
 
         if (game.$isTutorial || [GamePhase.Init, GamePhase.Preparation, GamePhase.End].includes(game.phase)) return null;
@@ -150,4 +149,4 @@ class JoiningLater extends React.Component<JoiningLaterProps,JoiningLaterState> 
     }
 }
 
-export default withStyles(styles)(JoiningLater);
+export default withTranslation()(withStyles(styles)(JoiningLater));
