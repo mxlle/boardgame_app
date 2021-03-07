@@ -1,21 +1,19 @@
 import React from 'react';
-import {WithTranslation, withTranslation} from "react-i18next";
-import {IGame, IHint} from '../../types';
+import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
-import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {getPlayerInGame} from "../gameFunctions";
-import {getCurrentUserInGame} from "../../shared/functions";
+import {extractGameData} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
 import EndPhaseButton from "../components/EndPhaseButton";
+import WordHintList from "./WordHintList";
 
 type GuessingViewProps = {
     game: IGame
-}&WithTranslation&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
 type GuessingViewState = {};
 
@@ -42,31 +40,8 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
     }
 
     render() {
-        const {game, i18n} = this.props;
-        const currentRound = game.rounds[game.round];
-        const currentUser = getCurrentUserInGame(game);
-        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
-        const isGuesser = currentUser && currentUser.id === guesser.id;
-        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
-
-        const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
-        const currentHints = currentRound.hints.map((hintObj: IHint) => {
-            const hint: string = hintObj.hint;
-            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
-
-            return (
-                <WordHint 
-                    key={hintObj.id}
-                    hint={hint} 
-                    color={author.color}
-                    showCross={isGuesser&&hintObj.isDuplicate}
-                    duplicate={hintObj.isDuplicate}
-                    author={authorName}
-                />
-            );
-        });
+        const {game} = this.props;
+        const { guesser, isGuesser, isGameHost, currentWord } = extractGameData(game);
 
         return (
             <GameField
@@ -86,10 +61,10 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
-                rightCol={currentHints}
+                rightCol={<WordHintList game={game} />}
             />
         );
     }
 }
 
-export default withTranslation()(GuessingView);
+export default GuessingView;

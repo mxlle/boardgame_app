@@ -1,22 +1,21 @@
 import React from 'react';
-import { Trans, WithTranslation, withTranslation } from 'react-i18next';
+import { Trans } from 'react-i18next';
 import { Grid, Button } from '@material-ui/core';
-import {IGame, IHint} from '../../types';
+import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
-import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {getPlayerInGame} from "../gameFunctions";
-import {getCurrentUserInGame} from "../../shared/functions";
+import {extractGameData} from "../../shared/functions";
 import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
 import EndPhaseButton from "../components/EndPhaseButton";
+import WordHintList from "./WordHintList";
 
 type SolutionViewProps = {
     game: IGame
-}&WithTranslation&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
 type SolutionViewState = {};
 
@@ -43,32 +42,8 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
     }
 
     render() {
-        const {game, i18n} = this.props;
-        const currentRound = game.rounds[game.round];
-        const currentUser = getCurrentUserInGame(game);
-        const guesser = getPlayerInGame(game, currentRound.guesserId) ||  { name: '?', id: '?' };
-        const isGuesser = currentUser && currentUser.id === guesser.id;
-        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?', id: '?' };
-        const isRoundHost = currentUser && currentUser.id === roundHost.id;
-        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
-
-        const currentWord = currentRound.word;
-        const currentGuess = currentRound.guess;
-        const currentHints = currentRound.hints.map((hintObj: IHint) => {
-            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
-
-            return (
-                <WordHint 
-                    key={hintObj.id}
-                    hint={hintObj.hint} 
-                    color={author.color}
-                    author={authorName}
-                    duplicate={hintObj.isDuplicate}
-                />
-            );
-        });
+        const {game} = this.props;
+        const { currentRound, guesser, isGuesser, isRoundHost, isGameHost, currentWord } = extractGameData(game);
 
         const leftCol = [];
         leftCol.push(
@@ -77,9 +52,10 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                 word={currentWord} 
                 guesser={guesser}
                 isGuesser={isGuesser}
-                guess={currentGuess} 
+                guess={currentRound.guess}
                 guessedRight={currentRound.correct} />
         );
+
         if (currentRound.correct) {
             leftCol.push(
                 <Grid item xs={12} key="button1">
@@ -121,10 +97,10 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
         return (
             <GameField
                 leftCol={leftCol}
-                rightCol={currentHints}
+                rightCol={<WordHintList game={game} />}
             />
         );
     }
 }
 
-export default withTranslation()(SolutionView);
+export default SolutionView;

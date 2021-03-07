@@ -1,23 +1,19 @@
 import React from 'react';
-import {withTranslation, WithTranslation} from "react-i18next";
-import {IGame, IHint} from '../../types';
+import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
-import WordHint from '../components/WordHint';
 import GameField from './GameField';
+import WordHintList from "./WordHintList";
 
 import api from '../../shared/apiFunctions';
-import {getPlayerInGame} from "../gameFunctions";
-import {getCurrentUserInGame} from "../../shared/functions";
-import {nextTutorialStep, TUTORIAL_HINTS} from "../tutorial";
+import {extractGameData} from "../../shared/functions";
+import {nextTutorialStep} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
-import {IconButton} from "@material-ui/core";
-import EditIcon from '@material-ui/icons/Edit';
 import EndPhaseButton from "../components/EndPhaseButton";
 
 type HintWritingViewProps = {
     game: IGame
-}&WithTranslation&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
 type HintWritingViewState = {
     submittedHints: {[key: string]: { hint: string, reset?: boolean }},
@@ -65,58 +61,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
     }
 
     render() {
-        const {game, i18n} = this.props;
+        const {game} = this.props;
         const { submittedHints } = this.state;
-        const currentRound = game.rounds[game.round];
-        const currentUser = getCurrentUserInGame(game);
-        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
-        const isGuesser = currentUser && currentUser.id === guesser.id;
-        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
-        let enteredHint: boolean = !!isGuesser;
-
-        const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
-        const currentHints = currentRound.hints.map((hintObj: IHint) => {
-            let hint: string = hintObj.hint;
-            let defaultValue = '';
-            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
-            if (hintIsMine && submittedHints[hintObj.id]) {
-                if (submittedHints[hintObj.id].reset) {
-                    defaultValue = submittedHints[hintObj.id].hint;
-                } else if (!hint) {
-                    hint = submittedHints[hintObj.id].hint;
-                }
-            }
-            if (!!hint) {
-                if (hintIsMine) {
-                    enteredHint = true;
-                }
-            }
-            const showHint = !hint || hintIsMine;
-            const showInput = !hint && hintIsMine;
-
-            if (game.$isTutorial && hintIsMine) defaultValue = TUTORIAL_HINTS[currentRound.word][0];
-
-            return (
-                <WordHint 
-                    key={hintObj.id}
-                    hint={hint} 
-                    color={author.color}
-                    showPencil={!showInput && !hint}
-                    submitHint={showInput ? (h) => this.submitHint(hintObj.id, h) : undefined}
-                    showCheck={!showHint}
-                    author={authorName}
-                    defaultValue={defaultValue}
-                >
-                    {hintIsMine && !showInput && !game.$isTutorial && (
-                        <IconButton color="primary" onClick={() => this.resetHint(hintObj.id, hint)}>
-                            <EditIcon />
-                        </IconButton>
-                    )}
-                </WordHint>
-            );
-        });
+        const { currentRound, currentUser, guesser, isGuesser, isGameHost, currentWord } = extractGameData(game);
+        let enteredHint: boolean = !!isGuesser || currentRound.hints.some((h) => h.authorId === currentUser?.id && !!h.hint);
 
         return (
             <GameField
@@ -134,10 +82,10 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
-                rightCol={currentHints}
+                rightCol={<WordHintList game={game} submittedHints={submittedHints} submitHint={this.submitHint} resetHint={this.resetHint} /> }
             />
         );
     }
 }
 
-export default withTranslation()(HintWritingView);
+export default HintWritingView;

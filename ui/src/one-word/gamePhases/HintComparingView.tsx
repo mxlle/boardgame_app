@@ -1,23 +1,21 @@
 import React from 'react';
-import { Trans, withTranslation, WithTranslation } from 'react-i18next';
-import {Grid, Button, Typography, Checkbox} from '@material-ui/core';
-import {IGame, IHint} from '../../types';
+import { Trans } from 'react-i18next';
+import {Grid, Button, Typography} from '@material-ui/core';
+import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
-import WordHint from '../components/WordHint';
 import GameField from './GameField';
 
 import api from '../../shared/apiFunctions';
-import {getPlayerInGame} from "../gameFunctions";
-import {getCurrentUserInGame} from "../../shared/functions";
+import {extractGameData} from "../../shared/functions";
 import {nextTutorialStep, toggleDuplicateInTutorial} from "../tutorial";
 import TutorialOverlay from "../../common/TutorialOverlay";
 import {OneWordGameChildProps} from "../OneWordGame";
-import {Mood as MoodIcon, MoodBad as MoodBadIcon} from "@material-ui/icons";
 import EndPhaseButton from "../components/EndPhaseButton";
+import WordHintList from "./WordHintList";
 
 type HintComparingViewProps = {
     game: IGame
-}&WithTranslation&OneWordGameChildProps;
+}&OneWordGameChildProps;
 
 type HintComparingViewState = {};
 
@@ -50,44 +48,13 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
     }
 
     render() {
-        const {game, i18n} = this.props;
-        const currentRound = game.rounds[game.round];
-        const currentUser = getCurrentUserInGame(game);
-        const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
-        const isGuesser = currentUser && currentUser.id === guesser.id;
+        const {game} = this.props;
+        const { guesser, isGuesser, isRoundHost, isGameHost, currentWord } = extractGameData(game);
         const guesserName = guesser.name;
-        const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?', id: '?' };
-        const isRoundHost = currentUser && currentUser.id === roundHost.id;
-        const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
 
-        const currentWord = isGuesser || !currentUser ? '?' : (currentRound.word || '');
-        const currentHints = currentRound.hints.map((hintObj: IHint) => {
-            const hintIsMine = currentUser && currentUser.id === hintObj.authorId;
-            const author = getPlayerInGame(game, hintObj.authorId) || { name: '?', id: '?' };
-            const authorName = hintIsMine ? i18n.t('COMMON.ME', 'Me') : author.name;
-
-            return (
-                <WordHint 
-                    key={hintObj.id}
-                    hint={hintObj.hint}
-                    color={author.color}
-                    showCheck={isGuesser||!currentUser}
-                    showCross={(isGuesser||!currentUser)&&hintObj.isDuplicate}
-                    duplicate={hintObj.isDuplicate}
-                    author={authorName}
-                >
-                    {isRoundHost && (
-                        <Checkbox
-                            icon={<MoodIcon />} checkedIcon={<MoodBadIcon />}
-                            checked={hintObj.isDuplicate || false}
-                            onChange={ ()=>this.toggleDuplicate(hintObj.id) }/>
-                    )}
-                </WordHint>
-            );
-        });
-
-        if (isRoundHost) { // TODO - maybe not use Grid for these elements (?)
-            currentHints.push((
+        const hintElements = [<WordHintList game={game} toggleDuplicate={this.toggleDuplicate} />];
+        if (isRoundHost) {
+            hintElements.push((
                 <Grid item xs={12} component={Typography} variant="subtitle1" key="info">
                     <Trans i18nKey="GAME.COMPARING.INFO">Mark invalid hints</Trans>
                 </Grid>
@@ -119,10 +86,10 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                     <TutorialOverlay game={game} key="tutorial" />
                 ]}
 
-                rightCol={currentHints}
+                rightCol={hintElements}
             />
         );
     }
 }
 
-export default withTranslation()(HintComparingView);
+export default HintComparingView;

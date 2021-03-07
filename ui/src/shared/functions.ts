@@ -1,6 +1,18 @@
 import {SETTING_ID} from './constants';
-import {IGame, IUser} from "../types";
+import {GamePhase, IGame, IUser} from "../types";
 import {getPlayerInGame} from "../one-word/gameFunctions";
+
+export function extractGameData(game: IGame) {
+	const currentRound = game.rounds[game.round];
+	const currentUser = getCurrentUserInGame(game);
+	const guesser = getPlayerInGame(game, currentRound.guesserId) || { name: '?', id: '?' };
+	const isGuesser = currentUser && currentUser.id === guesser.id;
+	const roundHost = getPlayerInGame(game, currentRound.hostId) || { name: '?', id: '?' };
+	const isRoundHost = currentUser && currentUser.id === roundHost.id;
+	const isGameHost: boolean = !!currentUser?.id && game.hostId === currentUser.id;
+	const currentWord = (game.phase === GamePhase.Solution || (!isGuesser && !!currentUser)) ? currentRound.word : '?';
+	return { currentRound, currentUser, guesser, isGuesser, roundHost, isRoundHost, isGameHost, currentWord };
+}
 
 export function getCurrentUserInGame(game: IGame): IUser | undefined {
 	return getPlayerInGame(game, getCurrentUserId());
