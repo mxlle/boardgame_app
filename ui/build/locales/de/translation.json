@@ -10,7 +10,15 @@
         "WELCOME_NAME": "Hallo {{ name }}! Viel Spaß!",
         "CONFETTI": "Konfetti! ({{confettiAmmo}})",
         "RELOAD_CONFETTI": "Konfetti nachladen...",
-        "BACK": "Zurück"
+        "BACK": "Zurück",
+        "DAYS": "{{count}} Tag",
+        "DAYS_plural": "{{count}} Tage",
+        "HOURS": "{{count}} Stunde",
+        "HOURS_plural": "{{count}} Stunden",
+        "MINUTES": "{{count}} Minute",
+        "MINUTES_plural": "{{count}} Minuten",
+        "SECONDS": "{{count}} Sekunde",
+        "SECONDS_plural": "{{count}} Sekunden"
     },
     "HOME": {
         "GAME_NAME": "Spielname",

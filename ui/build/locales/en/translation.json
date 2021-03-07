@@ -10,7 +10,15 @@
         "WELCOME_NAME": "Hi {{ name }}! Have fun!",
         "CONFETTI": "Confetti! ({{confettiAmmo}})",
         "RELOAD_CONFETTI": "Reloading confetti...",
-        "BACK": "Back"
+        "BACK": "Back",
+        "DAYS": "{{count}} day",
+        "DAYS_plural": "{{count}} days",
+        "HOURS": "{{count}} hour",
+        "HOURS_plural": "{{count}} hours",
+        "MINUTES": "{{count}} minute",
+        "MINUTES_plural": "{{count}} minutes",
+        "SECONDS": "{{count}} second",
+        "SECONDS_plural": "{{count}} seconds"
     },
     "HOME": {
         "GAME_NAME": "Game name",
