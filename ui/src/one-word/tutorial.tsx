@@ -10,7 +10,7 @@ import {
     guess,
     newRound,
     resolveRound,
-    toggleDuplicateHint
+    toggleDuplicateHint, getPlayerStatistics
 } from "./gameFunctions";
 import {getRandomColor} from "../common/ColorPicker";
 import {tutorialEmitter} from "../shared/socket";
@@ -29,6 +29,7 @@ function createTutorial(): IGame {
 
 export function saveTutorial(game: IGame) {
     game.actionRequiredFrom = getPlayersWithRequiredAction(game);
+    game.playerStatistics = getPlayerStatistics(game);
     sessionStorage.setItem(SETTING_TUTORIAL, JSON.stringify(game));
     tutorialEmitter.emit(GameEvent.Update, game);
 }

@@ -6,6 +6,7 @@ import {
     GamePhase,
     IGame,
     IGameRound,
+    IPlayerStatistics,
     IHint,
     IJoiningRequest,
     IUser
@@ -194,12 +195,14 @@ export function newRound(game: IGame, gameStart: boolean = false) {
     }
 
     game.phase = GamePhase.HintWriting;
+    game.rounds[game.round].startTime = new Date();
 }
 
 export function addHint(game: IGame, hintId: string, hint: string, playerId: string) {
     let hintObj = game.rounds[game.round].hints.find(h => h.id === hintId && h.authorId === playerId);
     if (!hintObj) return;
     hintObj.hint = hint.trim();
+    hintObj.hintTime = new Date();
 
     if (game.rounds[game.round].hints.every(h => h.hint && h.hint.length > 0)) {
         if (game.isTwoPlayerVariant) {
@@ -215,6 +218,7 @@ export function resetHint(game: IGame, hintId: string, playerId: string) {
     if (!hintObj) return;
 
     hintObj.hint = '';
+    hintObj.hintTime = undefined;
 }
 
 export function compareHints(game: IGame) {
@@ -245,6 +249,7 @@ export function removeTwoPlayerHint(game: IGame) {
     currentRoundHints[randomIndex].isDuplicate = true;
 
     game.phase = GamePhase.Guessing;
+    game.rounds[game.round].guessStartTime = new Date();
 }
 
 export function toggleDuplicateHint(game: IGame, hintId: string) {
@@ -260,6 +265,7 @@ export function showHints(game: IGame) {
     if (game.phase !== GamePhase.HintComparing) return;
 
     game.phase = GamePhase.Guessing;
+    game.rounds[game.round].guessStartTime = new Date();
 }
 
 export function guess(game: IGame, guess: string) {
@@ -268,6 +274,7 @@ export function guess(game: IGame, guess: string) {
 
     currentRound.guess = guess;
     currentRound.correct = isSameWord(currentRound.guess, currentRound.word);
+    currentRound.guessEndTime = new Date();
     game.phase = GamePhase.Solution;
 }
 
@@ -317,6 +324,63 @@ export function getPlayersWithRequiredAction(game: IGame): IUser[] {
             break;
     }
     return game.players.filter(p => actionRequiredFromIds.includes(p.id)).map(p => ({ id: p.id, name: p.name, color: p.color}));
+}
+
+export function getPlayerStatistics(game: IGame): IPlayerStatistics[] {
+    const gameEnded = game.phase === GamePhase.End;
+
+    // for now only calculate statistics at the end
+    if (!gameEnded) {
+        return [];
+    }
+
+    const playerStatistics: IPlayerStatistics[] = game.players.map(player => ({
+        playerId: player.id,
+        guessCount: 0,
+        correctGuessCount: 0,
+        totalGuessTime: 0,
+        hintCount: 0,
+        validHintCount: 0,
+        validHintCountWon: 0,
+        totalHintTime: 0
+    }));
+
+    const forLoopLimit = gameEnded ? game.rounds.length : game.round;
+
+    for (let i = 0; i < forLoopLimit; i++) {
+        const currentRound = game.rounds[i];
+        const roundWon = currentRound.correct || currentRound.countAnyway;
+        const guesserEntry = playerStatistics.find(entry => entry.playerId === currentRound.guesserId);
+
+        if (guesserEntry) {
+            guesserEntry.guessCount++;
+            if (roundWon) guesserEntry.correctGuessCount++;
+            if (currentRound.guessEndTime && currentRound.guessStartTime) {
+                const guessingTime = currentRound.guessEndTime.getTime() - currentRound.guessStartTime.getTime();
+                guesserEntry.totalGuessTime += guessingTime;
+            }
+        }
+
+        for (let j = 0; j < currentRound.hints.length; j++) {
+            const hint = currentRound.hints[j];
+            const hinterEntry = playerStatistics.find(entry => entry.playerId === hint.authorId);
+            if (hinterEntry) {
+                hinterEntry.hintCount++;
+                if (!hint.isDuplicate) {
+                    hinterEntry.validHintCount++;
+                    if (roundWon) hinterEntry.validHintCountWon++;
+                }
+                if (hint.hintTime && currentRound.startTime) {
+                    const hintTime = hint.hintTime.getTime() - currentRound.startTime.getTime();
+                    hinterEntry.totalHintTime += hintTime;
+                }
+            }
+
+        }
+
+    }
+
+    return playerStatistics;
 }
 
 function justOne(word: string = ''): string {
@@ -374,7 +438,8 @@ export function emptyGame(): IGame {
         "round": 0,
         "phase": 0,
         "rounds": [],
-        "actionRequiredFrom": []
+        "actionRequiredFrom": [],
+        "playerStatistics": []
     };
 }
 

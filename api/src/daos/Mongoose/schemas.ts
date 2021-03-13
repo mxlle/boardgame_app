@@ -1,5 +1,5 @@
 import { Schema } from 'mongoose';
-import { getPlayersWithRequiredAction } from '@gameFunctions';
+import {getPlayerStatistics, getPlayersWithRequiredAction} from '@gameFunctions';
 
 export const UserSchema: Schema = new Schema({
     id: String,
@@ -12,7 +12,8 @@ export const HintSchema: Schema = new Schema({
     id: String,
     hint: String,
     authorId: String,
-    isDuplicate: {type: Boolean, required: false}
+    isDuplicate: {type: Boolean, required: false},
+    hintTime: {type: Date, required: false}
 });
 
 export const RoundSchema: Schema = new Schema({
@@ -23,7 +24,10 @@ export const RoundSchema: Schema = new Schema({
     hints: [HintSchema],
     guess: String,
     correct: {type: Boolean, required: false},
-    countAnyway: {type: Boolean, required: false}
+    countAnyway: {type: Boolean, required: false},
+    startTime: {type: Date, required: false},
+    guessStartTime: {type: Date, required: false},
+    guessEndTime: {type: Date, required: false},
 });
 
 export const JoiningRequestSchema: Schema = new Schema({
@@ -51,11 +55,11 @@ const GameSchema: Schema = new Schema({
 
     joiningRequests: { type: [JoiningRequestSchema], default: [] },
 
-    creationTime: Date,
-    startTime: Date,
-    endTime: Date,
+    creationTime: {type: Date, required: false},
+    startTime: {type: Date, required: false},
+    endTime: {type: Date, required: false},
 
-    rematchId: String,
+    rematchId: {type: String, required: false},
 
     isTwoPlayerVariant: {type: Boolean, required: false}
 }, { toJSON: { virtuals: true } });
@@ -63,6 +67,10 @@ const GameSchema: Schema = new Schema({
 GameSchema.virtual('actionRequiredFrom').get(function() {
     // @ts-ignore
     return getPlayersWithRequiredAction(this);
+});
+GameSchema.virtual('gameStatistics').get(function() {
+    // @ts-ignore
+    return getPlayerStatistics(this);
 });
 
 export {GameSchema};

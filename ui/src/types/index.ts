@@ -27,6 +27,7 @@ export interface IGame {
     isTwoPlayerVariant?: boolean;
 
     actionRequiredFrom: IUser[]; // calculated virtual property
+    playerStatistics: IPlayerStatistics[]; // calculated virtual property
 
     $isTutorial?: boolean; // only in FE
 }
@@ -47,6 +48,10 @@ export interface IGameRound {
     guess: string;
     correct: boolean|null;
     countAnyway: boolean|null;
+    startTime?: Date;
+    endTime?: Date;
+    guessStartTime?: Date;
+    guessEndTime?: Date;
 }
 
 export interface IHint {
@@ -54,6 +59,7 @@ export interface IHint {
     hint: string;
     authorId: string;
     isDuplicate?: boolean;
+    hintTime?: Date;
 }
 
 export interface IJoiningRequest {
@@ -64,6 +70,17 @@ export interface IJoiningRequest {
     joinAsNewPlayer?: boolean;
     accepted?: boolean;
     denied?: boolean;
+}
+
+export interface IPlayerStatistics {
+    playerId: string;
+    guessCount: number;
+    correctGuessCount: number;
+    totalGuessTime: number;
+    hintCount: number;
+    validHintCount: number;
+    validHintCountWon: number;
+    totalHintTime: number;
 }
 
 export enum GamePhase {
