@@ -17,8 +17,6 @@
     "@gameFunctions": "dist/ui/src/one-word/gameFunctions"
   },
   "dependencies": {
-    "@types/fast-levenshtein": "0.0.1",
-    "@types/socket.io": "^2.1.13",
     "command-line-args": "^5.2.0",
     "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
@@ -45,6 +43,8 @@
     "@types/helmet": "0.0.47",
     "@types/jasmine": "^3.10.2",
     "@types/jsonfile": "^6.0.1",
+    "@types/fast-levenshtein": "0.0.1",
+    "@types/socket.io": "^2.1.13",
     "@types/mongodb": "^3.6.20",
     "@types/mongoose": "^5.11.97",
     "@types/morgan": "^1.9.3",
