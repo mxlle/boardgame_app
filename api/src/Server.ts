@@ -5,7 +5,13 @@ import {GameEvent, IGameApi, ROOM_GAME, WordEvent} from '@gameTypes';
 import words from '@shared/Words';
 
 
-export const httpServer = http.createServer();
+export const httpServer = http.createServer((req, res) => {
+    if (req.url === '/ping') {
+        res.statusCode = 200;
+        res.end('Server up');
+    }
+});
+
 const io = SocketIO(httpServer, {
     path: '/api',
     serveClient: false,
