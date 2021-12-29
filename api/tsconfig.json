@@ -1,45 +1,23 @@
 {
+  "extends": "@tsconfig/node16/tsconfig.json",
   "compilerOptions": {
     "baseUrl": "./",
     "emitDecoratorMetadata": true,
-    "esModuleInterop": true,
     "experimentalDecorators": true,
     "importHelpers": true,
-    "module": "commonjs",
     "outDir": "dist",
     "removeComments": true,
     "sourceMap": true,
-    "strict": true,
-    "target": "es6",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
     "moduleResolution": "node",
     "paths": {
-      "@daos/*": [
-        "src/daos/*"
-      ],
-      "@entities/*": [
-        "src/entities/*"
-      ],
-      "@shared/*": [
-        "src/shared/*"
-      ],
-      "@server": [
-        "src/Server"
-      ],
-      "@gameTypes": [
-        "../ui/src/types"
-      ],
-      "@gameFunctions": [
-        "../ui/src/one-word/gameFunctions"
-      ]
+      "@daos/*": ["src/daos/*"],
+      "@entities/*": ["src/entities/*"],
+      "@shared/*": ["src/shared/*"],
+      "@server": ["src/Server"],
+      "@gameTypes": ["../ui/src/types"],
+      "@gameFunctions": ["../ui/src/one-word/gameFunctions"]
     },
-    "types": [
-      "node"
-    ],
+    "types": ["node"],
     "typeRoots": [
       "node_modules/@types"
     ]
