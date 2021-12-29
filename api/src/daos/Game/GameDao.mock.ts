@@ -30,27 +30,28 @@ class GameDao extends MockDaoMock implements IGameDao {
     }
 
 
-    public async add(game: IGame): Promise<void> {
+    public async add(game: IGame): Promise<IGame> {
         try {
             const db = await super.openDb();
             if (!game.id) game.id = generateId();
             if (!db.games) db.games = [];
             db.games.push(game);
             await super.saveDb(db);
+            return game;
         } catch (err) {
             throw err;
         }
     }
 
 
-    public async update(game: IGame): Promise<void> {
+    public async update(game: IGame): Promise<IGame> {
         try {
             const db = await super.openDb();
             for (let i = 0; i < db.games.length; i++) {
                 if (db.games[i].id === game.id) {
                     db.games[i] = game;
                     await super.saveDb(db);
-                    return;
+                    return game;
                 }
             }
             throw new Error('Game not found');

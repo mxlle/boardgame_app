@@ -12,6 +12,9 @@
 /ui/*.log
 /ui/report.*.json
 
+# production
+/ui/build
+
 # api ----------------------------
 
 # dependencies

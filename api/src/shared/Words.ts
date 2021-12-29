@@ -13,8 +13,8 @@ class Words {
 
     async initWords(lng: 'en'|'de') {
         const data: any = [];
-        await new Promise((resolve, _reject) => {
-            fs.createReadStream(path.resolve(__dirname, `../data/words-${lng}.csv`))
+        await new Promise<void>((resolve, _reject) => {
+            fs.createReadStream(path.resolve( `src/data/words-${lng}.csv`))
                 .pipe(csv({
                     headers: ['word']
                 }))

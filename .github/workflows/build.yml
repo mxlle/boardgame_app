@@ -30,3 +30,18 @@ jobs:
         path: |
           api/dist
           ui/build
+
+  deploy:
+    name: Deploy
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/master'
+    needs: build
+    steps:
+      - name: Create Deployment
+        id: deploy
+        uses: abendigo/create-deployment@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          payload: ${{ github.run_id }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
