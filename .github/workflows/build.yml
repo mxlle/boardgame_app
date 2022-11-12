@@ -8,20 +8,24 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - run: echo ${{github.ref}} ${{github.sha}}
-    - uses: actions/checkout@v2
-    - uses: bahmutov/npm-install@v1
-      with: 
-        working-directory: |
-          api
-          ui
+    - uses: actions/checkout@v3
+    - uses: actions/setup-node@v3
+      with:
+        node-version: '16'
+        cache: 'npm'
+        cache-dependency-path: '**/package-lock.json'
   
     - name: Build API
-      run: npm run build
       working-directory: api
+      run: |
+        npm ci
+        npm run build
     
     - name: Build UI
-      run: npm run build
       working-directory: ui
+      run: |
+        npm ci
+        npm run build
       
     - name: Archive production artifacts
       uses: actions/upload-artifact@v2
