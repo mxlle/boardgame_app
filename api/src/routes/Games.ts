@@ -2,10 +2,11 @@ import {generateId} from '@shared/functions';
 
 import GameDao from '@daos/Game';
 import {GameController, GamePhase, IUser} from '@entities/Game';
-import {forbiddenError, gameNotFoundError, paramMissingError, joiningRequestNotFoundError} from '@shared/constants';
+import {forbiddenError, gameNotFoundError, joiningRequestNotFoundError, paramMissingError} from '@shared/constants';
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
+import {generateGuessForHints, generateHintForWord, generateWordToGuess} from '../ai/openai-integration';
 
 // Init shared
 const gameDao = new GameDao();
@@ -412,6 +413,18 @@ class GameApi implements IGameApi {
 
         return true;
     };
+
+    generateWordToGuess() {
+        return generateWordToGuess();
+    }
+
+    generateHintForWord(word: string) {
+        return generateHintForWord(word);
+    }
+
+    generateGuessForHints(hints: string[]) {
+        return generateGuessForHints(hints);
+    }
 }
 
 

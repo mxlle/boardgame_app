@@ -95,6 +95,10 @@ export interface IGameApi {
     guess: (gameId: string, guess: string) => Promise<boolean>;
     resolveRound: (gameId: string, correct: boolean|undefined) => Promise<boolean>;
     deleteGame: (gameId: string) => Promise<boolean>;
+
+    generateWordToGuess: () => Promise<string>;
+    generateHintForWord: (word: string) => Promise<string>;
+    generateGuessForHints: (hints: string[]) => Promise<string>;
 }
 
 export enum GameEvent {

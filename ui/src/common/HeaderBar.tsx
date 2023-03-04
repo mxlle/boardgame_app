@@ -1,18 +1,19 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { Trans, useTranslation } from 'react-i18next';
-import { AppBar, Toolbar, IconButton, Typography, Button, Menu, MenuItem, ListItemIcon } from '@material-ui/core';
-import { 
-    Home as HomeIcon, 
-    AccountCircle as AccountCircleIcon, 
-    Translate as TranslateIcon, 
-    BrightnessMedium as BrightnessMediumIcon 
+import {Link} from 'react-router-dom';
+import {Trans, useTranslation} from 'react-i18next';
+import {AppBar, Button, IconButton, ListItemIcon, Menu, MenuItem, Toolbar, Typography} from '@material-ui/core';
+import {
+    AccountCircle as AccountCircleIcon,
+    BrightnessMedium as BrightnessMediumIcon,
+    Home as HomeIcon,
+    StarRounded as StarIcon,
+    Translate as TranslateIcon
 } from '@material-ui/icons';
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
+import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
 
-import { SETTING_NAME, ThemeMode } from '../shared/constants';
+import {SETTING_NAME, ThemeMode} from '../shared/constants';
 
-import { SelectionDialog } from './SelectionDialog';
+import {SelectionDialog} from './SelectionDialog';
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -28,7 +29,8 @@ const styles = (theme: Theme) => createStyles({
         },
     },
     linkBtn: {
-        color: 'inherit'
+        color: 'inherit',
+        marginRight: theme.spacing(2),
     }
 });
 
@@ -78,6 +80,11 @@ const HeaderBar = (props: HeaderBarProps) => {
                 <Link to="/" className={classes.linkBtn}>
                     <IconButton edge="start" color="inherit" aria-label="home">
                         <HomeIcon />
+                    </IconButton>
+                </Link>
+                <Link to="/chat-gpt-playground" className={classes.linkBtn}>
+                    <IconButton edge="start" color="inherit" aria-label="home">
+                        <StarIcon />
                     </IconButton>
                 </Link>
                 <Typography variant="h2" className={classes.title}>

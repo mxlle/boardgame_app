@@ -1,18 +1,13 @@
-import React, { useState, Suspense } from 'react';
-import {
-    BrowserRouter as Router,
-    Switch,
-    Route,
-    RouteComponentProps,
-} from 'react-router-dom';
+import React, {Suspense, useState} from 'react';
+import {BrowserRouter as Router, Route, RouteComponentProps, Switch,} from 'react-router-dom';
 import './App.scss';
-import { Paper } from '@material-ui/core';
-import { createMuiTheme, ThemeProvider, makeStyles } from '@material-ui/core/styles';
+import {Paper} from '@material-ui/core';
+import {createMuiTheme, makeStyles, ThemeProvider} from '@material-ui/core/styles';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
-import { SnackbarProvider } from 'notistack';
+import {SnackbarProvider} from 'notistack';
 
-import { SETTING_COLOR, SETTING_THEME, ThemeMode } from './shared/constants';
-import { getTheme, STYLES } from './theme';
+import {SETTING_COLOR, SETTING_THEME, ThemeMode} from './shared/constants';
+import {getTheme, STYLES} from './theme';
 import HeaderBar from './common/HeaderBar';
 import Loader from "./common/Loader";
 import JustOneHome from './one-word/OneWordHome';
@@ -21,6 +16,7 @@ import OneWordGame from './one-word/OneWordGame';
 import './i18n';
 import ConnectionMonitor from "./one-word/components/ConnectionMonitor";
 import socket from "./shared/socket";
+import ChatGptPlayground from "./one-word/ChatGptPlayground";
 
 const useStyles = makeStyles({
     root: {
@@ -61,6 +57,7 @@ export const App = () =>    {
                         <Paper square elevation={0} className={classes.root} style={{backgroundColor: theme.palette.background.default}}>
                             <HeaderBar userTheme={userTheme} applyUserTheme={applyUserTheme}/>
                             <Switch>
+                                <Route path="/chat-gpt-playground" children={<ChatGptPlayground/>} />
                                 <Route path="/:gameId" component={(props: RouteComponentProps<any>) => <OneWordGame gameId={props.match.params.gameId} setTheme={setUserColor}/>} />
                                 <Route children={<JustOneHome/>} />
                             </Switch>
