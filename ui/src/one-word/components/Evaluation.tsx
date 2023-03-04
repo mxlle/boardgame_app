@@ -1,11 +1,11 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
+import {Trans} from 'react-i18next';
 import {createStyles, Grid, Theme, Typography, withStyles} from '@material-ui/core';
 import {IUser} from "../../types";
 import {WithStyles} from "@material-ui/core/styles";
 import ProgressBar from "../../common/ProgressBar";
-import {getRandomColor} from "../../common/ColorPicker";
 import {easeInQuad} from "../../shared/functions";
+import {getRandomColor} from "../../shared/color-util";
 
 const RESULT_ANIMATION_MILLIS = 1000;
 

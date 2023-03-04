@@ -7,7 +7,7 @@ const openai = new OpenAIApi(new Configuration({
     apiKey: process?.env?.OPENAI_API_KEY,
 }));
 
-const TEMPERATURE = 2;
+const TEMPERATURE = 1;
 const MAX_TOKENS = 4;
 const NUM_OF_CHOICES = 1;
 const DEFAULT_LANGUAGE = 'de';
@@ -72,10 +72,10 @@ async function getFormattedResultFromRequest(request: CreateChatCompletionReques
     }
 }
 
-function formatAnswer(answer: string = '') {
+function formatAnswer(answer: string = '', shouldBeOnlyOneWord: boolean = false): string {
     const onlyLetters = answer.replace(/[^\p{L} ]/gu, '');
 
-    return onlyLetters.split(' ')[0] ?? '';
+    return shouldBeOnlyOneWord ? (onlyLetters.split(' ')[0] ?? '') : onlyLetters;
 }
 
 function isAxiosError(e: unknown): e is AxiosError {
@@ -94,9 +94,9 @@ function getPromptForInitialWord(language: 'en' | 'de' = DEFAULT_LANGUAGE): stri
 
 function getPromptForHint(word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): string {
     if (language === 'de') {
-        return `Gib mir genau ein Nomen, dass helfen kann dieses Wort zu erraten: "${word}".`;
+        return `Gib mir genau ein Wort, dass helfen kann dieses Wort zu erraten: "${word}".`;
     } else {
-        return `Give me exactly one noun, that helps to guess this word: "${word}".`;
+        return `Give me exactly one word, that helps to guess this word: "${word}".`;
     }
 }
 

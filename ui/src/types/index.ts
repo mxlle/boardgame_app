@@ -36,6 +36,7 @@ export interface IUser {
     name: string;
     color?: string;
     enteredWords?: string[];
+    isAi?: boolean;
 }
 
 export interface IGameRound {
@@ -99,6 +100,7 @@ export interface IGameApi {
     generateWordToGuess: () => Promise<string>;
     generateHintForWord: (word: string) => Promise<string>;
     generateGuessForHints: (hints: string[]) => Promise<string>;
+    addAiPlayer: (gameId: string) => Promise<boolean>;
 }
 
 export enum GameEvent {

@@ -23,7 +23,7 @@ type WordHintListProps = {
 class WordHintList extends React.Component<WordHintListProps> {
     render() {
         const {game, submittedHints, resetHint, submitHint, toggleDuplicate, i18n} = this.props;
-        const { currentRound, currentUser, isGuesser, isRoundHost} = extractGameData(game);
+        const { currentRound, currentUser, isGuesser, isRoundHost, isGameHost} = extractGameData(game);
 
         const currentHints = currentRound.hints.map((hintObj: IHint) => {
             let hint: string = hintObj.hint;
@@ -44,7 +44,7 @@ class WordHintList extends React.Component<WordHintListProps> {
             const showHint = !hint || hintIsMine;
             const showInput = GamePhase.HintWriting === game.phase && !hint && hintIsMine;
             const showResetButton = GamePhase.HintWriting === game.phase && hintIsMine && !showInput && !game.$isTutorial;
-            const showToggleButton = GamePhase.HintComparing === game.phase && isRoundHost;
+            const showToggleButton = GamePhase.HintComparing === game.phase && (isRoundHost || (isGameHost && !isGuesser));
 
             const showCheck = (GamePhase.HintWriting === game.phase && !showHint) || (GamePhase.HintComparing === game.phase && (isGuesser || !currentUser));
             const showCross = [GamePhase.HintComparing, GamePhase.Guessing].includes(game.phase) && (isGuesser || !currentUser) && hintObj.isDuplicate;

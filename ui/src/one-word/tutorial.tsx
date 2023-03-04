@@ -5,15 +5,15 @@ import {GameEvent, GamePhase, IGame, IUser} from "../types";
 import {getCurrentUserId} from "../shared/functions";
 import {
     addHint,
-    getPlayersWithRequiredAction,
     emptyGame,
+    getPlayersWithRequiredAction,
     guess,
     newRound,
     resolveRound,
     toggleDuplicateHint
 } from "./gameFunctions";
-import {getRandomColor} from "../common/ColorPicker";
 import {tutorialEmitter} from "../shared/socket";
+import {getRandomColor} from "../shared/color-util";
 
 export const TUTORIAL_ID = 'tutorial';
 const SETTING_TUTORIAL = 'tutorial.game';

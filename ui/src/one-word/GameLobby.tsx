@@ -1,6 +1,6 @@
 import React from 'react';
 import {DEFAULT_NUM_WORDS, IGame, IUser} from '../types';
-import {Grid, Button, Paper, Typography, Box, Tooltip, IconButton} from '@material-ui/core';
+import {Box, Button, Grid, IconButton, Paper, Tooltip, Typography} from '@material-ui/core';
 import DeleteIcon from "@material-ui/icons/Delete";
 import ShareIcon from '@material-ui/icons/Share';
 import ArrowBackIcon from '@material-ui/icons/ArrowBack';
@@ -8,18 +8,18 @@ import LooksTwoIcon from '@material-ui/icons/LooksTwo';
 import HelpIcon from '@material-ui/icons/HelpOutline';
 import SentimentSatisfiedAltIcon from '@material-ui/icons/SentimentSatisfiedAlt';
 import {Trans, WithTranslation, withTranslation} from 'react-i18next';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
+import {withSnackbar, WithSnackbarProps} from 'notistack';
 import WordHint from './components/WordHint';
 import NewPlayer from '../common/NewPlayer';
-import { RoundSelector } from './components/RoundSelector';
-import { getRandomColor } from '../common/ColorPicker';
+import {RoundSelector} from './components/RoundSelector';
 
-import { SETTING_ID, SETTING_NAME, SETTING_COLOR } from '../shared/constants';
+import {SETTING_COLOR, SETTING_ID, SETTING_NAME} from '../shared/constants';
 import api from '../shared/apiFunctions';
 import {addPlayerToTutorial, nextTutorialStep} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
 import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
+import {getRandomColor} from "../shared/color-util";
 
 
 const styles = (theme: Theme) => createStyles({
@@ -65,6 +65,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         }
 
         this.addPlayer = this.addPlayer.bind(this);
+        this.addAiPlayer = this.addAiPlayer.bind(this);
         this.leaveGame = this.leaveGame.bind(this);
         this.setPlayerProps = this.setPlayerProps.bind(this);
         this.selectNumRounds = this.selectNumRounds.bind(this);
@@ -82,6 +83,10 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         if (this.props.game.$isTutorial) { addPlayerToTutorial(player); this.setLocalPlayer(player); return; }
         await api.addPlayer(this.props.game.id, player);
         this.setLocalPlayer(player);
+    }
+
+    addAiPlayer() {
+        api.addAiPlayer(this.props.game.id);
     }
 
     setLocalPlayer(player: IUser) {
@@ -205,6 +210,9 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isHost && isInGame && (
                             <Grid item xs={12}>
+                                <Button variant="contained" onClick={this.addAiPlayer}>
+                                    <Trans i18nKey="GAME.LOBBY.ADD_AI_PLAYER">Add AI player</Trans>
+                                </Button>
                                 <Button variant="contained" color="primary" className={game.players.length === 2 ? `submitBtn ${classes.fakeDisabled}` : 'submitBtn'}
                                     disabled={game.players.length < 2}
                                     onClick={() => this.selectNumRounds(false)}>

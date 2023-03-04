@@ -1,6 +1,6 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import { Grid, Button } from '@material-ui/core';
+import {Trans} from 'react-i18next';
+import {Button, Grid} from '@material-ui/core';
 import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
 import GameField from './GameField';
@@ -64,7 +64,7 @@ class SolutionView extends React.Component<SolutionViewProps,SolutionViewState> 
                     </Button>
                 </Grid>
             );
-        } else if (isRoundHost) {
+        } else if (isRoundHost || (isGameHost && !isGuesser)) {
             leftCol.push(
                 <Grid item xs={12} key="button1">
                     <Button variant="contained" onClick={() => this.resolveRound(true)} className="submitBtn correct">

@@ -1,6 +1,6 @@
 import React from 'react';
 import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
-import {allColors} from "./ColorPicker";
+import {allColors} from "../shared/color-util";
 
 const styles = (theme: Theme) => createStyles({
     root: {

@@ -1,6 +1,6 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import {Grid, Button, Typography} from '@material-ui/core';
+import {Trans} from 'react-i18next';
+import {Button, Grid, Typography} from '@material-ui/core';
 import {IGame} from '../../types';
 import WordCard from '../components/WordCard';
 import GameField from './GameField';
@@ -53,7 +53,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const guesserName = guesser.name;
 
         const hintElements = [<WordHintList game={game} toggleDuplicate={this.toggleDuplicate} />];
-        if (isRoundHost) {
+        if (isRoundHost || (isGameHost && !isGuesser)) {
             hintElements.push((
                 <Grid item xs={12} component={Typography} variant="subtitle1" key="info">
                     <Trans i18nKey="GAME.COMPARING.INFO">Mark invalid hints</Trans>

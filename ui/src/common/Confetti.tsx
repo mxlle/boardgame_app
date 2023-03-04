@@ -1,9 +1,9 @@
 import React from 'react';
-import { createStyles, withStyles, WithStyles, Theme } from '@material-ui/core/styles';
-import { create, CreateTypes } from 'canvas-confetti';
-import {allColors} from "./ColorPicker";
+import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
+import {create, CreateTypes} from 'canvas-confetti';
+import {allColors} from "../shared/color-util";
 
-const styles = (theme: Theme) => createStyles({
+const styles = (_theme: Theme) => createStyles({
     root: {
         position: "fixed",
         top: 0,

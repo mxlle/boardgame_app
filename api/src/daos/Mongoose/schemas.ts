@@ -1,11 +1,12 @@
-import { Schema } from 'mongoose';
-import { getPlayersWithRequiredAction } from '@gameFunctions';
+import {Schema} from 'mongoose';
+import {getPlayersWithRequiredAction} from '@gameFunctions';
 
 export const UserSchema: Schema = new Schema({
     id: String,
     name: String,
     color: {type: String, required: false},
-    enteredWords: [{type: String, required: false}]
+    enteredWords: [{type: String, required: false}],
+    isAi: {type: Boolean, required: false},
 });
 
 export const HintSchema: Schema = new Schema({

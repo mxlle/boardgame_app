@@ -12,11 +12,24 @@ import {
 } from "../types";
 import {generateId, randomInt} from "../shared/functions";
 import levenshtein from "fast-levenshtein";
+import {getRandomColor} from "../shared/color-util";
 
 export function addPlayer(game: IGame, player: IUser) {
     if (!game.hostId) game.hostId = player.id; // backup plan
     if (!player.enteredWords) player.enteredWords = [];
     game.players.push(player);
+}
+
+export function getNextAiPlayer(game: IGame): IUser {
+    const aiEmojis = ['🤖', '🪄', '👽', '🧙'];
+    const count = getAiPlayersCount(game);
+
+    return {
+        id: generateId(),
+        name: `${aiEmojis[count % aiEmojis.length]} AI ${count + 1}`,
+        color: getRandomColor(null, game.players.map(p => p.color)),
+        isAi: true
+    };
 }
 
 export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false) {
@@ -316,7 +329,7 @@ export function getPlayersWithRequiredAction(game: IGame): IUser[] {
         case GamePhase.End:
             break;
     }
-    return game.players.filter(p => actionRequiredFromIds.includes(p.id)).map(p => ({ id: p.id, name: p.name, color: p.color}));
+    return game.players.filter(p => actionRequiredFromIds.includes(p.id)).map(p => ({ id: p.id, name: p.name, color: p.color, isAi: p.isAi }));
 }
 
 function justOne(word: string = ''): string {
@@ -398,3 +411,18 @@ export function getClearedForDeletion(game: IGame, nowTime: number = (new Date()
         return [GamePhase.Init, GamePhase.End].includes(game.phase);
     }
 }
+
+function getAiPlayersCount(game: IGame): number {
+    return game.players.filter(p => p.isAi).length;
+}
+
+export function gameHasAiPlayers(game: IGame): boolean {
+    return getAiPlayersCount(game) > 0;
+}
+
+export function getAiPlayersThatNeedToAct(game: IGame): IUser[] {
+    const playersWithAction = getPlayersWithRequiredAction(game);
+    return playersWithAction.filter(p => p.isAi);
+}
+
+

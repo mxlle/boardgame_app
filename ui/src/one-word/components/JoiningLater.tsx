@@ -5,11 +5,11 @@ import {GamePhase, IGame, IUser} from '../../types';
 import api from '../../shared/apiFunctions';
 import {getCurrentUserId, getCurrentUserInGame} from '../../shared/functions';
 import {Trans, WithTranslation, withTranslation} from "react-i18next";
-import {getRandomColor} from "../../common/ColorPicker";
 import {SETTING_COLOR, SETTING_ID, SETTING_NAME} from "../../shared/constants";
 import JoiningRequests from "../components/JoiningRequests";
 import {SelectionDialog, SelectionDialogOption} from "../../common/SelectionDialog";
 import NewPlayer from "../../common/NewPlayer";
+import {getRandomColor} from "../../shared/color-util";
 
 const styles = (theme: Theme) => createStyles({
     button: {

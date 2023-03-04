@@ -1,4 +1,4 @@
-import {generateId} from '@shared/functions';
+import {generateId, sleep} from '@shared/functions';
 
 import GameDao from '@daos/Game';
 import {GameController, GamePhase, IUser} from '@entities/Game';
@@ -7,9 +7,12 @@ import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
 import {generateGuessForHints, generateHintForWord, generateWordToGuess} from '../ai/openai-integration';
+import {getNextAiPlayer} from '@gameFunctions';
 
 // Init shared
 const gameDao = new GameDao();
+
+const AI_TIMEOUT = 1500;
 
 class GameApi implements IGameApi {
     private socket: Namespace;
@@ -77,12 +80,43 @@ class GameApi implements IGameApi {
 
         GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
 
+        if (GameController.gameHasAiPlayers(game)) {
+            void this.setAiWords(gameId);
+        }
+
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
         return true;
     };
+
+    async setAiWords(gameId: string) {
+        await sleep(AI_TIMEOUT);
+
+        const game = await gameDao.getOne(gameId);
+        if (!game) throw new Error(gameNotFoundError);
+
+        const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+        for (const aiPlayer of aiPlayers) {
+            const enteredWords: string[] = [];
+            for (let i = 0; i < game.wordsPerPlayer; i++) {
+                enteredWords.push(await generateWordToGuess(game.language));
+            }
+            GameController.updatePlayer(game, {
+                ...aiPlayer,
+                enteredWords
+            });
+        }
+
+        const updatedGame = await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
+        if (updatedGame.phase === GamePhase.HintWriting) {
+            void this.addHintsForAiPlayers(gameId);
+        }
+    }
 
     async backToLobby(gameId: string) {
         const game = await gameDao.getOne(gameId);
@@ -115,6 +149,14 @@ class GameApi implements IGameApi {
         return true;
     };
 
+    async addAiPlayer(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+
+        if (!game) throw new Error(gameNotFoundError);
+
+        return this.addPlayer(gameId, getNextAiPlayer(game));
+    }
+
     async updatePlayer(gameId: string, player: IUser) {
         const game = await gameDao.getOne(gameId);
 
@@ -124,9 +166,14 @@ class GameApi implements IGameApi {
 
         GameController.updatePlayer(game, player);
 
+        if (game.phase === GamePhase.HintWriting) {
+            void this.addHintsForAiPlayers(gameId);
+        }
+
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
         if (game.phase === GamePhase.HintWriting) {
             // send notification for next phase
             const options: NotificationEventOptions = {
@@ -138,6 +185,26 @@ class GameApi implements IGameApi {
 
         return true;
     };
+
+    async addHintsForAiPlayers(gameId: string) {
+        await sleep(AI_TIMEOUT);
+
+        const game = await gameDao.getOne(gameId);
+        if (!game) throw new Error(gameNotFoundError);
+
+        if (GameController.gameHasAiPlayers(game)) {
+            const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+            for (const aiPlayer of aiPlayers) {
+                for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
+                    GameController.addHint(game, hint.id, await generateHintForWord(game.rounds[game.round].word, game.language), aiPlayer.id);
+                }
+            }
+        }
+
+        const updatedGame = await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+    }
 
     async removePlayerFromGame(gameId: string, playerId: string) {
         const game = await gameDao.getOne(gameId);
@@ -294,7 +361,7 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
 
         if (!game) throw new Error(gameNotFoundError);
-        if (game.rounds[game.round].hostId !== this.userId) throw new Error(forbiddenError);
+        if (game.rounds[game.round].hostId !== this.userId && game.hostId !== this.userId) throw new Error(forbiddenError);
 
         GameController.toggleDuplicateHint(game, hintId);
 
@@ -313,6 +380,10 @@ class GameApi implements IGameApi {
 
         GameController.showHints(game);
 
+        if (GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0) {
+            void this.addAiGuess(gameId);
+        }
+
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
@@ -326,6 +397,22 @@ class GameApi implements IGameApi {
 
         return true;
     };
+
+    async addAiGuess(gameId: string) {
+        await sleep(AI_TIMEOUT);
+
+        const game = await gameDao.getOne(gameId);
+        if (!game) throw new Error(gameNotFoundError);
+
+        const aiGuess = await generateGuessForHints(game.rounds[game.round].hints.map(h => h.hint), game.language);
+        GameController.guess(game, aiGuess);
+
+        const updatedGame = await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
+        this.afterGuessHandling(game, aiGuess);
+    }
 
     async guess(gameId: string, guess: string) {
         const game = await gameDao.getOne(gameId);
@@ -345,6 +432,14 @@ class GameApi implements IGameApi {
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
 
+        this.afterGuessHandling(game, guess);
+
+        return true;
+    };
+
+    afterGuessHandling(game: IGame, guess: string) {
+        const currentRound = game.rounds[game.round];
+
         // send notification
         const guesserName = game.players.find(p => p.id === currentRound.guesserId)?.name;
         const options: NotificationEventOptions = {
@@ -361,9 +456,7 @@ class GameApi implements IGameApi {
                 audience: game.actionRequiredFrom.map(p => p.id)
             });
         }
-
-        return true;
-    };
+    }
 
     async resolveRound(gameId: string, correct: boolean|undefined) {
         const game = await gameDao.getOne(gameId);
@@ -386,6 +479,10 @@ class GameApi implements IGameApi {
         }
 
         GameController.resolveRound(game, !!correct);
+
+        if (game.phase === GamePhase.HintWriting) {
+            void this.addHintsForAiPlayers(gameId);
+        }
 
         const updatedGame = await gameDao.update(game);
 

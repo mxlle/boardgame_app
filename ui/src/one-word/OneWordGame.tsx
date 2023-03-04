@@ -15,10 +15,10 @@ import {getCurrentUserId} from '../shared/functions';
 import {loadTutorial, removeTutorial, TUTORIAL_ID} from "./tutorial";
 import {Trans, WithTranslation, withTranslation} from "react-i18next";
 import Confetti from "../common/Confetti";
-import {allColors} from "../common/ColorPicker";
 import socket, {tutorialEmitter} from "../shared/socket";
 import {SnackbarKey, withSnackbar, WithSnackbarProps} from "notistack";
 import JoiningLater from "./components/JoiningLater";
+import {allColors} from "../shared/color-util";
 
 const styles = (theme: Theme) => createStyles({
     root: {
