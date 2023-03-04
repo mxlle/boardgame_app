@@ -20,7 +20,7 @@ jobs:
       working-directory: api
     
     - name: Build UI
-      run: npm run build
+      run: NODE_OPTIONS=--openssl-legacy-provider npm run build
       working-directory: ui
       
     - name: Archive production artifacts
