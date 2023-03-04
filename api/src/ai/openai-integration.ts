@@ -7,7 +7,7 @@ import * as process from 'process';
 let openai: OpenAIApi | undefined;
 let currentApiKey: string | undefined;
 
-const TEMPERATURE = 1.4;
+const TEMPERATURE = 1.5;
 const MAX_TOKENS = 4;
 const NUM_OF_CHOICES = 1;
 const DEFAULT_LANGUAGE = 'en';
@@ -40,7 +40,7 @@ export async function generateWordToGuess(openAiKey: string, language: 'en' | 'd
 }
 
 export async function generateHintForWord(openAiKey: string, word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
-    const numOfChoices = 3;
+    const numOfChoices = 4;
     const prompt = getPromptForHint(word, language);
     const request = getCreateChatCompletionRequest(prompt, numOfChoices);
 
