@@ -1,4 +1,4 @@
-import {SETTING_ID} from './constants';
+import {OPEN_AI_KEY, SETTING_ID} from './constants';
 import {GamePhase, IGame, IUser} from "../types";
 import {getPlayerInGame} from "../one-word/gameFunctions";
 
@@ -19,12 +19,20 @@ export function getCurrentUserInGame(game: IGame): IUser | undefined {
 }
 
 export function getCurrentUserId() {
-	let userId = localStorage.getItem(SETTING_ID) || '';
+	let userId = localStorage.getItem(SETTING_ID) ?? '';
 	if (!userId) {
 		userId = generateId();
 		localStorage.setItem(SETTING_ID, userId);
 	}
 	return userId;
+}
+
+export function getOpenAiKey() {
+	return localStorage.getItem(OPEN_AI_KEY) ?? '';
+}
+
+export function setOpenAiKey(key: string) {
+	localStorage.setItem(OPEN_AI_KEY, key);
 }
 
 export function generateId() {

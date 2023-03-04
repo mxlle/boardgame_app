@@ -20,20 +20,21 @@ const io = SocketIO(httpServer, {
 interface GamesApiCall {
     action: keyof IGameApi,
     auth: string,
+    openAiKey?: string,
     params: any[]
 }
 type ErrorFirstCallback = (error?: any, data?: any) => void;
 
 io.on('connection', (socket) => {
     // GameController
-    socket.on(GameEvent.ApiCall, ({ action, auth, params }: GamesApiCall, ack: ErrorFirstCallback) => {
-        const gameApi = new GameApi(io.sockets, auth);
+    socket.on(GameEvent.ApiCall, ({ action, auth, openAiKey, params }: GamesApiCall, ack: ErrorFirstCallback) => {
+        const gameApi = new GameApi(io.sockets, auth, openAiKey);
 
         if (!gameApi[action]) {
             ack('Invalid action');
         }
 
-        (<any>gameApi[action])(...params)
+        (gameApi[action] as any)(...params)
             .then((responseData: any) => ack(null, responseData))
             .catch((error: any) => ack(error));
     });

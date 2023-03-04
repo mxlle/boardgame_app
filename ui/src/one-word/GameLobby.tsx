@@ -20,6 +20,7 @@ import TutorialOverlay from "../common/TutorialOverlay";
 import {OneWordGameChildProps} from "./OneWordGame";
 import {createStyles, Theme, WithStyles, withStyles} from "@material-ui/core/styles";
 import {getRandomColor} from "../shared/color-util";
+import {getOpenAiKey, setOpenAiKey} from "../shared/functions";
 
 
 const styles = (theme: Theme) => createStyles({
@@ -48,6 +49,7 @@ type GameLobbyState = {
     currentPlayer: IUser,
     roundDialogOpen: boolean,
     isTwoPlayerVariant?: boolean
+    isAiAvailable: boolean,
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -61,7 +63,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 name: localStorage.getItem(SETTING_NAME) || '',
                 color: getRandomColor(localStorage.getItem(SETTING_COLOR), props.game.players.map(p => p.color))
             },
-            roundDialogOpen: false
+            roundDialogOpen: false,
+            isAiAvailable: !!getOpenAiKey(),
         }
 
         this.addPlayer = this.addPlayer.bind(this);
@@ -71,6 +74,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         this.selectNumRounds = this.selectNumRounds.bind(this);
         this.startPreparation = this.startPreparation.bind(this);
         this.shareGame = this.shareGame.bind(this);
+        this.activateAi = this.activateAi.bind(this);
     }
 
     setPlayerProps(player: IUser) {
@@ -146,6 +150,11 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         }
     }
 
+    activateAi() {
+        setOpenAiKey(window.prompt('Please enter your OpenAI API key or the secret password') ?? '');
+        this.setState({isAiAvailable: !!getOpenAiKey()});
+    }
+
     render() {
         const { game, classes } = this.props;
         const { currentPlayer, roundDialogOpen } = this.state;
@@ -169,6 +178,8 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         });
         const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
         const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
+
+        const isAiAvailable = !!getOpenAiKey();
 
         return (
             <Grid container spacing={4} className="Game-lobby">
@@ -210,9 +221,21 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isHost && isInGame && (
                             <Grid item xs={12}>
-                                <Button variant="contained" onClick={this.addAiPlayer}>
-                                    <Trans i18nKey="GAME.LOBBY.ADD_AI_PLAYER">Add AI player</Trans>
-                                </Button>
+                                {isAiAvailable ?
+                                    (<Button variant="contained" onClick={this.addAiPlayer}>
+                                        <Trans i18nKey="GAME.LOBBY.ADD_AI_PLAYER">Add AI player</Trans>
+                                    </Button>)
+                                :
+                                    (<Button variant="contained" onClick={this.activateAi}>
+                                        <Trans i18nKey="COMMON.ACTIVATE_AI">Activate AI</Trans>
+                                    </Button>)
+                                }
+                            </Grid>
+                        )
+                    }
+                    {
+                        isHost && isInGame && (
+                            <Grid item xs={12}>
                                 <Button variant="contained" color="primary" className={game.players.length === 2 ? `submitBtn ${classes.fakeDisabled}` : 'submitBtn'}
                                     disabled={game.players.length < 2}
                                     onClick={() => this.selectNumRounds(false)}>

@@ -17,10 +17,12 @@ const AI_TIMEOUT = 1500;
 class GameApi implements IGameApi {
     private socket: Namespace;
     private readonly userId: string;
+    private readonly openAiKey: string;
 
-    constructor(socket: Namespace, userId: string) {
+    constructor(socket: Namespace, userId: string, openAiKey: string = '') {
         this.socket = socket;
         this.userId = userId;
+        this.openAiKey = openAiKey;
     }
 
     async loadGames() {
@@ -101,7 +103,7 @@ class GameApi implements IGameApi {
         for (const aiPlayer of aiPlayers) {
             const enteredWords: string[] = [];
             for (let i = 0; i < game.wordsPerPlayer; i++) {
-                enteredWords.push(await generateWordToGuess(game.language));
+                enteredWords.push(await generateWordToGuess(this.openAiKey, game.language));
             }
             GameController.updatePlayer(game, {
                 ...aiPlayer,
@@ -196,7 +198,7 @@ class GameApi implements IGameApi {
             const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
             for (const aiPlayer of aiPlayers) {
                 for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
-                    GameController.addHint(game, hint.id, await generateHintForWord(game.rounds[game.round].word, game.language), aiPlayer.id);
+                    GameController.addHint(game, hint.id, await generateHintForWord(this.openAiKey, game.rounds[game.round].word, game.language), aiPlayer.id);
                 }
             }
         }
@@ -404,7 +406,7 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
 
-        const aiGuess = await generateGuessForHints(game.rounds[game.round].hints.map(h => h.hint), game.language);
+        const aiGuess = await generateGuessForHints(this.openAiKey, game.rounds[game.round].hints.map(h => h.hint), game.language);
         GameController.guess(game, aiGuess);
 
         const updatedGame = await gameDao.update(game);
@@ -512,15 +514,15 @@ class GameApi implements IGameApi {
     };
 
     generateWordToGuess() {
-        return generateWordToGuess();
+        return generateWordToGuess(this.openAiKey);
     }
 
     generateHintForWord(word: string) {
-        return generateHintForWord(word);
+        return generateHintForWord(this.openAiKey, word);
     }
 
     generateGuessForHints(hints: string[]) {
-        return generateGuessForHints(hints);
+        return generateGuessForHints(this.openAiKey, hints);
     }
 }
 

@@ -2,37 +2,56 @@ import {Configuration, CreateChatCompletionRequest, CreateChatCompletionResponse
 import {AxiosError} from 'axios';
 import {randomInt} from '@shared/functions';
 import words from '@shared/Words';
+import * as process from 'process';
 
-const openai = new OpenAIApi(new Configuration({
-    apiKey: process?.env?.OPENAI_API_KEY,
-}));
+let openai: OpenAIApi | undefined;
+let currentApiKey: string | undefined;
 
-const TEMPERATURE = 1;
+const TEMPERATURE = 1.4;
 const MAX_TOKENS = 4;
 const NUM_OF_CHOICES = 1;
-const DEFAULT_LANGUAGE = 'de';
+const DEFAULT_LANGUAGE = 'en';
+
+function getOpenAiApi(apiKey: string): OpenAIApi {
+    if (!openai || currentApiKey !== apiKey) {
+        openai = new OpenAIApi(new Configuration({
+            apiKey,
+        }));
+        currentApiKey = apiKey;
+    }
+
+    return openai;
+}
+
+function getApiKey(keyOrPassword?: string): string {
+    if (keyOrPassword === process?.env?.OPENAI_API_KEY_PASSWORD) {
+        return process?.env?.OPENAI_API_KEY ?? '';
+    } else {
+        return keyOrPassword ?? '';
+    }
+}
 
 
-export async function generateWordToGuess(language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
+export async function generateWordToGuess(openAiKey: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
     const prompt = getPromptForInitialWord(language);
     const request = getCreateChatCompletionRequest(prompt);
 
-    return getFormattedResultFromRequest(request);
+    return getFormattedResultFromRequest(openAiKey, request);
 }
 
-export async function generateHintForWord(word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
+export async function generateHintForWord(openAiKey: string, word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
     const numOfChoices = 3;
     const prompt = getPromptForHint(word, language);
     const request = getCreateChatCompletionRequest(prompt, numOfChoices);
 
-    return getFormattedResultFromRequest(request, numOfChoices);
+    return getFormattedResultFromRequest(openAiKey, request, numOfChoices);
 }
 
-export async function generateGuessForHints(hints: string[], language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
+export async function generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
     const prompt = getPromptForGuess(hints, language);
     const request = getCreateChatCompletionRequest(prompt);
 
-    return getFormattedResultFromRequest(request);
+    return getFormattedResultFromRequest(openAiKey, request);
 }
 
 function getCreateChatCompletionRequest(message: string, numOfChoices: number = NUM_OF_CHOICES): CreateChatCompletionRequest {
@@ -48,9 +67,9 @@ function getCreateChatCompletionRequest(message: string, numOfChoices: number = 
     };
 }
 
-async function getFormattedResultFromRequest(request: CreateChatCompletionRequest, numOfChoices: number = NUM_OF_CHOICES): Promise<string> {
+async function getFormattedResultFromRequest(openAiKey: string, request: CreateChatCompletionRequest, numOfChoices: number = NUM_OF_CHOICES): Promise<string> {
     try {
-        const response = await openai.createChatCompletion(request);
+        const response = await getOpenAiApi(getApiKey(openAiKey)).createChatCompletion(request);
 
         const data = response.data as CreateChatCompletionResponse;
 
@@ -63,12 +82,14 @@ async function getFormattedResultFromRequest(request: CreateChatCompletionReques
         if (isAxiosError(e)) {
             // tslint:disable-next-line:no-console
             console.warn(e.response?.statusText, e.response?.data);
+
+            return `Error: ${e.response?.statusText} - ${e.response?.data?.error.code}`;
         } else {
             // tslint:disable-next-line:no-console
             console.error('unknown error', e);
-        }
 
-        return 'Error';
+            return 'Unknown error';
+        }
     }
 }
 
