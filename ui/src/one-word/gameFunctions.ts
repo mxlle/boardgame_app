@@ -233,6 +233,12 @@ export function resetHint(game: IGame, hintId: string, playerId: string) {
 export function compareHints(game: IGame) {
     const currentRound = game.rounds[game.round];
     const currentRoundHints = currentRound.hints;
+
+    if (getPlayerInGame(game, currentRound.hostId)?.isAi && game.hostId === currentRound.guesserId) {
+        game.phase = GamePhase.Guessing;
+        return;
+    }
+
     for (let i = 0; i < currentRoundHints.length; i++) {
         const hint1 = currentRoundHints[i];
         for (let j = i+1; j < currentRoundHints.length; j++) {
