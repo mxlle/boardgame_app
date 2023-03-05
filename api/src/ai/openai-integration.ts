@@ -127,7 +127,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
 }
 
 function formatAnswer(answer: string = '', hasAnswerMultipleWords: boolean = false, shouldBeOnlyOneWord: boolean = false): string {
-    const withFormatWithMultipleWords = hasAnswerMultipleWords ? answer.replace(/(\s|,)+/g, ';') : answer;
+    const withFormatWithMultipleWords = hasAnswerMultipleWords ? answer.replace(/(\s|,|;)+/g, ';') : answer;
     const onlyLetters = withFormatWithMultipleWords.replace(/[^\p{L} ;]/gu, '');
 
     return shouldBeOnlyOneWord ? (onlyLetters.split(' ')[0] ?? '') : onlyLetters;
