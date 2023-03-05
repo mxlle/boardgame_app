@@ -58,7 +58,7 @@ export async function isApiKeyValid(openAiKey: string): Promise<true | string> {
 export async function generateWordsToGuess(openAiKey: string, language: 'en' | 'de', count: number = 1, existingWords: string[] = []): Promise<string[]> {
     const prompt = getPromptForInitialWord(language, count, existingWords);
     const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForMultipleWords(count));
-    const formattedResult = await getFormattedResultFromRequest(openAiKey, request);
+    const formattedResult = await getFormattedResultFromRequest(openAiKey, request, true);
 
     return formattedResult.split(';').map((word) => word.trim());
 }
@@ -66,7 +66,7 @@ export async function generateWordsToGuess(openAiKey: string, language: 'en' | '
 export async function generateHintsForWord(openAiKey: string, word: string, count: number, language: 'en' | 'de'): Promise<string[]> {
     const prompt = getPromptForHint(word, count, language);
     const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForMultipleWords(count));
-    const formattedResult = await getFormattedResultFromRequest(openAiKey, request);
+    const formattedResult = await getFormattedResultFromRequest(openAiKey, request, true);
 
     return formattedResult.split(';').map((hint) => hint.trim());
 }
@@ -97,7 +97,7 @@ function getCreateChatCompletionRequest(message: string, settings: Partial<Creat
     };
 }
 
-async function getFormattedResultFromRequest(openAiKey: string, request: CreateChatCompletionRequest): Promise<string> {
+async function getFormattedResultFromRequest(openAiKey: string, request: CreateChatCompletionRequest, hasAnswerMultipleWords: boolean = false): Promise<string> {
     try {
         const response = await getOpenAiApi(getApiKey(openAiKey)).createChatCompletion(request);
 
@@ -109,7 +109,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
         // tslint:disable-next-line:no-console
         console.log('answerContent', answerContent);
 
-        return formatAnswer(answerContent);
+        return formatAnswer(answerContent, hasAnswerMultipleWords);
     }
     catch (e: unknown) {
         if (isAxiosError(e)) {
@@ -126,8 +126,9 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
     }
 }
 
-function formatAnswer(answer: string = '', shouldBeOnlyOneWord: boolean = false): string {
-    const onlyLetters = answer.replace(',', ';').replace(/[^\p{L} ;]/gu, '');
+function formatAnswer(answer: string = '', hasAnswerMultipleWords: boolean = false, shouldBeOnlyOneWord: boolean = false): string {
+    const withFormatWithMultipleWords = hasAnswerMultipleWords ? answer.replace(/(\s|,)+/g, ';') : answer;
+    const onlyLetters = withFormatWithMultipleWords.replace(/[^\p{L} ;]/gu, '');
 
     return shouldBeOnlyOneWord ? (onlyLetters.split(' ')[0] ?? '') : onlyLetters;
 }
