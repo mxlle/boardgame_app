@@ -53,7 +53,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
         const guesserName = guesser.name;
 
         const hintElements = [<WordHintList game={game} toggleDuplicate={this.toggleDuplicate} />];
-        if (isRoundHost || (isGameHost && !isGuesser)) {
+        if (isRoundHost || isGameHost) {
             hintElements.push((
                 <Grid item xs={12} component={Typography} variant="subtitle1" key="info">
                     <Trans i18nKey="GAME.COMPARING.INFO">Mark invalid hints</Trans>

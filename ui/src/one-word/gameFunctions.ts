@@ -23,10 +23,11 @@ export function addPlayer(game: IGame, player: IUser) {
 export function getNextAiPlayer(game: IGame): IUser {
     const aiEmojis = ['🤖', '🪄', '👽', '🧙'];
     const count = getAiPlayersCount(game);
+    const aiName = game.language === 'de' ? 'KI' : 'AI';
 
     return {
         id: generateId(),
-        name: `${aiEmojis[count % aiEmojis.length]} AI ${count + 1}`,
+        name: `${aiEmojis[count % aiEmojis.length]} ${aiName} ${count + 1}`,
         color: getRandomColor(null, game.players.map(p => p.color)),
         isAi: true
     };
@@ -237,11 +238,6 @@ export function getHintsWithoutDuplicates(game: IGame): string[] {
 export function compareHints(game: IGame) {
     const currentRound = game.rounds[game.round];
     const currentRoundHints = currentRound.hints;
-
-    if (getPlayerInGame(game, currentRound.hostId)?.isAi && game.hostId === currentRound.guesserId) {
-        game.phase = GamePhase.Guessing;
-        return;
-    }
 
     for (let i = 0; i < currentRoundHints.length; i++) {
         const hint1 = currentRoundHints[i];

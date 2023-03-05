@@ -223,12 +223,12 @@
     },
     "AI": {
         "ACTIVATION": {
-            "BUTTON": "AI aktivieren",
+            "BUTTON": "KI aktivieren",
             "PROMPT": "Gib deinen OpenAI API Key oder das geheime Passwort ein",
-            "SUCCESS": "AI erfolgreich aktiviert",
+            "SUCCESS": "KI erfolgreich aktiviert",
             "RESET_BUTTON": "Neuen API Key setzen"
         },
-        "ADD_PLAYER": "AI Mitspieler hinzufügen",
+        "ADD_PLAYER": "KI Mitspieler hinzufügen",
         "PLAYGROUND": {
             "GENERATE_WORD": "Generiere Wort",
             "GENERATE_HINTS": "Generiere Hinweise für \"{{word}}\"",

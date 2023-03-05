@@ -44,7 +44,7 @@ class WordHintList extends React.Component<WordHintListProps> {
             const showHint = !hint || hintIsMine;
             const showInput = GamePhase.HintWriting === game.phase && !hint && hintIsMine;
             const showResetButton = GamePhase.HintWriting === game.phase && hintIsMine && !showInput && !game.$isTutorial;
-            const showToggleButton = GamePhase.HintComparing === game.phase && (isRoundHost || (isGameHost && !isGuesser));
+            const showToggleButton = GamePhase.HintComparing === game.phase && (isRoundHost || isGameHost);
 
             const showCheck = (GamePhase.HintWriting === game.phase && !showHint) || (GamePhase.HintComparing === game.phase && (isGuesser || !currentUser));
             const showCross = [GamePhase.HintComparing, GamePhase.Guessing].includes(game.phase) && (isGuesser || !currentUser) && hintObj.isDuplicate;

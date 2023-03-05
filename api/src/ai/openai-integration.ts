@@ -16,7 +16,7 @@ const defaultSettings: Partial<CreateChatCompletionRequest> = {
     presence_penalty: 1,
 };
 
-function getDefaultSettingsForHints(count: number): Partial<CreateChatCompletionRequest> {
+function getDefaultSettingsForMultipleWords(count: number): Partial<CreateChatCompletionRequest> {
     return {
         ...defaultSettings,
         max_tokens: 11 * count,
@@ -55,16 +55,17 @@ export async function isApiKeyValid(openAiKey: string): Promise<true | string> {
 }
 
 
-export async function generateWordToGuess(openAiKey: string, language: 'en' | 'de'): Promise<string> {
-    const prompt = getPromptForInitialWord(language);
-    const request = getCreateChatCompletionRequest(prompt, defaultSettings);
+export async function generateWordsToGuess(openAiKey: string, language: 'en' | 'de', count: number = 1, existingWords: string[] = []): Promise<string[]> {
+    const prompt = getPromptForInitialWord(language, count, existingWords);
+    const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForMultipleWords(count));
+    const formattedResult = await getFormattedResultFromRequest(openAiKey, request);
 
-    return getFormattedResultFromRequest(openAiKey, request);
+    return formattedResult.split(';').map((word) => word.trim());
 }
 
 export async function generateHintsForWord(openAiKey: string, word: string, count: number, language: 'en' | 'de'): Promise<string[]> {
     const prompt = getPromptForHint(word, count, language);
-    const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForHints(count));
+    const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForMultipleWords(count));
     const formattedResult = await getFormattedResultFromRequest(openAiKey, request);
 
     return formattedResult.split(';').map((hint) => hint.trim());
@@ -78,6 +79,9 @@ export async function generateGuessForHints(openAiKey: string, hints: string[], 
 }
 
 function getCreateChatCompletionRequest(message: string, settings: Partial<CreateChatCompletionRequest>): CreateChatCompletionRequest {
+    // tslint:disable-next-line:no-console
+    console.log('Prompt to send to OpenAI', message);
+
     return {
         ...settings,
         model: 'gpt-3.5-turbo',
@@ -123,7 +127,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
 }
 
 function formatAnswer(answer: string = '', shouldBeOnlyOneWord: boolean = false): string {
-    const onlyLetters = answer.replace(/[^\p{L} ;]/gu, '');
+    const onlyLetters = answer.replace(',', ';').replace(/[^\p{L} ;]/gu, '');
 
     return shouldBeOnlyOneWord ? (onlyLetters.split(' ')[0] ?? '') : onlyLetters;
 }
@@ -132,13 +136,16 @@ function isAxiosError(e: unknown): e is AxiosError {
     return (e as AxiosError).isAxiosError;
 }
 
-function getPromptForInitialWord(language: 'en' | 'de'): string {
-    const randomWords = [words.getRandom(language), words.getRandom(language),words.getRandom(language)];
+function getPromptForInitialWord(language: 'en' | 'de', count: number, existingWords: string[]): string {
+    const exampleWords = existingWords;
+    for (let i = exampleWords.length; i < 3; i++) {
+        exampleWords.push(words.getRandom(language));
+    }
 
     if (language === 'de') {
-        return `Gib mir genau ein Nomen. Beispiele sind: ${randomWords.join(', ')}`;
+        return `Gib mir genau ${count} Nomen. Beispiele sind: ${exampleWords.join(', ')}`;
     } else {
-        return `Give me exactly one noun. Examples are: ${randomWords.join(', ')}`;
+        return `Give me exactly ${count} nouns. Examples are: ${exampleWords.join(', ')}`;
     }
 }
 

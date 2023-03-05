@@ -9,7 +9,7 @@ import words from '@shared/Words';
 import {
     generateGuessForHints,
     generateHintsForWord,
-    generateWordToGuess,
+    generateWordsToGuess,
     getApiKey,
     isApiKeyValid
 } from '../ai/openai-integration';
@@ -110,10 +110,6 @@ class GameApi implements IGameApi {
 
         GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
 
-        if (GameController.gameHasAiPlayers(game)) {
-            void this.setAiWords(gameId);
-        }
-
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
@@ -122,17 +118,28 @@ class GameApi implements IGameApi {
     };
 
     async setAiWords(gameId: string) {
-        await sleep(AI_TIMEOUT);
+        await sleep(500);
 
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
 
         const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+        const countOfWords = game.wordsPerPlayer * aiPlayers.length;
+        const existingWords = game.players.reduce((acc: string[], player: IUser) => {
+            return [...acc, ...(player.enteredWords || [])];
+        }, []);
+        const newWords: string[] = [];
+        if (game.openAiKey) {
+            newWords.push(...(await generateWordsToGuess(game.openAiKey, game.language, countOfWords, existingWords) ?? []));
+        } else {
+            for (let i = 0; i < countOfWords; i++) {
+                newWords.push(words.getRandom(game.language));
+            }
+        }
         for (const aiPlayer of aiPlayers) {
             const enteredWords: string[] = [];
             for (let i = 0; i < game.wordsPerPlayer; i++) {
-                const word = game.openAiKey ? await generateWordToGuess(game.openAiKey, game.language) : words.getRandom(game.language);
-                enteredWords.push(word);
+                enteredWords.push(newWords.pop() ?? '[Error]');
             }
             GameController.updatePlayer(game, {
                 ...aiPlayer,
@@ -204,6 +211,13 @@ class GameApi implements IGameApi {
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
+        if (GameController.gameHasAiPlayers(game)) {
+            const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+            if (aiPlayers.length === game.actionRequiredFrom.length) {
+                await this.setAiWords(gameId);
+            }
+        }
 
         if (game.phase === GamePhase.HintWriting) {
             // send notification for next phase
@@ -449,7 +463,7 @@ class GameApi implements IGameApi {
         let aiGuess;
         if (game.openAiKey) {
             const hintsWithoutDuplicates = GameController.getHintsWithoutDuplicates(game);
-            aiGuess = hintsWithoutDuplicates.length > 0 ? await generateGuessForHints(game.openAiKey, hintsWithoutDuplicates, game.language) : await generateWordToGuess(game.openAiKey, game.language)
+            aiGuess = hintsWithoutDuplicates.length > 0 ? await generateGuessForHints(game.openAiKey, hintsWithoutDuplicates, game.language) : (await generateWordsToGuess(game.openAiKey, game.language))[0];
         } else {
             aiGuess = words.getRandom(game.language);
         }
@@ -560,8 +574,8 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    generateWordToGuess(openAiKey: string, language: 'en' | 'de') {
-        return generateWordToGuess(openAiKey, language);
+    async generateWordToGuess(openAiKey: string, language: 'en' | 'de') {
+        return (await generateWordsToGuess(openAiKey, language))[0] ?? words.getRandom(language);
     }
 
     generateHintsForWord(openAiKey: string, word: string, language: 'en' | 'de') {
