@@ -149,12 +149,12 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     async activateAi() {
-        const key = window.prompt(this.props.i18n.t('COMMON.AI_ACTIVATION.PROMPT', 'Please enter your OpenAI API key or the secret password'), getOpenAiKey() ?? '');
+        const key = window.prompt(this.props.i18n.t('AI.ACTIVATION.PROMPT', 'Please enter your OpenAI API key or the secret password'), getOpenAiKey() ?? '');
         if (key) {
             const isValidCheck = await api.setOpenAiKey(this.props.game.id, key);
             if (isValidCheck === true) {
                 setOpenAiKey(key);
-                this.props.enqueueSnackbar(this.props.i18n.t('COMMON.AI_ACTIVATION.SUCCESS', 'AI successfully activated'), {variant: 'success'});
+                this.props.enqueueSnackbar(this.props.i18n.t('AI.ACTIVATION.SUCCESS', 'AI successfully activated'), {variant: 'success'});
             } else {
                 this.props.enqueueSnackbar(isValidCheck, {variant: 'error'});
             }
@@ -227,11 +227,11 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                             <Grid item xs={12}>
                                 {game.openAiKey ?
                                     (<Button variant="contained" onClick={this.addAiPlayer}>
-                                        <Trans i18nKey="GAME.LOBBY.ADD_AI_PLAYER">Add AI player</Trans>
+                                        <Trans i18nKey="AI.ADD_PLAYER">Add AI player</Trans>
                                     </Button>)
                                 :
                                     (<Button variant="contained" onClick={this.activateAi}>
-                                        <Trans i18nKey="COMMON.ACTIVATE_AI">Activate AI</Trans>
+                                        <Trans i18nKey="AI.ACTIVATION.BUTTON">Activate AI</Trans>
                                     </Button>)
                                 }
                             </Grid>

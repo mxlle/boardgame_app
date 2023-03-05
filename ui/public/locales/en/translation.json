@@ -220,5 +220,19 @@
         "CONNECTED": "Connected",
         "DISCONNECTED": "Disconnected",
         "CONNECTING": "Connecting..."
+    },
+    "AI": {
+        "ACTIVATION": {
+            "BUTTON": "Activate AI",
+            "PROMPT": "Enter your OpenAI API key or the secret password",
+            "SUCCESS": "AI activated successfully",
+            "RESET_BUTTON": "Set new OpenAI API key"
+        },
+        "ADD_PLAYER": "Add AI player",
+        "PLAYGROUND": {
+            "GENERATE_WORD": "Generate word",
+            "GENERATE_HINTS": "Generate hints for \"{{word}}\"",
+            "GENERATE_GUESS": "Generate guess for {{hints}}"
+        }
     }
 }

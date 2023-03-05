@@ -8,7 +8,6 @@ import {withSnackbar, WithSnackbarProps} from 'notistack';
 import {SETTING_ID, SETTING_NAME} from '../shared/constants';
 import api from '../shared/apiFunctions';
 import {STYLES} from '../theme';
-import {TUTORIAL_ID} from "./tutorial";
 import {getOpenAiKey, setOpenAiKey} from "../shared/functions";
 import {getCurrentLanguage} from "../i18n";
 
@@ -89,43 +88,42 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
         return response.startsWith('Error:');
     }
 
-    startTutorial() {
-        this.props.history.push('/' + TUTORIAL_ID);
-    }
-
     activateAi() {
-        setOpenAiKey(window.prompt('Please enter your OpenAI API key or the secret password') ?? '');
-        this.setState({isAiAvailable: !!getOpenAiKey()});
+        const key = window.prompt(this.props.i18n.t('AI.ACTIVATION.PROMPT', 'Please enter your OpenAI API key or the secret password'), getOpenAiKey() ?? '');
+        if (key !== null) {
+            setOpenAiKey(key);
+            this.setState({isAiAvailable: !!getOpenAiKey()});
+        }
     }
 
     render() {
         let { classes } = this.props;
-        let { lastWord, hints} = this.state;
-        const isAiAvailable = !!getOpenAiKey();
+        let { lastWord, hints, isAiAvailable} = this.state;
+        const hintText = hints.map((hint) => `"${hint}"`).join(', ');
 
         return (
             isAiAvailable ?
                 <Container maxWidth="sm" className={classes.root}>
                     <Box mb={2}>
                         <Button variant="contained" onClick={this.generateWord}>
-                            Generate word
+                            <Trans i18nKey="AI.PLAYGROUND.GENERATE_WORD">Generate word</Trans>
                         </Button>
                     </Box>
                     <Box mb={2}>
                         <Button variant="contained" disabled={!lastWord} onClick={this.generateHintForWord}>
-                            Generate hint for "{lastWord}"
+                            <Trans i18nKey="AI.PLAYGROUND.GENERATE_HINTS" tOptions={{word: lastWord}}>Generate hint for "{lastWord}"</Trans>
                         </Button>
                     </Box>
                     <Box mb={2}>
                         <Button variant="contained" disabled={!hints.length} onClick={this.generateGuessForHints}>
-                            Generate guess for "{hints.join(', ')}"
+                            <Trans i18nKey="AI.PLAYGROUND.GENERATE_GUESS" tOptions={{hints: hintText}}>Generate guess for "{hintText}"</Trans>
                         </Button>
                     </Box>
                     <Box mb={2}>
-                        <Button variant="contained" onClick={this.activateAi}><Trans i18nKey="COMMON.RESET_AI_KEY">Set new OpenAI API key</Trans></Button>
+                        <Button variant="contained" onClick={this.activateAi}><Trans i18nKey="AI.ACTIVATION.RESET_BUTTON">Set new OpenAI API key</Trans></Button>
                     </Box>
                 </Container>
-                : <Container maxWidth="sm" className={classes.root}><Button variant="contained" onClick={this.activateAi}><Trans i18nKey="COMMON.ACTIVATE_AI">Activate AI</Trans></Button> </Container>
+                : <Container maxWidth="sm" className={classes.root}><Button variant="contained" onClick={this.activateAi}><Trans i18nKey="AI.ACTIVATION.BUTTON">Activate AI</Trans></Button> </Container>
         );
     }
 }
