@@ -100,12 +100,8 @@ class GameApi implements IGameApi {
         }
 
         if (isTwoPlayerVariant) {
-            for (const player of game.players) {
-                player.enteredWords = [];
-                for (let j = 0; j < wordsPerPlayer; j++) {
-                    player.enteredWords.push(words.getRandom(game.language));
-                }
-            }
+            game.wordsPerPlayer = wordsPerPlayer;
+            await this.setWordsForPlayers(game, game.players);
         }
 
         GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
@@ -113,6 +109,10 @@ class GameApi implements IGameApi {
         const updatedGame = await gameDao.update(game);
 
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
+        if (game.phase === GamePhase.HintWriting) {
+            void this.addHintsForAiPlayers(gameId);
+        }
 
         return true;
     };
@@ -124,7 +124,29 @@ class GameApi implements IGameApi {
         if (!game) throw new Error(gameNotFoundError);
 
         const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
-        const countOfWords = game.wordsPerPlayer * aiPlayers.length;
+
+        const updatedAiPlayers = await this.setWordsForPlayers(game, aiPlayers);
+
+        for (const player of updatedAiPlayers) {
+            const playerIndex = game.players.findIndex(p => p.id === player.id);
+            game.players[playerIndex] = player;
+        }
+
+        // check if ready to start
+        const allWordsEntered: boolean = game.players.every(p => p.enteredWords?.length === game.wordsPerPlayer);
+        if (allWordsEntered) GameController.startGame(game);
+
+        const updatedGame = await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+
+        if (updatedGame.phase === GamePhase.HintWriting) {
+            void this.addHintsForAiPlayers(gameId);
+        }
+    }
+
+    private async setWordsForPlayers(game: IGame, players: IUser[]): Promise<IUser[]> {
+        const countOfWords = game.wordsPerPlayer * players.length;
         const existingWords = game.players.reduce((acc: string[], player: IUser) => {
             return [...acc, ...(player.enteredWords || [])];
         }, []);
@@ -136,24 +158,15 @@ class GameApi implements IGameApi {
                 newWords.push(words.getRandom(game.language));
             }
         }
-        for (const aiPlayer of aiPlayers) {
+        for (const player of players) {
             const enteredWords: string[] = [];
             for (let i = 0; i < game.wordsPerPlayer; i++) {
                 enteredWords.push(newWords.pop() ?? '[Error]');
             }
-            GameController.updatePlayer(game, {
-                ...aiPlayer,
-                enteredWords
-            });
+           player.enteredWords = enteredWords;
         }
 
-        const updatedGame = await gameDao.update(game);
-
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
-
-        if (updatedGame.phase === GamePhase.HintWriting) {
-            void this.addHintsForAiPlayers(gameId);
-        }
+        return players;
     }
 
     async backToLobby(gameId: string) {
@@ -361,6 +374,10 @@ class GameApi implements IGameApi {
         }
 
         GameController.addHint(game, hintId, hint, this.userId);
+
+        if (game.isTwoPlayerVariant && GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0) {
+            void this.addAiGuess(gameId);
+        }
 
         const updatedGame = await gameDao.update(game);
 
