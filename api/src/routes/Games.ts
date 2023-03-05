@@ -6,7 +6,7 @@ import {forbiddenError, gameNotFoundError, joiningRequestNotFoundError, paramMis
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
-import {generateGuessForHints, generateHintForWord, generateWordToGuess} from '../ai/openai-integration';
+import {generateGuessForHints, generateHintsForWord, generateWordToGuess} from '../ai/openai-integration';
 import {getNextAiPlayer} from '@gameFunctions';
 
 // Init shared
@@ -196,9 +196,13 @@ class GameApi implements IGameApi {
 
         if (GameController.gameHasAiPlayers(game)) {
             const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+            const countOfAiHints =  game.rounds[game.round].hints.filter((hint) => aiPlayers.map((p) => p.id).includes(hint.authorId)).length;
+            if (countOfAiHints === 0) return;
+
+            const aiHints = await generateHintsForWord(this.openAiKey, game.rounds[game.round].word, countOfAiHints, game.language);
             for (const aiPlayer of aiPlayers) {
                 for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
-                    GameController.addHint(game, hint.id, await generateHintForWord(this.openAiKey, game.rounds[game.round].word, game.language), aiPlayer.id);
+                    GameController.addHint(game, hint.id, aiHints.pop() ?? '[Error]', aiPlayer.id);
                 }
             }
         }
@@ -513,16 +517,16 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    generateWordToGuess() {
-        return generateWordToGuess(this.openAiKey);
+    generateWordToGuess(language: 'en' | 'de') {
+        return generateWordToGuess(this.openAiKey, language);
     }
 
-    generateHintForWord(word: string) {
-        return generateHintForWord(this.openAiKey, word);
+    generateHintsForWord(word: string, language: 'en' | 'de') {
+        return generateHintsForWord(this.openAiKey, word, 3, language);
     }
 
-    generateGuessForHints(hints: string[]) {
-        return generateGuessForHints(this.openAiKey, hints);
+    generateGuessForHints(hints: string[], language: 'en' | 'de') {
+        return generateGuessForHints(this.openAiKey, hints, language);
     }
 }
 

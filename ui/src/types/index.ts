@@ -97,9 +97,9 @@ export interface IGameApi {
     resolveRound: (gameId: string, correct: boolean|undefined) => Promise<boolean>;
     deleteGame: (gameId: string) => Promise<boolean>;
 
-    generateWordToGuess: () => Promise<string>;
-    generateHintForWord: (word: string) => Promise<string>;
-    generateGuessForHints: (hints: string[]) => Promise<string>;
+    generateWordToGuess: (language: 'en' | 'de') => Promise<string>;
+    generateHintsForWord: (word: string, language: 'en' | 'de') => Promise<string[]>;
+    generateGuessForHints: (hints: string[], language: 'en' | 'de') => Promise<string>;
     addAiPlayer: (gameId: string) => Promise<boolean>;
 }
 

@@ -7,10 +7,26 @@ import * as process from 'process';
 let openai: OpenAIApi | undefined;
 let currentApiKey: string | undefined;
 
-const TEMPERATURE = 1.5;
-const MAX_TOKENS = 4;
 const NUM_OF_CHOICES = 1;
-const DEFAULT_LANGUAGE = 'en';
+
+const defaultSettings: Partial<CreateChatCompletionRequest> = {
+    temperature: 1.5,
+    max_tokens: 10,
+    n: NUM_OF_CHOICES,
+    presence_penalty: 1,
+};
+
+function getDefaultSettingsForHints(count: number): Partial<CreateChatCompletionRequest> {
+    return {
+        ...defaultSettings,
+        max_tokens: 11 * count,
+    }
+}
+
+const defaultSettingsForGuess: Partial<CreateChatCompletionRequest> = {
+    ...defaultSettings,
+    temperature: 0.5,
+}
 
 function getOpenAiApi(apiKey: string): OpenAIApi {
     if (!openai || currentApiKey !== apiKey) {
@@ -32,49 +48,55 @@ function getApiKey(keyOrPassword?: string): string {
 }
 
 
-export async function generateWordToGuess(openAiKey: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
+export async function generateWordToGuess(openAiKey: string, language: 'en' | 'de'): Promise<string> {
     const prompt = getPromptForInitialWord(language);
-    const request = getCreateChatCompletionRequest(prompt);
+    const request = getCreateChatCompletionRequest(prompt, defaultSettings);
 
     return getFormattedResultFromRequest(openAiKey, request);
 }
 
-export async function generateHintForWord(openAiKey: string, word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
-    const numOfChoices = 4;
-    const prompt = getPromptForHint(word, language);
-    const request = getCreateChatCompletionRequest(prompt, numOfChoices);
+export async function generateHintsForWord(openAiKey: string, word: string, count: number, language: 'en' | 'de'): Promise<string[]> {
+    const prompt = getPromptForHint(word, count, language);
+    const request = getCreateChatCompletionRequest(prompt, getDefaultSettingsForHints(count));
+    const formattedResult = await getFormattedResultFromRequest(openAiKey, request);
 
-    return getFormattedResultFromRequest(openAiKey, request, numOfChoices);
+    return formattedResult.split(';').map((hint) => hint.trim());
 }
 
-export async function generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de' = DEFAULT_LANGUAGE): Promise<string> {
+export async function generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de'): Promise<string> {
     const prompt = getPromptForGuess(hints, language);
-    const request = getCreateChatCompletionRequest(prompt);
+    const request = getCreateChatCompletionRequest(prompt, defaultSettingsForGuess);
 
     return getFormattedResultFromRequest(openAiKey, request);
 }
 
-function getCreateChatCompletionRequest(message: string, numOfChoices: number = NUM_OF_CHOICES): CreateChatCompletionRequest {
+function getCreateChatCompletionRequest(message: string, settings: Partial<CreateChatCompletionRequest>): CreateChatCompletionRequest {
     return {
+        ...settings,
         model: 'gpt-3.5-turbo',
-        messages: [{
+        messages: [
+        {
             role: 'system',
+            content: 'Produce one-word answers. When asked for multiple words separate them with semicolons',
+        },
+        {
+            role: 'user',
             content: message,
         }],
-        temperature: TEMPERATURE,
-        max_tokens: MAX_TOKENS,
-        n: numOfChoices,
     };
 }
 
-async function getFormattedResultFromRequest(openAiKey: string, request: CreateChatCompletionRequest, numOfChoices: number = NUM_OF_CHOICES): Promise<string> {
+async function getFormattedResultFromRequest(openAiKey: string, request: CreateChatCompletionRequest): Promise<string> {
     try {
         const response = await getOpenAiApi(getApiKey(openAiKey)).createChatCompletion(request);
 
         const data = response.data as CreateChatCompletionResponse;
 
-        const randomAnswer = data.choices[randomInt(numOfChoices - 1)]?.message;
+        const randomAnswer = data.choices[randomInt(NUM_OF_CHOICES - 1)]?.message;
         const answerContent = randomAnswer?.content ?? 'Error';
+
+        // tslint:disable-next-line:no-console
+        console.log('answerContent', answerContent);
 
         return formatAnswer(answerContent);
     }
@@ -94,7 +116,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
 }
 
 function formatAnswer(answer: string = '', shouldBeOnlyOneWord: boolean = false): string {
-    const onlyLetters = answer.replace(/[^\p{L} ]/gu, '');
+    const onlyLetters = answer.replace(/[^\p{L} ;]/gu, '');
 
     return shouldBeOnlyOneWord ? (onlyLetters.split(' ')[0] ?? '') : onlyLetters;
 }
@@ -103,28 +125,28 @@ function isAxiosError(e: unknown): e is AxiosError {
     return (e as AxiosError).isAxiosError;
 }
 
-function getPromptForInitialWord(language: 'en' | 'de' = DEFAULT_LANGUAGE): string {
+function getPromptForInitialWord(language: 'en' | 'de'): string {
     const randomWords = [words.getRandom(language), words.getRandom(language),words.getRandom(language)];
 
     if (language === 'de') {
-        return `Gib mir genau ein Nomen. Beispiele sind: ${randomWords.join(', ')}.`;
+        return `Gib mir genau ein Nomen. Beispiele sind: ${randomWords.join(', ')}`;
     } else {
-        return `Give me exactly one noun. Examples are: ${randomWords.join(', ')}.`;
+        return `Give me exactly one noun. Examples are: ${randomWords.join(', ')}`;
     }
 }
 
-function getPromptForHint(word: string, language: 'en' | 'de' = DEFAULT_LANGUAGE): string {
+function getPromptForHint(word: string, count: number, language: 'en' | 'de'): string {
     if (language === 'de') {
-        return `Gib mir genau ein Wort, dass helfen kann dieses Wort zu erraten: "${word}".`;
+        return `Gib mir ${count} Ein-Wort-Hinweise für das Wort "${word}"`;
     } else {
-        return `Give me exactly one word, that helps to guess this word: "${word}".`;
+        return `Give me ${count} one-word clues for the word "${word}"`;
     }
 }
 
-function getPromptForGuess(hints: string[], language: 'en' | 'de' = DEFAULT_LANGUAGE): string {
+function getPromptForGuess(hints: string[], language: 'en' | 'de'): string {
     if (language === 'de') {
-        return `Errate das Wort basierend auf diesen Hinweisen: ${hints.join(', ')}. Antwort in einem Wort.`;
+        return `Errate das Wort basierend auf diesen Hinweisen: ${hints.join(', ')}`;
     } else {
-        return `Guess the word based on these hints: ${hints.join(', ')}. Answer in one word.`;
+        return `Guess the word based on these clues: ${hints.join(', ')}`;
     }
 }

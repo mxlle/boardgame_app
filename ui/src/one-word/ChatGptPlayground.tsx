@@ -10,6 +10,7 @@ import api from '../shared/apiFunctions';
 import {STYLES} from '../theme';
 import {TUTORIAL_ID} from "./tutorial";
 import {getOpenAiKey, setOpenAiKey} from "../shared/functions";
+import {getCurrentLanguage} from "../i18n";
 
 const styles = (_theme: Theme) => createStyles({
     root: {
@@ -53,7 +54,7 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
     }
 
     async generateWord() {
-        const word = await api.generateWordToGuess();
+        const word = await api.generateWordToGuess(getCurrentLanguage());
         console.log(word);
         this.setState({lastWord: word, hints: []});
         this.props.enqueueSnackbar(word, { variant: this.responseIsError(word) ? 'error' : 'info' });
@@ -65,12 +66,12 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
             return;
         }
 
-        const hint = await api.generateHintForWord(lastWord);
-        console.log(hint);
-        if (hint && !hints.includes(hint)) {
-            this.setState({hints: [...hints, hint]});
+        const newHints = await api.generateHintsForWord(lastWord, getCurrentLanguage());
+        console.log(newHints);
+        if (newHints) {
+            this.setState({hints: [...hints, ...newHints]});
         }
-        this.props.enqueueSnackbar(hint, { variant: this.responseIsError(hint) ? 'error' : 'info' });
+        this.props.enqueueSnackbar(newHints.join(', '), { variant: this.responseIsError(newHints[0]) ? 'error' : 'info' });
     }
 
     async generateGuessForHints() {
@@ -79,7 +80,7 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
             return;
         }
 
-        const guess = await api.generateGuessForHints(hints);
+        const guess = await api.generateGuessForHints(hints, getCurrentLanguage());
         console.log(guess);
         this.props.enqueueSnackbar(guess, { variant: this.responseIsError(guess) ? 'error' : 'info' });
     }
