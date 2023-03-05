@@ -6,7 +6,13 @@ import {forbiddenError, gameNotFoundError, joiningRequestNotFoundError, paramMis
 import {Namespace} from 'socket.io';
 import {GameEvent, IGame, IGameApi, NotificationEventOptions, ROOM_GAME, ROOM_GAME_LIST} from '@gameTypes';
 import words from '@shared/Words';
-import {generateGuessForHints, generateHintsForWord, generateWordToGuess} from '../ai/openai-integration';
+import {
+    generateGuessForHints,
+    generateHintsForWord,
+    generateWordToGuess,
+    getApiKey,
+    isApiKeyValid
+} from '../ai/openai-integration';
 import {getNextAiPlayer} from '@gameFunctions';
 
 // Init shared
@@ -17,12 +23,10 @@ const AI_TIMEOUT = 1500;
 class GameApi implements IGameApi {
     private socket: Namespace;
     private readonly userId: string;
-    private readonly openAiKey: string;
 
-    constructor(socket: Namespace, userId: string, openAiKey: string = '') {
+    constructor(socket: Namespace, userId: string) {
         this.socket = socket;
         this.userId = userId;
-        this.openAiKey = openAiKey;
     }
 
     async loadGames() {
@@ -60,6 +64,30 @@ class GameApi implements IGameApi {
         }
 
         return createdGame.id as string;
+    }
+
+    async setOpenAiKey(gameId: string, keyOrPassword: string) {
+        const game = await gameDao.getOne(gameId);
+        if (!game) {
+            throw new Error(gameNotFoundError);
+        }
+        if (game.hostId !== this.userId) {
+            throw new Error(forbiddenError);
+        }
+
+        const apiKey = getApiKey(keyOrPassword);
+        const isValidCheck = await isApiKeyValid(apiKey);
+
+        if (isValidCheck !== true) {
+            return isValidCheck;
+        }
+
+        game.openAiKey = keyOrPassword;
+        await gameDao.update(game);
+
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+
+        return true;
     }
 
     async startPreparation(gameId: string, wordsPerPlayer: number, isTwoPlayerVariant: boolean = false) {
@@ -103,7 +131,8 @@ class GameApi implements IGameApi {
         for (const aiPlayer of aiPlayers) {
             const enteredWords: string[] = [];
             for (let i = 0; i < game.wordsPerPlayer; i++) {
-                enteredWords.push(await generateWordToGuess(this.openAiKey, game.language));
+                const word = game.openAiKey ? await generateWordToGuess(game.openAiKey, game.language) : words.getRandom(game.language);
+                enteredWords.push(word);
             }
             GameController.updatePlayer(game, {
                 ...aiPlayer,
@@ -199,7 +228,14 @@ class GameApi implements IGameApi {
             const countOfAiHints =  game.rounds[game.round].hints.filter((hint) => aiPlayers.map((p) => p.id).includes(hint.authorId)).length;
             if (countOfAiHints === 0) return;
 
-            const aiHints = await generateHintsForWord(this.openAiKey, game.rounds[game.round].word, countOfAiHints, game.language);
+            const aiHints: string[] = [];
+            if (game.openAiKey) {
+                aiHints.push(...await generateHintsForWord(game.openAiKey, game.rounds[game.round].word, countOfAiHints, game.language));
+            } else {
+                for (let i = 0; i < countOfAiHints; i++) {
+                    aiHints.push('Random: ', words.getRandom(game.language));
+                }
+            }
             for (const aiPlayer of aiPlayers) {
                 for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
                     GameController.addHint(game, hint.id, aiHints.pop() ?? '[Error]', aiPlayer.id);
@@ -410,8 +446,14 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
 
-        const hintsWithoutDuplicates = GameController.getHintsWithoutDuplicates(game);
-        const aiGuess = hintsWithoutDuplicates.length > 0 ? await generateGuessForHints(this.openAiKey, hintsWithoutDuplicates, game.language) : await generateWordToGuess(this.openAiKey, game.language);
+        let aiGuess;
+        if (game.openAiKey) {
+            const hintsWithoutDuplicates = GameController.getHintsWithoutDuplicates(game);
+            aiGuess = hintsWithoutDuplicates.length > 0 ? await generateGuessForHints(game.openAiKey, hintsWithoutDuplicates, game.language) : await generateWordToGuess(game.openAiKey, game.language)
+        } else {
+            aiGuess = words.getRandom(game.language);
+        }
+
         GameController.guess(game, aiGuess);
 
         const updatedGame = await gameDao.update(game);
@@ -518,16 +560,16 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    generateWordToGuess(language: 'en' | 'de') {
-        return generateWordToGuess(this.openAiKey, language);
+    generateWordToGuess(openAiKey: string, language: 'en' | 'de') {
+        return generateWordToGuess(openAiKey, language);
     }
 
-    generateHintsForWord(word: string, language: 'en' | 'de') {
-        return generateHintsForWord(this.openAiKey, word, 3, language);
+    generateHintsForWord(openAiKey: string, word: string, language: 'en' | 'de') {
+        return generateHintsForWord(openAiKey, word, 3, language);
     }
 
-    generateGuessForHints(hints: string[], language: 'en' | 'de') {
-        return generateGuessForHints(this.openAiKey, hints, language);
+    generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de') {
+        return generateGuessForHints(openAiKey, hints, language);
     }
 }
 

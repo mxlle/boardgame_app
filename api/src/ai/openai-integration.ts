@@ -39,12 +39,19 @@ function getOpenAiApi(apiKey: string): OpenAIApi {
     return openai;
 }
 
-function getApiKey(keyOrPassword?: string): string {
+export function getApiKey(keyOrPassword?: string): string {
     if (keyOrPassword === process?.env?.OPENAI_API_KEY_PASSWORD) {
         return process?.env?.OPENAI_API_KEY ?? '';
     } else {
         return keyOrPassword ?? '';
     }
+}
+
+export async function isApiKeyValid(openAiKey: string): Promise<true | string> {
+    const request = getCreateChatCompletionRequest('Is this API call valid?', defaultSettings);
+    const result = await getFormattedResultFromRequest(openAiKey, request);
+
+    return !result.includes('Error') || result;
 }
 
 
@@ -110,7 +117,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
             // tslint:disable-next-line:no-console
             console.error('unknown error', e);
 
-            return 'Unknown error';
+            return 'Error: unknown error';
         }
     }
 }

@@ -49,7 +49,6 @@ type GameLobbyState = {
     currentPlayer: IUser,
     roundDialogOpen: boolean,
     isTwoPlayerVariant?: boolean
-    isAiAvailable: boolean,
 };
 
 class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
@@ -64,7 +63,6 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 color: getRandomColor(localStorage.getItem(SETTING_COLOR), props.game.players.map(p => p.color))
             },
             roundDialogOpen: false,
-            isAiAvailable: !!getOpenAiKey(),
         }
 
         this.addPlayer = this.addPlayer.bind(this);
@@ -90,7 +88,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     addAiPlayer() {
-        api.addAiPlayer(this.props.game.id);
+        void api.addAiPlayer(this.props.game.id);
     }
 
     setLocalPlayer(player: IUser) {
@@ -112,7 +110,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
     }
 
     leaveGame(playerId: string = this.state.currentPlayer.id) {
-        api.removePlayerFromGame(this.props.game.id, playerId);
+        void api.removePlayerFromGame(this.props.game.id, playerId);
     }
 
     selectNumRounds(isTwoPlayerVariant: boolean = false) {
@@ -150,9 +148,17 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         }
     }
 
-    activateAi() {
-        setOpenAiKey(window.prompt('Please enter your OpenAI API key or the secret password') ?? '');
-        this.setState({isAiAvailable: !!getOpenAiKey()});
+    async activateAi() {
+        const key = window.prompt(this.props.i18n.t('COMMON.AI_ACTIVATION.PROMPT', 'Please enter your OpenAI API key or the secret password'), getOpenAiKey() ?? '');
+        if (key) {
+            const isValidCheck = await api.setOpenAiKey(this.props.game.id, key);
+            if (isValidCheck === true) {
+                setOpenAiKey(key);
+                this.props.enqueueSnackbar(this.props.i18n.t('COMMON.AI_ACTIVATION.SUCCESS', 'AI successfully activated'), {variant: 'success'});
+            } else {
+                this.props.enqueueSnackbar(isValidCheck, {variant: 'error'});
+            }
+        }
     }
 
     render() {
@@ -178,8 +184,6 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
         });
         const newPlayerName: string = !currentPlayer.name ? '?' : currentPlayer.name;
         const newPlayerColor: string = !currentPlayer.color ? getRandomColor() : currentPlayer.color;
-
-        const isAiAvailable = !!getOpenAiKey();
 
         return (
             <Grid container spacing={4} className="Game-lobby">
@@ -221,7 +225,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                     {
                         isHost && isInGame && (
                             <Grid item xs={12}>
-                                {isAiAvailable ?
+                                {game.openAiKey ?
                                     (<Button variant="contained" onClick={this.addAiPlayer}>
                                         <Trans i18nKey="GAME.LOBBY.ADD_AI_PLAYER">Add AI player</Trans>
                                     </Button>)

@@ -54,7 +54,7 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
     }
 
     async generateWord() {
-        const word = await api.generateWordToGuess(getCurrentLanguage());
+        const word = await api.generateWordToGuess(getOpenAiKey(), getCurrentLanguage());
         console.log(word);
         this.setState({lastWord: word, hints: []});
         this.props.enqueueSnackbar(word, { variant: this.responseIsError(word) ? 'error' : 'info' });
@@ -66,7 +66,7 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
             return;
         }
 
-        const newHints = await api.generateHintsForWord(lastWord, getCurrentLanguage());
+        const newHints = await api.generateHintsForWord(getOpenAiKey(), lastWord, getCurrentLanguage());
         console.log(newHints);
         if (newHints) {
             this.setState({hints: [...hints, ...newHints]});
@@ -80,7 +80,7 @@ class ChatGptPlayground extends React.Component<ChatGptPlaygroundProps,ChatGptPl
             return;
         }
 
-        const guess = await api.generateGuessForHints(hints, getCurrentLanguage());
+        const guess = await api.generateGuessForHints(getOpenAiKey(), hints, getCurrentLanguage());
         console.log(guess);
         this.props.enqueueSnackbar(guess, { variant: this.responseIsError(guess) ? 'error' : 'info' });
     }

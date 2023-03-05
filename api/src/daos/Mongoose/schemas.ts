@@ -58,7 +58,8 @@ const GameSchema: Schema = new Schema({
 
     rematchId: String,
 
-    isTwoPlayerVariant: {type: Boolean, required: false}
+    isTwoPlayerVariant: {type: Boolean, required: false},
+    openAiKey: {type: String, required: false},
 }, { toJSON: { virtuals: true } });
 
 GameSchema.virtual('actionRequiredFrom').get(function() {

@@ -26,6 +26,8 @@ export interface IGame {
 
     isTwoPlayerVariant?: boolean;
 
+    openAiKey?: string;
+
     actionRequiredFrom: IUser[]; // calculated virtual property
 
     $isTutorial?: boolean; // only in FE
@@ -97,9 +99,10 @@ export interface IGameApi {
     resolveRound: (gameId: string, correct: boolean|undefined) => Promise<boolean>;
     deleteGame: (gameId: string) => Promise<boolean>;
 
-    generateWordToGuess: (language: 'en' | 'de') => Promise<string>;
-    generateHintsForWord: (word: string, language: 'en' | 'de') => Promise<string[]>;
-    generateGuessForHints: (hints: string[], language: 'en' | 'de') => Promise<string>;
+    setOpenAiKey: (gameId: string, key: string) => Promise<true | string>;
+    generateWordToGuess: (openAiKey: string, language: 'en' | 'de') => Promise<string>;
+    generateHintsForWord: (openAiKey: string, word: string, language: 'en' | 'de') => Promise<string[]>;
+    generateGuessForHints: (openAiKey: string, hints: string[], language: 'en' | 'de') => Promise<string>;
     addAiPlayer: (gameId: string) => Promise<boolean>;
 }
 
