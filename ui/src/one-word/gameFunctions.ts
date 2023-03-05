@@ -230,6 +230,10 @@ export function resetHint(game: IGame, hintId: string, playerId: string) {
     hintObj.hint = '';
 }
 
+export function getHintsWithoutDuplicates(game: IGame): string[] {
+    return game.rounds[game.round].hints.filter(h => !h.isDuplicate).map(h => h.hint);
+}
+
 export function compareHints(game: IGame) {
     const currentRound = game.rounds[game.round];
     const currentRoundHints = currentRound.hints;

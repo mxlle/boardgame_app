@@ -410,7 +410,8 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
 
-        const aiGuess = await generateGuessForHints(this.openAiKey, game.rounds[game.round].hints.map(h => h.hint), game.language);
+        const hintsWithoutDuplicates = GameController.getHintsWithoutDuplicates(game);
+        const aiGuess = hintsWithoutDuplicates.length > 0 ? await generateGuessForHints(this.openAiKey, hintsWithoutDuplicates, game.language) : await generateWordToGuess(this.openAiKey, game.language);
         GameController.guess(game, aiGuess);
 
         const updatedGame = await gameDao.update(game);
