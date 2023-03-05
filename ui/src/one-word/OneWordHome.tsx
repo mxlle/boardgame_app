@@ -91,7 +91,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         });
         try {
             let games = await api.loadGames();
-            if (!this._isMounted) return;     
+            if (!this._isMounted) return;
             this.setState({
                 allGames: games,
                 gamesLoading: false

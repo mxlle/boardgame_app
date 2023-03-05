@@ -31,14 +31,24 @@ class GameApi implements IGameApi {
 
     async loadGames() {
         let games = await gameDao.getAll();
-        games = games.filter((game: IGame) => {
+        games = games.filter((game) => {
             return game.phase === GamePhase.Init || (this.userId && game.players.findIndex(p => p.id === this.userId) > -1);
+        }).map((game) => {
+            this._hideOpenAiKey(game);
+            return game;
         });
+
         return games;
     }
 
-    loadGame(gameId: string) {
-        return gameDao.getOne(gameId);
+    async loadGame(gameId: string) {
+        const game = await gameDao.getOne(gameId);
+        if(!game) {
+            return null;
+        }
+
+        this._hideOpenAiKey(game);
+        return game;
     }
 
     async addGame(game: IGame, previousGameId?: string) {
@@ -59,7 +69,7 @@ class GameApi implements IGameApi {
             if (!!previousGame) {
                 previousGame.rematchId = game.id;
                 await gameDao.update(previousGame);
-                this.socket.to(ROOM_GAME(previousGame.id)).emit(GameEvent.Update, previousGame);
+                this._sendGameUpdate(previousGame);
             }
         }
 
@@ -85,7 +95,7 @@ class GameApi implements IGameApi {
         game.openAiKey = keyOrPassword;
         await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+        this._sendGameUpdate(game);
 
         return true;
     }
@@ -108,7 +118,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         if (game.phase === GamePhase.HintWriting) {
             void this.addHintsForAiPlayers(gameId);
@@ -138,7 +148,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         if (updatedGame.phase === GamePhase.HintWriting) {
             void this.addHintsForAiPlayers(gameId);
@@ -178,7 +188,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         return true;
     };
@@ -194,7 +204,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
         this.socket.to(ROOM_GAME_LIST).emit(GameEvent.UpdateList);
 
         return true;
@@ -223,7 +233,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         if (GameController.gameHasAiPlayers(game)) {
             const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
@@ -272,7 +282,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
     }
 
     async removePlayerFromGame(gameId: string, playerId: string) {
@@ -286,7 +296,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         return true;
     }
@@ -307,7 +317,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
         this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
             transKey: 'GAME.MESSAGE.NEW_JOINING_REQUEST',
             audience: joiningRequestAudience
@@ -358,7 +368,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
         if (!!notificationOptions) this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, notificationOptions);
 
         return true;
@@ -381,7 +391,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         if (game.phase === GamePhase.HintComparing) {
             // send notification for next phase
@@ -408,7 +418,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         return true;
     };
@@ -425,7 +435,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         return true;
     };
@@ -440,7 +450,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         return true;
     };
@@ -459,7 +469,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         // send notification for next phase
         const options: NotificationEventOptions = {
@@ -489,7 +499,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         this.afterGuessHandling(game, aiGuess);
     }
@@ -510,7 +520,7 @@ class GameApi implements IGameApi {
 
         const updatedGame = await gameDao.update(game);
 
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
 
         this.afterGuessHandling(game, guess);
 
@@ -567,7 +577,7 @@ class GameApi implements IGameApi {
         const updatedGame = await gameDao.update(game);
 
         // send notification for next phase
-        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, updatedGame);
+        this._sendGameUpdate(updatedGame);
         if (game.phase === GamePhase.HintWriting) {
             this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Notification, {
                 transKey: 'GAME.MESSAGE.YOUR_TURN_HINT_WRITING',
@@ -601,6 +611,15 @@ class GameApi implements IGameApi {
 
     generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de') {
         return generateGuessForHints(openAiKey, hints, language);
+    }
+
+    private _sendGameUpdate(game: IGame) {
+        this._hideOpenAiKey(game);
+        this.socket.to(ROOM_GAME(game.id)).emit(GameEvent.Update, game);
+    }
+
+    private _hideOpenAiKey(game: IGame) {
+        game.openAiKey = game.openAiKey ? '***' : undefined;
     }
 }
 

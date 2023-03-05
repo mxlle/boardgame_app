@@ -1,6 +1,6 @@
 import React from 'react';
 import {Trans, WithTranslation, withTranslation} from 'react-i18next';
-import { withSnackbar, WithSnackbarProps } from 'notistack';
+import {withSnackbar, WithSnackbarProps} from 'notistack';
 import {Box, Button, createStyles, Grid, Theme, Typography, withStyles} from '@material-ui/core';
 import WordCard from './components/WordCard';
 import {GameEvent, IGame, IGameRound} from '../types';
