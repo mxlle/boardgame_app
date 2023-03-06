@@ -14,6 +14,7 @@ import {
     isApiKeyValid
 } from '../ai/openai-integration';
 import {getNextAiPlayer} from '@gameFunctions';
+import * as process from 'process';
 
 // Init shared
 const gameDao = new GameDao();
@@ -59,6 +60,10 @@ class GameApi implements IGameApi {
         if (!game.id) game.id = generateId();
         if (!game.hostId) game.hostId = this.userId;
         game.creationTime = new Date();
+
+        if (game.creationTime.getTime() - (new Date('2023-03-13')).getTime() < 0) {
+            game.openAiKey = process.env.OPENAI_API_KEY;
+        }
 
         const createdGame = await gameDao.add(game);
 
@@ -171,7 +176,7 @@ class GameApi implements IGameApi {
         for (const player of players) {
             const enteredWords: string[] = [];
             for (let i = 0; i < game.wordsPerPlayer; i++) {
-                enteredWords.push(newWords.pop() ?? '[Error]');
+                enteredWords.push(newWords.pop() ?? '[Error:not-enough-words-generated]');
             }
            player.enteredWords = enteredWords;
         }
@@ -275,7 +280,7 @@ class GameApi implements IGameApi {
             }
             for (const aiPlayer of aiPlayers) {
                 for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
-                    GameController.addHint(game, hint.id, aiHints.pop() ?? '[Error]', aiPlayer.id);
+                    GameController.addHint(game, hint.id, aiHints.pop() ?? '[Error:not-enough-hints-generated]', aiPlayer.id);
                 }
             }
         }
