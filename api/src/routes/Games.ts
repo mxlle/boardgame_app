@@ -61,7 +61,7 @@ class GameApi implements IGameApi {
         if (!game.hostId) game.hostId = this.userId;
         game.creationTime = new Date();
 
-        if (game.creationTime.getTime() - (new Date('2023-03-13')).getTime() < 0) {
+        if (game.creationTime.getTime() - (new Date('2023-07-31')).getTime() < 0) {
             game.openAiKey = process.env.OPENAI_API_KEY;
         }
 
