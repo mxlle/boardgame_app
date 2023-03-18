@@ -175,7 +175,7 @@ function assignWordsToRounds(game: IGame) {
 
     for (let i = 0; i < game.rounds.length; i++) {
         const round = game.rounds[i];
-        let wordOptions = words.filter(wo => wo.authorId !== round.guesserId);
+        let wordOptions = words.filter(wo => game.isOnlyGuessing || wo.authorId !== round.guesserId);
         let wordToGuess: {word: string, authorId: string};
 
         if (wordOptions.length) {

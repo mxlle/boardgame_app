@@ -182,6 +182,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         let { classes } = this.props;
         let {newGameName, allGames, areGamesLoading, isRoundSelectionDialogOpen, isGuessingGame} = this.state;
         if (newGameName === null) newGameName = this._getInitialGameName(this.currentUserName);
+        const numOfPlayersForAiGame = NUM_OF_HINTS_FOR_GUESSING_GAME + 1;
 
         return (
             <Container maxWidth="sm" className={classes.root}>
@@ -210,7 +211,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     </ActionButton>
                 </Box>
                 <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
-                <RoundSelector isForGuessingOnly={isGuessingGame} numOfPlayers={NUM_OF_HINTS_FOR_GUESSING_GAME} open={isRoundSelectionDialogOpen} onClose={this.startGuessingGame}/>
+                <RoundSelector isForGuessingOnly={isGuessingGame} numOfPlayers={numOfPlayersForAiGame} open={isRoundSelectionDialogOpen} onClose={this.startGuessingGame}/>
             </Container>
         );
     }
