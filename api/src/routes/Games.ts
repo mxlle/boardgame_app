@@ -129,14 +129,14 @@ class GameApi implements IGameApi {
         this._sendGameUpdate(updatedGame);
 
         if (game.phase === GamePhase.HintWriting) {
-            void this.addHintsForAiPlayers(gameId);
+            void this.addHintsForAiPlayers(gameId, game.isSinglePlayerGame);
         }
 
         return true;
     };
 
-    async setAiWords(gameId: string) {
-        await sleep(500);
+    async setAiWords(gameId: string, isSinglePlayer: boolean) {
+        await sleep(this._getAiTimeout(isSinglePlayer, 500));
 
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
@@ -159,7 +159,7 @@ class GameApi implements IGameApi {
         this._sendGameUpdate(updatedGame);
 
         if (updatedGame.phase === GamePhase.HintWriting) {
-            void this.addHintsForAiPlayers(gameId);
+            void this.addHintsForAiPlayers(gameId, game.isSinglePlayerGame);
         }
     }
 
@@ -236,7 +236,7 @@ class GameApi implements IGameApi {
         GameController.updatePlayer(game, player);
 
         if (game.phase === GamePhase.HintWriting) {
-            void this.addHintsForAiPlayers(gameId);
+            void this.addHintsForAiPlayers(gameId, game.isSinglePlayerGame);
         }
 
         const updatedGame = await gameDao.update(game);
@@ -246,7 +246,7 @@ class GameApi implements IGameApi {
         const playersThatNeedWords = GameController.getPlayersThatNeedWordsGenerated(game);
         if (playersThatNeedWords.length > 0) {
             if (playersThatNeedWords.length === game.actionRequiredFrom.length) {
-                await this.setAiWords(gameId);
+                await this.setAiWords(gameId, game.isSinglePlayerGame);
             }
         }
 
@@ -262,8 +262,8 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    async addHintsForAiPlayers(gameId: string) {
-        await sleep(AI_TIMEOUT);
+    async addHintsForAiPlayers(gameId: string, isSinglePlayer: boolean) {
+        await sleep(this._getAiTimeout(isSinglePlayer));
 
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
@@ -394,7 +394,7 @@ class GameApi implements IGameApi {
         GameController.addHint(game, hintId, hint, this.userId);
 
         if (GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0 && game.phase === GamePhase.Guessing) {
-            void this.addAiGuess(gameId);
+            void this.addAiGuess(gameId, game.isSinglePlayerGame);
         }
 
         const updatedGame = await gameDao.update(game);
@@ -472,7 +472,7 @@ class GameApi implements IGameApi {
         GameController.showHints(game);
 
         if (GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0) {
-            void this.addAiGuess(gameId);
+            void this.addAiGuess(gameId, game.isSinglePlayerGame);
         }
 
         const updatedGame = await gameDao.update(game);
@@ -489,8 +489,8 @@ class GameApi implements IGameApi {
         return true;
     };
 
-    async addAiGuess(gameId: string) {
-        await sleep(AI_TIMEOUT);
+    async addAiGuess(gameId: string, isSinglePlayerGame: boolean) {
+        await sleep(this._getAiTimeout(isSinglePlayerGame));
 
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
@@ -579,7 +579,7 @@ class GameApi implements IGameApi {
         GameController.resolveRound(game, !!correct);
 
         if (game.phase === GamePhase.HintWriting) {
-            void this.addHintsForAiPlayers(gameId);
+            void this.addHintsForAiPlayers(gameId, game.isSinglePlayerGame);
         }
 
         const updatedGame = await gameDao.update(game);
@@ -619,6 +619,10 @@ class GameApi implements IGameApi {
 
     generateGuessForHints(openAiKey: string, hints: string[], language: 'en' | 'de') {
         return generateGuessForHints(openAiKey, hints, language);
+    }
+
+    private _getAiTimeout(isSinglePlayerGame: boolean, timeout: number = AI_TIMEOUT) {
+        return isSinglePlayerGame ? 500 : timeout;
     }
 
     private _sendGameUpdate(game: IGame) {
