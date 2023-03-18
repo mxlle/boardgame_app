@@ -29,7 +29,8 @@
             "DONE": "My finished games",
             "NEW": "New games",
             "ONGOING": "My ongoing games",
-            "PLAYERS": "Players: {{playersString}}"
+            "PLAYERS": "Players: {{playersString}}",
+            "RESULT": "Result: {{score}}"
         },
         "DELETED_GAME": "Game deleted",
         "START_TUTORIAL": "How to play"

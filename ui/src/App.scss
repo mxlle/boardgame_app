@@ -49,6 +49,12 @@ $breakPoint_md: 720px; // TODO
     }
 }
 
+.GameList {
+    .list-extra-info {
+        display: grid;
+    }
+}
+
 .MuiPaper-root.StatusInfo {
     padding: $standardMargin;
 }

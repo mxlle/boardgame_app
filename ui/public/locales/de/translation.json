@@ -29,7 +29,8 @@
             "DONE": "Meine beendeten Spiele",
             "NEW": "Neue Spiele",
             "ONGOING": "Meine laufenden Spiele",
-            "PLAYERS": "Spieler: {{playersString}}"
+            "PLAYERS": "Spieler: {{playersString}}",
+            "RESULT": "Ergebnis: {{score}}"
         },
         "DELETED_GAME": "Spiel gelöscht",
         "START_TUTORIAL": "Wie funktioniert's?"

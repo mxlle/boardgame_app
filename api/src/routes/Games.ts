@@ -37,7 +37,7 @@ class GameApi implements IGameApi {
         }).map((game) => {
             this._hideOpenAiKey(game);
             return game;
-        });
+        }).reverse(); // newest first
 
         return games;
     }

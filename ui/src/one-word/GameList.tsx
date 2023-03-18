@@ -1,22 +1,23 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { 
+import {Link} from 'react-router-dom';
+import {
+    Box,
     Grid,
-    List, 
-    ListItem, 
-    ListItemText, 
-    ListItemSecondaryAction, 
     IconButton,
+    List,
+    ListItem,
+    ListItemSecondaryAction,
+    ListItemText,
     Paper,
     Typography
 } from '@material-ui/core';
 import DeleteIcon from '@material-ui/icons/Delete';
-import { Trans } from 'react-i18next';
-import { IGame, GamePhase } from '../types';
+import {Trans} from 'react-i18next';
+import {GamePhase, IGame} from '../types';
 
-import { SETTING_ID, SETTING_NAME } from '../shared/constants';
+import {SETTING_ID, SETTING_NAME} from '../shared/constants';
 import {getCurrentUserInGame} from "../shared/functions";
-import {getClearedForDeletion} from "./gameFunctions";
+import {getClearedForDeletion, getCorrectRounds} from "./gameFunctions";
 
 type GameListProps = {
     allGames: IGame[],
@@ -40,7 +41,13 @@ export class GameList extends React.Component<GameListProps,GameListState> {
 
         const createListItem = (game: IGame) => {
             const playersString = game.players.map(p => p.name).join(', ') || '-';
+            const date = game.endTime ?? game.startTime ?? game.creationTime;
+            const dateString = date ? new Date(date).toLocaleString() : ''
             const nowTime: number = (new Date()).getTime();
+            let score = '';
+            if (game.phase === GamePhase.End) {
+                score = getCorrectRounds(game).length + '/' + game.rounds.length;
+            }
 
             return (
                 <ListItem key={game.id}
@@ -51,7 +58,12 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                     <ListItemText 
                         id={game.id} 
                         primary={`${game.name || game.id}`}
-                        secondary={<Trans i18nKey="HOME.GAME_LIST.PLAYERS">Players: {{playersString}}</Trans>}
+                        secondary={
+                        <Box component="span" className="list-extra-info">
+                            <Box component="span"><Trans i18nKey="HOME.GAME_LIST.PLAYERS">Players: {{playersString}}</Trans></Box>
+                            <Box component="span">{dateString}</Box>
+                            {(score && <Box component="span"><Trans i18nKey="HOME.GAME_LIST.RESULT">Score: {{score}}</Trans></Box>)}
+                        </Box>}
                     />
                     {
                         (this.currentUserId === game.hostId || getClearedForDeletion(game, nowTime)) && (
