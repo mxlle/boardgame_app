@@ -3,7 +3,7 @@ import {AxiosError} from 'axios';
 import {randomInt} from '@shared/functions';
 import words from '@shared/Words';
 import * as process from 'process';
-import {categories} from './categories';
+import {getRandomCategory} from './categories';
 
 let openai: OpenAIApi | undefined;
 let currentApiKey: string | undefined;
@@ -145,7 +145,7 @@ function getPromptForInitialWord(language: 'en' | 'de', count: number, existingW
         exampleWords.push(words.getRandom(language));
     }
     for (let j = 0; j < count; j++) {
-        randomCategories.push(categories[randomInt(categories.length - 1)]);
+        randomCategories.push(getRandomCategory(language));
     }
 
     if (count === 1) {

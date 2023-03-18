@@ -59,7 +59,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
         this.deleteGame = this.deleteGame.bind(this);
         this.openRoundSelectionDialog = this.openRoundSelectionDialog.bind(this);
-        this.startGuessingGame = this.startGuessingGame.bind(this);
+        this.startSinglePlayerGame = this.startSinglePlayerGame.bind(this);
         this._setupConnection = this._setupConnection.bind(this);
 
         this.state = { allGames: [], newGameName: null, areGamesLoading: true, isRoundSelectionDialogOpen: false, isGuessingGame: false };
@@ -86,7 +86,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.setState({isRoundSelectionDialogOpen: true, isGuessingGame});
     }
 
-    async startGuessingGame(numberOfRounds: number = 1) {
+    async startSinglePlayerGame(numberOfRounds: number = 1) {
         this.setState({isRoundSelectionDialogOpen: false});
         await this.createGame(true, numberOfRounds);
     }
@@ -212,7 +212,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     </ActionButton>
                 </Box>
                 <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
-                <RoundSelector isForGuessingOnly={isGuessingGame} numOfPlayers={numOfPlayersForAiGame} open={isRoundSelectionDialogOpen} onClose={this.startGuessingGame}/>
+                <RoundSelector isForGuessingOnly={isGuessingGame} numOfPlayers={numOfPlayersForAiGame} open={isRoundSelectionDialogOpen} onClose={this.startSinglePlayerGame}/>
             </Container>
         );
     }
