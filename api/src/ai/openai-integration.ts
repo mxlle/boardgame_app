@@ -3,6 +3,7 @@ import {AxiosError} from 'axios';
 import {randomInt} from '@shared/functions';
 import words from '@shared/Words';
 import * as process from 'process';
+import {categories} from './categories';
 
 let openai: OpenAIApi | undefined;
 let currentApiKey: string | undefined;
@@ -139,14 +140,26 @@ function isAxiosError(e: unknown): e is AxiosError {
 
 function getPromptForInitialWord(language: 'en' | 'de', count: number, existingWords: string[]): string {
     const exampleWords = existingWords;
+    const randomCategories = [];
     for (let i = exampleWords.length; i < 3; i++) {
         exampleWords.push(words.getRandom(language));
     }
+    for (let j = 0; j < count; j++) {
+        randomCategories.push(categories[randomInt(categories.length - 1)]);
+    }
 
-    if (language === 'de') {
-        return `Gib mir genau ${count} Nomen. Beispiele sind: ${exampleWords.join(', ')}`;
+    if (count === 1) {
+        if (language === 'de') {
+            return `Gib mir genau ein Wort aus der folgenden Kategorie: ${randomCategories.join(', ')}. Beispiele sind: ${exampleWords.join(', ')}`;
+        } else {
+            return `Give me exactly one words out of the following category: ${randomCategories.join(', ')}. Examples are: ${exampleWords.join(', ')}`;
+        }
     } else {
-        return `Give me exactly ${count} nouns. Examples are: ${exampleWords.join(', ')}`;
+        if (language === 'de') {
+            return `Gib mir genau ${count} Wörter aus einer der folgenden Kategorien: ${randomCategories.join(', ')}. Beispiele sind: ${exampleWords.join(', ')}`;
+        } else {
+            return `Give me exactly ${count} words out of the following categories: ${randomCategories.join(', ')}. Examples are: ${exampleWords.join(', ')}`;
+        }
     }
 }
 
