@@ -113,13 +113,9 @@ class GameApi implements IGameApi {
             throw new Error(forbiddenError);
         }
 
-        if (isTwoPlayerVariant) {
+        if (isTwoPlayerVariant || game.isOnlyGuessing) {
             game.wordsPerPlayer = wordsPerPlayer;
             await this.setWordsForPlayers(game, game.players);
-        }
-
-        if (game.isOnlyGuessing) {
-            game.players = await this.setWordsForPlayers(game, game.players);
         }
 
         GameController.goToPreparation(game, wordsPerPlayer, isTwoPlayerVariant);
