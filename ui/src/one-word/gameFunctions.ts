@@ -140,7 +140,7 @@ export function createRounds(game: IGame) {
         const guesserIndex = i % game.players.length;
         const hostIndex = (i+1) % game.players.length;
         const guesserId = game.players[guesserIndex].id;
-        const hostId = game.players[hostIndex].id;
+        const hostId = game.isSinglePlayerGame ? game.hostId : game.players[hostIndex].id;
 
         let hints: IHint[] = _initHints(game.players, guesserId);
         if (game.players.length < 4) hints = hints.concat(_initHints(game.players, guesserId));
@@ -255,7 +255,12 @@ export function compareHints(game: IGame) {
             hint1.isDuplicate = true;
         }
     }
-    game.phase = GamePhase.HintComparing;
+
+    if (game.isSinglePlayerGame) {
+        game.phase = GamePhase.Guessing;
+    } else {
+        game.phase = GamePhase.HintComparing;
+    }
 }
 
 export function removeTwoPlayerHint(game: IGame) {
@@ -308,6 +313,14 @@ export function resolveRound(game: IGame, countAsCorrect: boolean) {
 export function endOfGame(game: IGame) {
     game.phase = GamePhase.End;
     game.endTime = new Date();
+}
+
+export function isSinglePlayerGame(game: IGame): boolean {
+    return getHumanPlayers(game).length === 1;
+}
+
+export function getHumanPlayers(game: IGame): IUser[] {
+    return game.players.filter(p => !p.isAi);
 }
 
 export function getPlayersWithRequiredAction(game: IGame): IUser[] {
@@ -393,7 +406,8 @@ export function emptyGame(): IGame {
         "round": 0,
         "phase": 0,
         "rounds": [],
-        "actionRequiredFrom": []
+        "actionRequiredFrom": [],
+        "isSinglePlayerGame": false,
     };
 }
 

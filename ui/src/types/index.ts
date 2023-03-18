@@ -30,6 +30,8 @@ export interface IGame {
 
     actionRequiredFrom: IUser[]; // calculated virtual property
 
+    isSinglePlayerGame: boolean; // calculated virtual property
+
     $isTutorial?: boolean; // only in FE
 }
 

@@ -24,6 +24,7 @@
         "GAME_NAME": "Spielname",
         "LOAD_GAMES": "Spiele aktualisieren",
         "NEW_GAME": "Neues Spiel",
+        "NEW_AI_GAME": "Spiel mit KI starten",
         "NEW_GAME_PERSONAL": "{{name}}s Spiel",
         "GAME_LIST": {
             "DONE": "Meine beendeten Spiele",

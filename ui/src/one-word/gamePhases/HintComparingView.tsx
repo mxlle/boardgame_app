@@ -76,7 +76,7 @@ class HintComparingView extends React.Component<HintComparingViewProps,HintCompa
                         isGuesser={isGuesser}
                         key="1" />),
                     (<EndPhaseButton
-                        show={isGameHost && !isRoundHost && !game.isTwoPlayerVariant && !game.$isTutorial}
+                        show={isGameHost && !isRoundHost && !game.isTwoPlayerVariant && !game.$isTutorial && !game.isSinglePlayerGame}
                         endPhase={() => this.showHints()}
                         actionRequiredFrom={game.actionRequiredFrom}
                         key="2"/>),

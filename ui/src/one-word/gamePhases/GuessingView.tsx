@@ -54,7 +54,7 @@ class GuessingView extends React.Component<GuessingViewProps,GuessingViewState> 
                         submitGuess={isGuesser ? this.guess : undefined}
                         key="1" />),
                     (<EndPhaseButton
-                        show={isGameHost && !isGuesser && !game.isTwoPlayerVariant && !game.$isTutorial}
+                        show={isGameHost && !isGuesser && !game.isTwoPlayerVariant && !game.$isTutorial && !game.isSinglePlayerGame}
                         endPhase={() => this.guess('')}
                         actionRequiredFrom={game.actionRequiredFrom}
                         key="2"/>),

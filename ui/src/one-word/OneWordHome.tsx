@@ -15,6 +15,7 @@ import {getCurrentLanguage} from '../i18n';
 import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
+import {createAiGame} from "../shared/sharedUiFunctions";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -136,7 +137,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.setState({newGameName: event.target.value});
     }
 
-    async createGame() {
+    async createGame(isSinglePlayerGame: boolean) {
         const game: IGame = emptyGame();
         let gameName = this.state.newGameName;
         if (gameName === null) gameName = this._getInitialGameName(this.currentUserName);
@@ -145,6 +146,10 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
         try {
             const gameId = await api.addGame(game);
+
+            if (isSinglePlayerGame) {
+                await createAiGame(gameId);
+            }
 
             this.props.history.push('/'+gameId);
 
@@ -166,9 +171,12 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
             <Container maxWidth="sm" className={classes.root}>
                 <Box className={classes.newGame}>
                     <TextField label={<Trans i18nKey="HOME.GAME_NAME">Game name</Trans>} value={newGameName} onChange={this.handleChange} />
-                    <Button variant="contained" color="primary" onClick={this.createGame}>
+                    <Button variant="contained" color="primary" onClick={() => this.createGame(false)}>
                         <Trans i18nKey="HOME.NEW_GAME">New game</Trans>
-                    </Button>         
+                    </Button>
+                    <Button variant="contained" onClick={() => this.createGame(true)}>
+                        <Trans i18nKey="HOME.NEW_AI_GAME">Start game with AI</Trans>
+                    </Button>
                 </Box>
                 <Box mb={2}>
                     <Button variant="contained" onClick={this.startTutorial}>

@@ -17,6 +17,7 @@ import api from "../shared/apiFunctions";
 import {RouteComponentProps, withRouter} from "react-router-dom";
 import ConfettiButton from "../common/ConfettiButton";
 import TimerIcon from '@material-ui/icons/Timer';
+import {createAiGame, triggerAiConfetti} from "../shared/sharedUiFunctions";
 
 const styles = (theme: Theme) => createStyles({
     timeBox: {
@@ -70,6 +71,10 @@ class GameEndView extends React.Component<GameEndViewProps> {
 
             try {
                 const rematchId = await api.addGame(rematch, game.id);
+
+                if (game.isSinglePlayerGame) {
+                    await createAiGame(rematchId);
+                }
 
                 this.props.history.push('/'+rematchId);
 
@@ -125,6 +130,10 @@ class GameEndView extends React.Component<GameEndViewProps> {
                 const colors = color ? [color] : undefined;
                 socket.emit(GameEvent.Confetti, game.id, colors);
                 triggerConfetti(colors);
+
+                if (game.isSinglePlayerGame) {
+                    void triggerAiConfetti(game, triggerConfetti);
+                }
             }
         }
 

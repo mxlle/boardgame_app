@@ -390,7 +390,7 @@ class GameApi implements IGameApi {
 
         GameController.addHint(game, hintId, hint, this.userId);
 
-        if (game.isTwoPlayerVariant && GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0) {
+        if (GameController.gameHasAiPlayers(game) && GameController.getAiPlayersThatNeedToAct(game).length > 0 && game.phase === GamePhase.Guessing) {
             void this.addAiGuess(gameId);
         }
 

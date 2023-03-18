@@ -64,7 +64,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
         const {game} = this.props;
         const { submittedHints } = this.state;
         const { currentRound, currentUser, guesser, isGuesser, isGameHost, currentWord } = extractGameData(game);
-        let enteredHint: boolean = !!isGuesser || currentRound.hints.some((h) => h.authorId === currentUser?.id && !!h.hint);
+        let enteredHint: boolean = isGuesser || currentRound.hints.some((h) => h.authorId === currentUser?.id && !!h.hint);
 
         return (
             <GameField
@@ -75,7 +75,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         isGuesser={isGuesser}
                         key="1" />),
                     (<EndPhaseButton
-                        show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial}
+                        show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial && !game.isSinglePlayerGame}
                         endPhase={() => this.forceEndPhase()}
                         actionRequiredFrom={game.actionRequiredFrom}
                         key="2"/>),

@@ -1,5 +1,5 @@
 import {Schema} from 'mongoose';
-import {getPlayersWithRequiredAction} from '@gameFunctions';
+import {getPlayersWithRequiredAction, isSinglePlayerGame} from '@gameFunctions';
 
 export const UserSchema: Schema = new Schema({
     id: String,
@@ -65,6 +65,11 @@ const GameSchema: Schema = new Schema({
 GameSchema.virtual('actionRequiredFrom').get(function() {
     // @ts-ignore
     return getPlayersWithRequiredAction(this);
+});
+
+GameSchema.virtual('isSinglePlayerGame').get(function() {
+    // @ts-ignore
+    return isSinglePlayerGame(this);
 });
 
 export {GameSchema};
