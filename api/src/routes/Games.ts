@@ -13,7 +13,6 @@ import {
     getApiKey,
     isApiKeyValid
 } from '../ai/openai-integration';
-import {getNextAiPlayer} from '@gameFunctions';
 import * as process from 'process';
 
 // Init shared
@@ -138,11 +137,11 @@ class GameApi implements IGameApi {
         const game = await gameDao.getOne(gameId);
         if (!game) throw new Error(gameNotFoundError);
 
-        const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
+        const playersThatNeedWords = GameController.getPlayersThatNeedWordsGenerated(game);
 
-        const updatedAiPlayers = await this.setWordsForPlayers(game, aiPlayers);
+        const updatedPlayers = await this.setWordsForPlayers(game, playersThatNeedWords);
 
-        for (const player of updatedAiPlayers) {
+        for (const player of updatedPlayers) {
             const playerIndex = game.players.findIndex(p => p.id === player.id);
             game.players[playerIndex] = player;
         }
@@ -220,7 +219,7 @@ class GameApi implements IGameApi {
 
         if (!game) throw new Error(gameNotFoundError);
 
-        return this.addPlayer(gameId, getNextAiPlayer(game));
+        return this.addPlayer(gameId, GameController.getNextAiPlayer(game));
     }
 
     async updatePlayer(gameId: string, player: IUser) {
@@ -240,9 +239,9 @@ class GameApi implements IGameApi {
 
         this._sendGameUpdate(updatedGame);
 
-        if (GameController.gameHasAiPlayers(game)) {
-            const aiPlayers = GameController.getAiPlayersThatNeedToAct(game);
-            if (aiPlayers.length === game.actionRequiredFrom.length) {
+        const playersThatNeedWords = GameController.getPlayersThatNeedWordsGenerated(game);
+        if (playersThatNeedWords.length > 0) {
+            if (playersThatNeedWords.length === game.actionRequiredFrom.length) {
                 await this.setAiWords(gameId);
             }
         }

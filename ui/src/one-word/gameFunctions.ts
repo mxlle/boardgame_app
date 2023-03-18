@@ -57,6 +57,7 @@ export function updatePlayer(game: IGame, player: IUser) {
     currentUser.name = player.name;
     currentUser.color = player.color;
     currentUser.enteredWords = player.enteredWords || [];
+    currentUser.useSurpriseWords = player.useSurpriseWords;
 
     // check if ready to start
     const allWordsEntered: boolean = game.players.every(p => p.enteredWords?.length === game.wordsPerPlayer);
@@ -443,6 +444,10 @@ export function gameHasAiPlayers(game: IGame): boolean {
 export function getAiPlayersThatNeedToAct(game: IGame): IUser[] {
     const playersWithAction = getPlayersWithRequiredAction(game);
     return playersWithAction.filter(p => p.isAi);
+}
+
+export function getPlayersThatNeedWordsGenerated(game: IGame): IUser[] {
+    return game.players.filter(p => (p.isAi || p.useSurpriseWords) && !p.enteredWords?.length);
 }
 
 

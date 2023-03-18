@@ -1,5 +1,5 @@
 import React from 'react';
-import { Trans, withTranslation, WithTranslation } from 'react-i18next';
+import {Trans, withTranslation, WithTranslation} from 'react-i18next';
 import {Button, IconButton, InputAdornment, Typography} from '@material-ui/core';
 import CasinoIcon from '@material-ui/icons/Casino';
 import TextField from '@material-ui/core/TextField';
@@ -10,8 +10,10 @@ import ActionButton from "../../common/ActionButton";
 
 type WordAdderProps = {
     add: (words: string[])=>void,
+    setSurprise: ()=>void,
     numOfWords: number,
     allowRandom?: boolean,
+    allowSurprise?: boolean,
     defaultValues?: string[]
 }&WithTranslation;
 
@@ -53,7 +55,7 @@ class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
     }
 
     render() {
-        const { add, numOfWords, allowRandom, i18n } = this.props;
+        const { add, numOfWords, allowRandom, i18n, allowSurprise, setSurprise } = this.props;
         const { words, randomLoading } = this.state;
 
         const getRandomWord = (index: number) => {
@@ -114,6 +116,7 @@ class WordAdder extends React.Component<WordAdderProps, WordAdderState> {
                     onClick={() => add(words)}>
                     <Trans i18nKey="GAME.PREP.WORD_ADDER.BUTTON" count={numOfWords}>Submit</Trans>
                 </Button>
+                {allowSurprise && <Button variant="contained" onClick={setSurprise}><Trans i18nKey="GAME.PREP.SURPRISE_ME">Surprise me</Trans></Button>}
             </div>
         );
     }

@@ -6,6 +6,7 @@ export const UserSchema: Schema = new Schema({
     name: String,
     color: {type: String, required: false},
     enteredWords: [{type: String, required: false}],
+    useSurpriseWords: {type: Boolean, required: false},
     isAi: {type: Boolean, required: false},
 });
 

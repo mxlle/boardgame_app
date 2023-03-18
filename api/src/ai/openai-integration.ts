@@ -116,7 +116,7 @@ async function getFormattedResultFromRequest(openAiKey: string, request: CreateC
             // tslint:disable-next-line:no-console
             console.warn(e.response?.statusText, e.response?.data);
 
-            return `Error: ${e.response?.statusText} - ${e.response?.data?.error.code}`;
+            return `Error: ${e.response?.statusText} - ${e.response?.data?.error?.code}`;
         } else {
             // tslint:disable-next-line:no-console
             console.error('unknown error', e);

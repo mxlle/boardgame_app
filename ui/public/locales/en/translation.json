@@ -80,6 +80,7 @@
             "MY_WORDS": "My word",
             "MY_WORDS_plural": "My words",
             "WAIT_MESSAGE": "Waiting for $t(COMMON.TEAMMATES)... As soon as everyone is ready the game begins.",
+            "SURPRISE_ME": "Surprise me!",
             "WORD_ADDER": {
                 "BUTTON": "Submit word",
                 "BUTTON_plural": "Submit words",

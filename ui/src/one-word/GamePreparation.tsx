@@ -1,12 +1,12 @@
 import React from 'react';
-import { Trans } from 'react-i18next';
-import { IGame, DEFAULT_NUM_WORDS } from '../types';
+import {Trans} from 'react-i18next';
+import {DEFAULT_NUM_WORDS, IGame} from '../types';
 import {Box, Button, Grid, IconButton, Paper, Typography} from '@material-ui/core';
 import WordHint from './components/WordHint';
 import WordCard from './components/WordCard';
 import WordAdder from './components/WordAdder';
 
-import { SETTING_ID } from '../shared/constants';
+import {SETTING_ID} from '../shared/constants';
 import api from '../shared/apiFunctions';
 import {nextTutorialStep, TUTORIAL_WORDS} from "./tutorial";
 import TutorialOverlay from "../common/TutorialOverlay";
@@ -32,6 +32,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         this.addWords = this.addWords.bind(this);
         this.resetWords = this.resetWords.bind(this);
         this.backToLobby = this.backToLobby.bind(this);
+        this.setSurpriseWords = this.setSurpriseWords.bind(this);
 
         const player = getCurrentUserInGame(props.game);
         this.state = { submittedWords: player?.enteredWords?.slice(0, props.game.wordsPerPlayer) || [], resetWords: false };
@@ -52,6 +53,20 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         await api.updatePlayer(this.props.game.id, player);
     }
 
+    async setSurpriseWords() {
+        const player = getCurrentUserInGame(this.props.game);
+        if (!player) return;
+
+        player.useSurpriseWords = true;
+
+        this.setState({
+            submittedWords: Array(this.props.game.wordsPerPlayer).fill('?'),
+            resetWords: false
+        });
+
+        await api.updatePlayer(this.props.game.id, player);
+    }
+
     backToLobby() {
         api.backToLobby(this.props.game.id);
     }
@@ -66,6 +81,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         });
 
         player.enteredWords = [];
+        player.useSurpriseWords = false;
 
         api.updatePlayer(this.props.game.id, player);
     }
@@ -80,12 +96,12 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         let myWords: string[] = [];
         let allMyWordsEntered: boolean = false;
         const listOfPlayers = game.players.map(player => {
-            const wordsEntered: boolean = !!player.enteredWords && player.enteredWords.length === numWordsPerPlayer;
+            const wordsEntered: boolean = (!!player.enteredWords && player.enteredWords.length === numWordsPerPlayer) || !!player.useSurpriseWords
             if (player.id === currentUserId) {
                 isInGame = true;
-                myWords = player.enteredWords || submittedWords;
+                myWords = player.enteredWords?.length ? player.enteredWords : submittedWords;
                 allMyWordsEntered = wordsEntered || (!resetWords && myWords.length === numWordsPerPlayer);
-            } 
+            }
             return (
                 <WordHint key={player.id} hint={player.name} color={player.color} showPencil={!wordsEntered} />
             )
@@ -111,8 +127,10 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                             <Grid item xs={12}>
                                 <WordAdder
                                     add={this.addWords}
+                                    setSurprise={this.setSurpriseWords}
                                     numOfWords={numWordsPerPlayer}
                                     allowRandom={!game.$isTutorial}
+                                    allowSurprise={!!game.openAiKey}
                                     defaultValues={defaultValues}
                                 />
                             </Grid>

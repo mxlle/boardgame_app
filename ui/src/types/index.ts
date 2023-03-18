@@ -40,6 +40,7 @@ export interface IUser {
     name: string;
     color?: string;
     enteredWords?: string[];
+    useSurpriseWords?: boolean;
     isAi?: boolean;
 }
 
