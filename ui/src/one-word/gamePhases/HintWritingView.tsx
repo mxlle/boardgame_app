@@ -75,7 +75,7 @@ class HintWritingView extends React.Component<HintWritingViewProps, HintWritingV
                         isGuesser={isGuesser}
                         key="1" />),
                     (<EndPhaseButton
-                        show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial && !game.isSinglePlayerGame}
+                        show={isGameHost && enteredHint && !game.isTwoPlayerVariant && !game.$isTutorial}
                         endPhase={() => this.forceEndPhase()}
                         actionRequiredFrom={game.actionRequiredFrom}
                         key="2"/>),

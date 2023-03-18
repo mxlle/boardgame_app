@@ -283,7 +283,7 @@ class GameApi implements IGameApi {
             }
             for (const aiPlayer of aiPlayers) {
                 for (const hint of game.rounds[game.round].hints.filter(h => h.authorId === aiPlayer.id)) {
-                    GameController.addHint(game, hint.id, aiHints.pop() ?? '[Error:not-enough-hints-generated]', aiPlayer.id);
+                    GameController.addHint(game, hint.id, aiHints.pop() || '[Error:not-enough-hints-generated]', aiPlayer.id);
                 }
             }
         }
