@@ -2,6 +2,7 @@
 
 export const DEFAULT_NUM_WORDS: number = 2; // Two words per player
 export const DELETE_CLEARANCE_TIME: number = 7 * 24 * 60 * 60 * 1000; // 1 week
+export const NUM_OF_HINTS_FOR_GUESSING_GAME: number = 3;
 
 export interface IGame {
     id: string;
@@ -25,6 +26,8 @@ export interface IGame {
     rematchId?: string;
 
     isTwoPlayerVariant?: boolean;
+
+    isOnlyGuessing?: boolean;
 
     openAiKey?: string;
 

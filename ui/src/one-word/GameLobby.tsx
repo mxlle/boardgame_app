@@ -62,7 +62,7 @@ class GameLobby extends React.Component<GameLobbyProps,GameLobbyState> {
                 name: localStorage.getItem(SETTING_NAME) || '',
                 color: getRandomColor(localStorage.getItem(SETTING_COLOR), props.game.players.map(p => p.color))
             },
-            roundDialogOpen: props.game.isSinglePlayerGame,
+            roundDialogOpen: false,
         }
 
         this.addPlayer = this.addPlayer.bind(this);

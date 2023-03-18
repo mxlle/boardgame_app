@@ -25,6 +25,7 @@
         "LOAD_GAMES": "Reload games",
         "NEW_GAME": "New game",
         "NEW_AI_GAME": "Start game with AI",
+        "NEW_GUESSING_GAME": "Start guessing game",
         "NEW_GAME_PERSONAL": "{{name}}'s game",
         "GAME_LIST": {
             "DONE": "My finished games",

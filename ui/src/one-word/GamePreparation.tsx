@@ -95,7 +95,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
         let isInGame: boolean = false;
         let myWords: string[] = [];
         let allMyWordsEntered: boolean = false;
-        const listOfPlayers = game.players.map(player => {
+        const listOfPlayers = game.players.filter(player => !game.isOnlyGuessing || player.isAi).map(player => {
             const wordsEntered: boolean = (!!player.enteredWords && player.enteredWords.length === numWordsPerPlayer) || !!player.useSurpriseWords
             if (player.id === currentUserId) {
                 isInGame = true;
@@ -117,7 +117,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
             <Grid container spacing={4} className="Game-lobby">
                 <Grid item xs={12} sm={6} container spacing={2} className="New-player">
                     { 
-                        allMyWordsEntered || !isInGame ? (
+                        allMyWordsEntered || !isInGame || game.isOnlyGuessing ? (
                             <Grid item xs={12}> 
                                 <Paper className="StatusInfo">
                                     <Trans i18nKey="GAME.PREP.WAIT_MESSAGE">Waiting for teammates</Trans>
@@ -136,7 +136,7 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                             </Grid>
                         )
                     }
-                    {allMyWordsEntered && myWordCards.length > 0 && (
+                    {allMyWordsEntered && myWordCards.length > 0 && !game.isOnlyGuessing && (
                         <Grid item xs={12} component={Typography} variant="subtitle1">
                             <Trans i18nKey="GAME.PREP.MY_WORDS" count={myWords.length}>My words</Trans>
                             {!game.$isTutorial && (<IconButton onClick={this.resetWords} component={Box} ml={1}>
@@ -144,8 +144,8 @@ export class GamePreparation extends React.Component<GamePreparationProps,GamePr
                             </IconButton>)}
                         </Grid>
                     )}
-                    {allMyWordsEntered && myWordCards}
-                    {isHost && !game.$isTutorial && (
+                    {allMyWordsEntered && !game.isSinglePlayerGame && myWordCards}
+                    {isHost && !game.$isTutorial && !game.isSinglePlayerGame && (
                         <Button variant="outlined"
                                 startIcon={<ArrowBackIcon />}
                                 onClick={this.backToLobby}>

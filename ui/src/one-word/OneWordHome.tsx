@@ -4,7 +4,7 @@ import {Box, Button, Container, TextField} from '@material-ui/core';
 import {createStyles, Theme, WithStyles, withStyles} from '@material-ui/core/styles';
 import {Trans, WithTranslation, withTranslation} from 'react-i18next';
 import {CloseReason, withSnackbar, WithSnackbarProps} from 'notistack';
-import {GameEvent, IGame, ROOM_GAME_LIST, SocketEvent} from '../types';
+import {GameEvent, IGame, NUM_OF_HINTS_FOR_GUESSING_GAME, ROOM_GAME_LIST, SocketEvent} from '../types';
 import {GameList} from './GameList';
 import ActionButton from '../common/ActionButton';
 
@@ -16,6 +16,7 @@ import {emptyGame} from "./gameFunctions";
 import {TUTORIAL_ID} from "./tutorial";
 import socket from "../shared/socket";
 import {createAiGame} from "../shared/sharedUiFunctions";
+import {RoundSelector} from "./components/RoundSelector";
 
 const styles = (theme: Theme) => createStyles({
     root: {
@@ -37,7 +38,9 @@ type JustOneHomeProps = {}&WithTranslation&WithSnackbarProps&RouteComponentProps
 type JustOneHomeState = {
     newGameName: string|null,
     allGames: IGame[],
-    gamesLoading: boolean
+    areGamesLoading: boolean,
+    isRoundSelectionDialogOpen: boolean,
+    isGuessingGame: boolean,
 };
 
 class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
@@ -55,9 +58,11 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.handleChange = this.handleChange.bind(this);
         this.triggerDeleteGame = this.triggerDeleteGame.bind(this);
         this.deleteGame = this.deleteGame.bind(this);
+        this.openRoundSelectionDialog = this.openRoundSelectionDialog.bind(this);
+        this.startGuessingGame = this.startGuessingGame.bind(this);
         this._setupConnection = this._setupConnection.bind(this);
 
-        this.state = { allGames: [], newGameName: null, gamesLoading: true };
+        this.state = { allGames: [], newGameName: null, areGamesLoading: true, isRoundSelectionDialogOpen: false, isGuessingGame: false };
     }
 
     componentDidMount() {
@@ -77,6 +82,15 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         socket.off(SocketEvent.Reconnect, this._setupConnection);
     }
 
+    openRoundSelectionDialog(isGuessingGame: boolean = false) {
+        this.setState({isRoundSelectionDialogOpen: true, isGuessingGame});
+    }
+
+    async startGuessingGame(numberOfRounds: number = 1) {
+        this.setState({isRoundSelectionDialogOpen: false});
+        await this.createGame(true, numberOfRounds);
+    }
+
     private _getInitialGameName(userName?: string) {
         return userName ? this.props.i18n.t('HOME.NEW_GAME_PERSONAL', 'New game', {name: userName}) : this.props.i18n.t('HOME.NEW_GAME', 'New game');
     }
@@ -88,19 +102,19 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
     async loadGames() {
         this.setState({
-            gamesLoading: true
+            areGamesLoading: true
         });
         try {
             let games = await api.loadGames();
             if (!this._isMounted) return;
             this.setState({
                 allGames: games,
-                gamesLoading: false
+                areGamesLoading: false
             });
         } catch(e) {
             this.props.enqueueSnackbar(<Trans i18nKey="ERROR.LOAD_GAMES">Error</Trans>, { variant: 'error' });
             this.setState({
-                gamesLoading: false
+                areGamesLoading: false
             });
         }
     }
@@ -137,18 +151,20 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         this.setState({newGameName: event.target.value});
     }
 
-    async createGame(isSinglePlayerGame: boolean) {
+    async createGame(isSinglePlayerGame: boolean, wordsPerPlayer: number = 1) {
         const game: IGame = emptyGame();
         let gameName = this.state.newGameName;
         if (gameName === null) gameName = this._getInitialGameName(this.currentUserName);
         game.name = gameName;
         game.language = getCurrentLanguage();
+        game.isOnlyGuessing = this.state.isGuessingGame;
 
         try {
             const gameId = await api.addGame(game);
 
             if (isSinglePlayerGame) {
-                await createAiGame(gameId);
+                await createAiGame(gameId, NUM_OF_HINTS_FOR_GUESSING_GAME, game.isOnlyGuessing);
+                void api.startPreparation(gameId, wordsPerPlayer);
             }
 
             this.props.history.push('/'+gameId);
@@ -164,7 +180,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
 
     render() {
         let { classes } = this.props;
-        let {newGameName, allGames, gamesLoading} = this.state;
+        let {newGameName, allGames, areGamesLoading, isRoundSelectionDialogOpen, isGuessingGame} = this.state;
         if (newGameName === null) newGameName = this._getInitialGameName(this.currentUserName);
 
         return (
@@ -174,8 +190,11 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     <Button variant="contained" color="primary" onClick={() => this.createGame(false)}>
                         <Trans i18nKey="HOME.NEW_GAME">New game</Trans>
                     </Button>
-                    <Button variant="contained" onClick={() => this.createGame(true)}>
+                    <Button variant="contained" onClick={() => this.openRoundSelectionDialog()}>
                         <Trans i18nKey="HOME.NEW_AI_GAME">Start game with AI</Trans>
+                    </Button>
+                    <Button variant="contained" onClick={() => this.openRoundSelectionDialog(true)}>
+                        <Trans i18nKey="HOME.NEW_GUESSING_GAME">Start guessing game</Trans>
                     </Button>
                 </Box>
                 <Box mb={2}>
@@ -184,13 +203,14 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
                     </Button>
                 </Box>
                 <Box mb={2}>
-                    <ActionButton loading={gamesLoading}>
+                    <ActionButton loading={areGamesLoading}>
                         <Button variant="contained" onClick={this.loadGames}>
                             <Trans i18nKey="HOME.LOAD_GAMES">Refresh</Trans>
                         </Button>
                     </ActionButton>
                 </Box>
                 <GameList allGames={allGames} deleteGame={this.triggerDeleteGame} />
+                <RoundSelector isForGuessingOnly={isGuessingGame} numOfPlayers={NUM_OF_HINTS_FOR_GUESSING_GAME} open={isRoundSelectionDialogOpen} onClose={this.startGuessingGame}/>
             </Container>
         );
     }

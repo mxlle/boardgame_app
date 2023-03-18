@@ -174,7 +174,7 @@ class OneWordGame extends React.Component<OneWordGameProps,OneWordGameState> {
         const getGameContent = () => {
             switch(currentGame.phase) {
                 case GamePhase.Init:
-                    return <GameLobby game={currentGame} setTheme={setTheme} />;
+                    return !currentGame.isSinglePlayerGame ? <GameLobby game={currentGame} setTheme={setTheme} /> : <GamePreparation game={currentGame} />;
                 case GamePhase.Preparation:
                     return <GamePreparation game={currentGame} />;
                 case GamePhase.HintWriting:

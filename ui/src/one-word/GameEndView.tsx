@@ -68,12 +68,14 @@ class GameEndView extends React.Component<GameEndViewProps> {
             const rematch: IGame = emptyGame();
             rematch.name = game.name + ' - ' + i18n.t('GAME.AGAIN', 'Again!');
             rematch.language = getCurrentLanguage();
+            rematch.isOnlyGuessing = game.isOnlyGuessing;
 
             try {
                 const rematchId = await api.addGame(rematch, game.id);
 
                 if (game.isSinglePlayerGame) {
-                    await createAiGame(rematchId);
+                    await createAiGame(rematchId, game.players.length - 1, game.isOnlyGuessing);
+                    void api.startPreparation(rematchId, game.wordsPerPlayer);
                 }
 
                 this.props.history.push('/'+rematchId);

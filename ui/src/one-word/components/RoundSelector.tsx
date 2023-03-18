@@ -1,16 +1,17 @@
 import React from 'react';
-import { List, ListItem, ListItemText, DialogTitle, Dialog } from '@material-ui/core';
-import { Trans } from 'react-i18next';
+import {Dialog, DialogTitle, List, ListItem, ListItemText} from '@material-ui/core';
+import {Trans} from 'react-i18next';
 
 type RoundSelectorProps = {
     onClose: (value?: number)=>void,
     numOfPlayers: number,
-    open: boolean
+    open: boolean,
+    isForGuessingOnly?: boolean,
 };
 
 export class RoundSelector extends React.Component<RoundSelectorProps> {
     render() {
-        const { open, onClose, numOfPlayers } = this.props;
+        const { open, onClose, numOfPlayers, isForGuessingOnly } = this.props;
 
         const handleClose = () => {
             onClose();
@@ -28,7 +29,7 @@ export class RoundSelector extends React.Component<RoundSelectorProps> {
                 <ListItem button onClick={() => handleListItemClick(wordCount)} key={wordCount}>
                     <ListItemText 
                         primary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.NUM" count={roundCount}>{{roundCount}} rounds</Trans>}
-                        secondary={<Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{{wordCount}} words per player</Trans>} />
+                        secondary={isForGuessingOnly ? null : <Trans i18nKey="GAME.LOBBY.ROUND_SELECT.WORDS" count={wordCount}>{{wordCount}} words per player</Trans>} />
                 </ListItem>
             );
         }

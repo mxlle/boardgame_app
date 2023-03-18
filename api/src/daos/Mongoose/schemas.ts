@@ -60,6 +60,7 @@ const GameSchema: Schema = new Schema({
     rematchId: String,
 
     isTwoPlayerVariant: {type: Boolean, required: false},
+    isOnlyGuessing: {type: Boolean, required: false},
     openAiKey: {type: String, required: false},
 }, { toJSON: { virtuals: true } });
 

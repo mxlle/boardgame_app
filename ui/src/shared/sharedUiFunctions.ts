@@ -4,15 +4,17 @@ import {SETTING_COLOR, SETTING_NAME} from "./constants";
 import {getRandomColor} from "./color-util";
 import {IGame} from "../types";
 
-export async function createAiGame(gameId: string) {
+export async function createAiGame(gameId: string, numberOfAiPlayers: number, isGuessingGame: boolean) {
     await api.addPlayer(gameId, {
         id: getCurrentUserId(),
         name: localStorage.getItem(SETTING_NAME) || 'You',
-        color: getRandomColor(localStorage.getItem(SETTING_COLOR))
+        color: getRandomColor(localStorage.getItem(SETTING_COLOR)),
+        useSurpriseWords: isGuessingGame,
     })
-    await api.addAiPlayer(gameId);
-    await api.addAiPlayer(gameId);
-    await api.addAiPlayer(gameId);
+
+    for (let i = 0; i < numberOfAiPlayers; i++) {
+        await api.addAiPlayer(gameId);
+    }
 }
 
 export async function triggerAiConfetti(game: IGame, triggerConfetti: (colors: string[]) => void) {

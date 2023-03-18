@@ -39,7 +39,7 @@ export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayer
     game.wordsPerPlayer = wordsPerPlayer || game.wordsPerPlayer || DEFAULT_NUM_WORDS;
     game.isTwoPlayerVariant = isTwoPlayerVariant;
     game.startTime = new Date();
-    if (game.isTwoPlayerVariant) {
+    if (game.isTwoPlayerVariant || game.isOnlyGuessing) {
         startGame(game);
     } else {
         game.phase = GamePhase.Preparation;
@@ -140,7 +140,7 @@ export function createRounds(game: IGame) {
     for (let i = 0; i < roundCount; i++) {
         const guesserIndex = i % game.players.length;
         const hostIndex = (i+1) % game.players.length;
-        const guesserId = game.players[guesserIndex].id;
+        const guesserId = game.isOnlyGuessing ? game.hostId : game.players[guesserIndex].id;
         const hostId = game.isSinglePlayerGame ? game.hostId : game.players[hostIndex].id;
 
         let hints: IHint[] = _initHints(game.players, guesserId);
