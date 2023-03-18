@@ -1,5 +1,5 @@
 import {Schema} from 'mongoose';
-import {getPlayersWithRequiredAction, isSinglePlayerGame} from '@gameFunctions';
+import {getPlayersWithRequiredAction} from '@gameFunctions';
 
 export const UserSchema: Schema = new Schema({
     id: String,
@@ -61,17 +61,13 @@ const GameSchema: Schema = new Schema({
 
     isTwoPlayerVariant: {type: Boolean, required: false},
     isOnlyGuessing: {type: Boolean, required: false},
+    isSinglePlayerGame: {type: Boolean, required: false},
     openAiKey: {type: String, required: false},
 }, { toJSON: { virtuals: true } });
 
 GameSchema.virtual('actionRequiredFrom').get(function() {
     // @ts-ignore
     return getPlayersWithRequiredAction(this);
-});
-
-GameSchema.virtual('isSinglePlayerGame').get(function() {
-    // @ts-ignore
-    return isSinglePlayerGame(this);
 });
 
 export {GameSchema};

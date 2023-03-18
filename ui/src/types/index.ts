@@ -28,12 +28,11 @@ export interface IGame {
     isTwoPlayerVariant?: boolean;
 
     isOnlyGuessing?: boolean;
+    isSinglePlayerGame: boolean;
 
     openAiKey?: string;
 
     actionRequiredFrom: IUser[]; // calculated virtual property
-
-    isSinglePlayerGame: boolean; // calculated virtual property
 
     $isTutorial?: boolean; // only in FE
 }

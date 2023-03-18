@@ -38,6 +38,7 @@ export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayer
 
     game.wordsPerPlayer = wordsPerPlayer || game.wordsPerPlayer || DEFAULT_NUM_WORDS;
     game.isTwoPlayerVariant = isTwoPlayerVariant;
+    game.isSinglePlayerGame = isSinglePlayerGame(game);
     game.startTime = new Date();
     if (game.isTwoPlayerVariant || game.isOnlyGuessing) {
         startGame(game);
@@ -49,6 +50,7 @@ export function goToPreparation(game: IGame, wordsPerPlayer: number, isTwoPlayer
 export function backToLobby(game: IGame) {
     if (game.phase !== GamePhase.Preparation) return;
     game.phase = GamePhase.Init;
+    game.isSinglePlayerGame = false;
 }
 
 export function updatePlayer(game: IGame, player: IUser) {

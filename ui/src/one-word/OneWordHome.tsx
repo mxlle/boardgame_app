@@ -158,6 +158,7 @@ class OneWordHome extends React.Component<JustOneHomeProps,JustOneHomeState> {
         game.name = gameName;
         game.language = getCurrentLanguage();
         game.isOnlyGuessing = this.state.isGuessingGame;
+        game.isSinglePlayerGame = isSinglePlayerGame;
 
         try {
             const gameId = await api.addGame(game);
