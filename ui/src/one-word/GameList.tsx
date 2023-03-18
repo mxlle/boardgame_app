@@ -49,6 +49,8 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                 score = getCorrectRounds(game).length + '/' + game.rounds.length;
             }
 
+            const tKey = game.isOnlyGuessing ? 'HOME.GUESSING_GAME' : (game.isSinglePlayerGame ? 'HOME.AI_GAME' : 'HOME.GAME_LIST.PLAYERS');
+
             return (
                 <ListItem key={game.id}
                     {...{ to: `/${game.id}` }}
@@ -60,7 +62,7 @@ export class GameList extends React.Component<GameListProps,GameListState> {
                         primary={`${game.name || game.id}`}
                         secondary={
                         <Box component="span" className="list-extra-info">
-                            <Box component="span"><Trans i18nKey="HOME.GAME_LIST.PLAYERS">Players: {{playersString}}</Trans></Box>
+                            <Box component="span"><Trans i18nKey={tKey}>Players: {{playersString}}</Trans></Box>
                             <Box component="span">{dateString}</Box>
                             {(score && <Box component="span"><Trans i18nKey="HOME.GAME_LIST.RESULT">Score: {{score}}</Trans></Box>)}
                         </Box>}
