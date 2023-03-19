@@ -14,6 +14,10 @@ export function randomInt(max: number) {
     return Math.floor(Math.random()*max);
 }
 
+export function shuffleArray<T>(array: T[]): T[] {
+    return array.sort(() => Math.random() - 0.5);
+}
+
 export function sleep(ms: number) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
