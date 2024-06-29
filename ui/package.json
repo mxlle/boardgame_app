@@ -20,13 +20,13 @@
     "socket.io-client": "2.4.0"
   },
   "devDependencies": {
-    "@types/canvas-confetti": "^1.4.2",
+    "@types/canvas-confetti": "^1.6.4",
     "@types/fast-levenshtein": "0.0.1",
     "@types/http-proxy-middleware": "^0.19.3",
-    "@types/node": "^12.20.37",
-    "@types/react": "^16.14.21",
-    "@types/react-dom": "^16.9.14",
-    "@types/react-router-dom": "^5.3.2",
+    "@types/node": "^12.20.55",
+    "@types/react": "^16.14.60",
+    "@types/react-dom": "^16.9.24",
+    "@types/react-router-dom": "^5.3.3",
     "@types/shortid": "0.0.29",
     "@types/socket.io-client": "^1.4.36",
     "cross-env": "^7.0.3",
